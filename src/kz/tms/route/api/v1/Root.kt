@@ -5,6 +5,8 @@ import io.ktor.routing.*
 
 fun Route.v1() {
     route("/api/v1") {
+        docs()
+
         authentication()
 
         authenticate("token") {
