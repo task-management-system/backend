@@ -8,13 +8,9 @@ import kz.tms.database.data.user.UserService
 import org.koin.dsl.module
 
 val databaseModule = module(createdAtStart = true) {
-    single {
-        DatabaseConnector(dataSource = get())
-    }
+    single { DatabaseConnector(dataSource = get()) }
 
-    single<TransactionService> {
-        TransactionServiceImpl(databaseConnector = get())
-    }
+    single<TransactionService> { TransactionServiceImpl(databaseConnector = get()) }
 
     single { UserRepository() }
 

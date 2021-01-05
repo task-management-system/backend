@@ -1,10 +1,9 @@
-package kz.tms
+package kz.tms.utils
 
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import com.zaxxer.hikari.HikariConfig
 import java.util.*
-import kotlin.collections.HashMap
 
 class ApplicationSettings {
 
@@ -15,9 +14,9 @@ class ApplicationSettings {
         HikariConfig(databaseConfig.toProperties())
     }
 
-    val jwtConfig by lazy {
+    val jwtProperties by lazy {
         val jwtConfig = config.getConfig("jwt")
-        jwtConfig.toHashMap()
+        jwtConfig.toProperties()
     }
 
     private fun Config.toProperties(): Properties {
@@ -28,11 +27,4 @@ class ApplicationSettings {
         }
     }
 
-    private fun Config.toHashMap(): HashMap<String, String> {
-        return HashMap<String, String>().apply {
-            for (e in entrySet()) {
-                this[e.key] = getString(e.key)
-            }
-        }
-    }
 }

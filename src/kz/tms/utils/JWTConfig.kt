@@ -6,16 +6,23 @@ import com.auth0.jwt.algorithms.Algorithm
 import kz.tms.database.data.user.User
 import java.util.*
 
-class JWTConfig(jwtProperties: HashMap<String, String>) {
-    private val secret = jwtProperties["secret"]
-    private val realm = jwtProperties["realm"]
-    private val issuer = jwtProperties["issuer"]
-    private val audience = jwtProperties["audience"]
+class JWTConfig(jwtProperties: Properties) {
 
-    private val algorithm = Algorithm.HMAC256(secret)
+    val realm = jwtProperties["realm"].toString()
 
-    fun makeToken(user: User): String = JWT
-        .create()
+    private val secret = jwtProperties["secret"].toString()
+    private val issuer = jwtProperties["issuer"].toString()
+    private val audience = jwtProperties["audience"].toString()
+
+    private val algorithm = Algorithm.HMAC512(secret)
+
+    val verifier: JWTVerifier = JWT
+        .require(algorithm)
+        .withIssuer(issuer)
+        .withAudience(audience)
+        .build()
+
+    fun makeToken(user: User): String = JWT.create()
         .withSubject("Authentication")
         .withIssuer(issuer)
         .withAudience(audience)
@@ -24,9 +31,4 @@ class JWTConfig(jwtProperties: HashMap<String, String>) {
         .withExpiresAt(setAndReturnDate(Calendar.HOUR, 12))
         .sign(algorithm)
 
-    fun makeJwtVerifier(): JWTVerifier = JWT
-        .require(algorithm)
-        .withIssuer(issuer)
-        .withAudience(audience)
-        .build()
 }

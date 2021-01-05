@@ -10,7 +10,6 @@ import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransacti
 import org.jetbrains.exposed.sql.transactions.experimental.suspendedTransaction
 import javax.sql.DataSource
 
-
 class DatabaseConnector(dataSource: DataSource) {
     private val database = Database.connect(dataSource)
 
@@ -18,7 +17,7 @@ class DatabaseConnector(dataSource: DataSource) {
         UserTable
     )
 
-    //TODO Resolve copy-paste magic below
+    //TODO Разобрать копипастную магию
     init {
         runBlocking {
             newTransaction {
