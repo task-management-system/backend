@@ -3,16 +3,15 @@ package kz.tms.route.api.v1
 import io.ktor.application.*
 import io.ktor.request.*
 import io.ktor.routing.*
-import io.ktor.util.*
 import kz.tms.database.data.user.UserService
 import kz.tms.enums.MessageType
+import kz.tms.model.Message
 import kz.tms.model.authentication.AuthenticationCredential
-import kz.tms.model.response.Message
+import kz.tms.model.authentication.AuthenticationResponse
 import kz.tms.utils.JWTConfig
 import kz.tms.utils.respond
 import org.koin.ktor.ext.inject
 
-@OptIn(InternalAPI::class)
 fun Route.authentication() {
     val jwtConfig: JWTConfig by inject()
     val userService: UserService by inject()
@@ -26,7 +25,7 @@ fun Route.authentication() {
                 val token = jwtConfig.makeToken(user)
                 call.respond(
                     message = Message(MessageType.Success, "Аутентификация прошла успешно"),
-                    data = mapOf("token" to token)
+                    data = AuthenticationResponse(token, user)
                 )
             } else {
                 call.respond(
