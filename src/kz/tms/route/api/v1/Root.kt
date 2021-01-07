@@ -10,6 +10,8 @@ fun Route.v1() {
         authentication()
 
         authenticate("token") {
+            claims()
+
             user()
         }
     }
