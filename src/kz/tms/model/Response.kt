@@ -1,4 +1,4 @@
-package kz.tms.model.response
+package kz.tms.model
 
 import kz.tms.enums.MessageType
 

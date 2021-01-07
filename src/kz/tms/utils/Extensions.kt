@@ -2,8 +2,8 @@ package kz.tms.utils
 
 import io.ktor.application.*
 import io.ktor.response.*
-import kz.tms.model.response.Message
-import kz.tms.model.response.Response
+import kz.tms.model.Message
+import kz.tms.model.Response
 import java.util.*
 
 suspend fun <T> ApplicationCall.respond(

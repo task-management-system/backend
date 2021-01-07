@@ -4,7 +4,7 @@ import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.http.*
 import kz.tms.enums.MessageType
-import kz.tms.model.response.Message
+import kz.tms.model.Message
 import kz.tms.utils.respond
 
 fun Application.installStatusPages() {

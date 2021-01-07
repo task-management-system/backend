@@ -4,7 +4,7 @@ import io.ktor.application.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import kz.tms.database.data.user.UserService
-import kz.tms.model.response.Response
+import kz.tms.model.Response
 import org.koin.ktor.ext.inject
 
 fun Route.user() {
