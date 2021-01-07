@@ -5,7 +5,7 @@ import org.jetbrains.exposed.sql.selectAll
 
 class UserRepository {
     fun getAll(): List<User> {
-        return UserTable
+        return UsersTable
             .selectAll()
             .map {
                 toUser(it)
@@ -13,15 +13,15 @@ class UserRepository {
     }
 
     fun getByIdOrNull(id: Long): User? {
-        return UserTable
-            .select { UserTable.id eq id }
+        return UsersTable
+            .select { UsersTable.id eq id }
             .map { toUser(it) }
             .singleOrNull()
     }
 
     fun getByUsernameOrNull(username: String): User? {
-        return UserTable
-            .select { UserTable.username eq username }
+        return UsersTable
+            .select { UsersTable.username eq username }
             .map { toUser(it) }
             .singleOrNull()
     }
