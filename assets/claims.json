@@ -1,0 +1,12 @@
+[
+  {
+    "name": "VIEW_TASK",
+    "power": 1,
+    "text": "Просмотр задач"
+  },
+  {
+    "name": "CREATE_TASK",
+    "power": 2,
+    "text": "Создание задач"
+  }
+]
