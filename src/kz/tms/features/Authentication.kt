@@ -18,16 +18,11 @@ fun Application.installAuthentication() {
             verifier(jwtConfig.verifier)
             validate { credential ->
                 val username = credential.payload.getClaim("username").asString()
-                val password = credential.payload.getClaim("password").asString()
 
                 val user = service.getByUsernameOrNull(username)
 
                 if (user != null) {
-                    if (user.password == password) {
-                        AuthenticationPrincipal(username)
-                    } else {
-                        null
-                    }
+                    AuthenticationPrincipal(username)
                 } else {
                     null
                 }

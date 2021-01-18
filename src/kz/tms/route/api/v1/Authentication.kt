@@ -22,7 +22,7 @@ fun Route.authentication() {
 
         if (user != null) {
             if (user.password == credentials.password) {
-                val token = jwtConfig.makeToken(user)
+                val token = jwtConfig.makeToken(user.username)
                 call.respond(
                     message = Message(MessageType.Success, "Аутентификация прошла успешно"),
                     data = AuthenticationResponse(token, user)

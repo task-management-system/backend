@@ -3,7 +3,6 @@ package kz.tms.utils
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
-import kz.tms.database.data.user.User
 import java.util.*
 
 class JWTConfig(jwtProperties: Properties) {
@@ -22,12 +21,11 @@ class JWTConfig(jwtProperties: Properties) {
         .withAudience(audience)
         .build()
 
-    fun makeToken(user: User): String = JWT.create()
+    fun makeToken(username: String): String = JWT.create()
         .withSubject("Authentication")
         .withIssuer(issuer)
         .withAudience(audience)
-        .withClaim("username", user.username)
-        .withClaim("password", user.password)
+        .withClaim("username", username)
         .withExpiresAt(setAndReturnDate(Calendar.HOUR, 12))
         .sign(algorithm)
 
