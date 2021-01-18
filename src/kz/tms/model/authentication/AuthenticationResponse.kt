@@ -1,8 +1,10 @@
 package kz.tms.model.authentication
 
-import kz.tms.database.data.user.User
+import com.google.gson.annotations.SerializedName
+import kz.tms.database.data.user.UserResponse
 
 data class AuthenticationResponse(
     val token: String,
-    val user: User
+    @SerializedName("user")
+    val userResponse: UserResponse
 )

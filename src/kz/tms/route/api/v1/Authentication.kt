@@ -3,6 +3,7 @@ package kz.tms.route.api.v1
 import io.ktor.application.*
 import io.ktor.request.*
 import io.ktor.routing.*
+import kz.tms.database.data.user.UserResponse
 import kz.tms.database.data.user.UserService
 import kz.tms.enums.MessageType
 import kz.tms.model.Message
@@ -23,9 +24,10 @@ fun Route.authentication() {
         if (user != null) {
             if (user.password == credentials.password) {
                 val token = jwtConfig.makeToken(user.username)
+                val userResponse = UserResponse(user.username, user.name, user.email, user.role)
                 call.respond(
                     message = Message(MessageType.Success, "Аутентификация прошла успешно"),
-                    data = AuthenticationResponse(token, user)
+                    data = AuthenticationResponse(token, userResponse)
                 )
             } else {
                 call.respond(
