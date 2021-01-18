@@ -10,7 +10,7 @@ object UsersTable : Table("users") {
     val password = varchar("password", 50)
     val name = varchar("name", 50).nullable()
     val email = varchar("email", 50).nullable()
-    val roleId = reference("role_id", RolesTable, onDelete = ReferenceOption.CASCADE).nullable()
+    private val roleId = reference("role_id", RolesTable, onDelete = ReferenceOption.CASCADE)
 
     override val primaryKey = PrimaryKey(id, name = "user_pkey")
 }

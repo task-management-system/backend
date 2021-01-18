@@ -10,6 +10,6 @@ fun toUser(resultRow: ResultRow): User {
         password = resultRow[UsersTable.password],
         name = resultRow[UsersTable.name],
         email = resultRow[UsersTable.email],
-        role = resultRow[UsersTable.roleId]?.let { toRole(resultRow) }
+        role = toRole(resultRow)
     )
 }
