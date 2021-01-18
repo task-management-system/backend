@@ -11,7 +11,11 @@ fun Application.installStatusPages() {
     install(StatusPages) {
         status(HttpStatusCode.Unauthorized) {
             call.respond(
-                message = Message(MessageType.Error, "Дружок пирожок авторазьку то не прошел"),
+                statusCode = HttpStatusCode.Unauthorized,
+                message = Message(
+                    MessageType.Error,
+                    "Дружок пирожок авторазьку то не прошел, купи мне питсы скину лог пасс от админки"
+                ),
                 data = null
             )
         }

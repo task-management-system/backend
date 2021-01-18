@@ -10,6 +10,6 @@ fun Route.claims() {
     val service: ClaimService by inject()
 
     get("/claims") {
-        call.respond(null, service.getAll())
+        call.respond(data = service.getAll())
     }
 }
