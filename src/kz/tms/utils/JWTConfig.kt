@@ -26,7 +26,12 @@ class JWTConfig(jwtProperties: Properties) {
         .withIssuer(issuer)
         .withAudience(audience)
         .withClaim("username", username)
-        .withExpiresAt(setAndReturnDate(Calendar.HOUR, 12))
+        .withExpiresAt(getExpiresDate())
         .sign(algorithm)
 
+    private fun getExpiresDate(): Date {
+        val calendar = Calendar.getInstance()
+        calendar.set(Calendar.HOUR, 12)
+        return calendar.time
+    }
 }
