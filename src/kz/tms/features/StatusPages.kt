@@ -7,6 +7,14 @@ import kz.tms.utils.error
 
 fun Application.installStatusPages() {
     install(StatusPages) {
+        exception<Throwable> { cause ->
+            call.error<Nothing>(
+                statusCode = HttpStatusCode.BadRequest,
+                message = "Что-то пошло не так",
+                stackTrace = cause.stackTraceToString()
+            )
+        }
+
         status(HttpStatusCode.Unauthorized) {
             call.error<Nothing>(
                 statusCode = HttpStatusCode.Unauthorized,
