@@ -1,4 +1,4 @@
-package kz.tms.database.data.claims
+package kz.tms.model.claim
 
 data class Claim(
     val name: String,
