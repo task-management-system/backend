@@ -1,5 +1,6 @@
 package kz.tms.di.modules
 
+import kz.tms.authentication.AuthenticationService
 import kz.tms.database.DatabaseConnector
 import kz.tms.database.TransactionService
 import kz.tms.database.TransactionServiceImpl
@@ -23,6 +24,8 @@ val databaseModule = module(createdAtStart = true) {
     single { RoleRepository() }
 
     single { RoleService(get(), get()) }
+
+    single { AuthenticationService(get(), get(), get()) }
 
     single { ClaimRepository() }
 

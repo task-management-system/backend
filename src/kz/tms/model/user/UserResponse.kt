@@ -1,6 +1,6 @@
-package kz.tms.database.data.user
+package kz.tms.model.user
 
-import kz.tms.database.data.roles.Role
+import kz.tms.model.role.Role
 
 data class UserResponse(
     val username: String,

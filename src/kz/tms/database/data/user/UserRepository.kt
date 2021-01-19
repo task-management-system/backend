@@ -1,16 +1,27 @@
 package kz.tms.database.data.user
 
 import kz.tms.database.data.roles.RolesTable
+import kz.tms.model.user.User
+import kz.tms.model.user.UserResponse
+import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.or
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.statements.InsertStatement
 
 class UserRepository {
-    fun getAll(): List<User> {
+    fun insert(user: User): InsertStatement<Number> {
+        return UsersTable.insert { insertStatement ->
+            insertStatement.toUser(user)
+        }
+    }
+
+    fun getAll(): List<UserResponse> {
         return UsersTable
             .leftJoin(RolesTable)
             .selectAll()
             .map {
-                toUser(it)
+                toUserResponse(it)
             }
     }
 
@@ -22,10 +33,9 @@ class UserRepository {
             .singleOrNull()
     }
 
-    fun getByUsernameOrNull(username: String): User? {
+    fun getByUsernameOrByEmailOrNull(usernameOrEmail: String): User? {
         return UsersTable
-            .leftJoin(RolesTable)
-            .select { UsersTable.username eq username }
+            .select { (UsersTable.username eq usernameOrEmail) or (UsersTable.email eq usernameOrEmail) }
             .map { toUser(it) }
             .singleOrNull()
     }

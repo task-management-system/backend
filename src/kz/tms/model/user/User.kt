@@ -1,12 +1,10 @@
-package kz.tms.database.data.user
-
-import kz.tms.database.data.roles.Role
+package kz.tms.model.user
 
 data class User(
-    val id: Long,
+    val id: Long? = null,
     val username: String,
     val password: String,
     val name: String?,
     val email: String?,
-    val role: Role
+    val roleId: Long
 )

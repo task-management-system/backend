@@ -10,7 +10,7 @@ import org.koin.ktor.ext.inject
 
 fun Application.installAuthentication() {
     val jwtConfig: JWTConfig by inject()
-    val service: UserService by inject()
+    val userService: UserService by inject()
 
     install(Authentication) {
         jwt("token") {
@@ -19,7 +19,7 @@ fun Application.installAuthentication() {
             validate { credential ->
                 val username = credential.payload.getClaim("username").asString()
 
-                val user = service.getByUsernameOrNull(username)
+                val user = userService.getByUsernameOrByEmailOrNull(username)
 
                 if (user != null) {
                     AuthenticationPrincipal(username)
