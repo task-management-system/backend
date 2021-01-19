@@ -1,5 +1,6 @@
 package kz.tms.database.data.roles
 
+import kz.tms.model.role.Role
 import org.jetbrains.exposed.sql.ResultRow
 
 fun toRole(resultRow: ResultRow): Role {

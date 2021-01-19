@@ -1,4 +1,4 @@
-package kz.tms.database.data.roles
+package kz.tms.model.role
 
 data class Role(
     val power: Long,
