@@ -11,6 +11,8 @@ fun Route.user() {
     val service: UserService by inject()
 
     get("/users") {
-        call.respond(Response(null, service.getAll()))
+        call.success(
+            data = userService.getAll()
+        )
     }
 }

@@ -2,13 +2,38 @@ package kz.tms.model
 
 import kz.tms.enums.MessageType
 
-data class Response<T>(
+sealed class Response<out T>(
     val message: Message?,
-    val data: T
-)
+    val data: T?
+) {
+    class Success<T>(
+        message: String? = null,
+        data: T
+    ) : Response<T>(
+        message?.let { Message(MessageType.Success, message) },
+        data
+    )
 
-class Message(
+    class Error<T>(
+        message: String? = null,
+        data: T? = null,
+        stackTrace: String? = null
+    ) : Response<T>(
+        message?.let { Message(MessageType.Error, message, stackTrace) },
+        data
+    )
+
+    class Warning<T>(
+        message: String? = null,
+        data: T? = null
+    ) : Response<T>(
+        message?.let { Message(MessageType.Warning, message) },
+        data
+    )
+}
+
+data class Message(
     val type: MessageType,
-    val text: String
+    val text: String,
+    val stackTrace: String? = null
 )
-
