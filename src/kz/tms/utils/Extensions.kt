@@ -20,7 +20,7 @@ suspend fun <T> ApplicationCall.success(
 }
 
 suspend fun <T> ApplicationCall.error(
-    statusCode: HttpStatusCode = HttpStatusCode.OK,
+    statusCode: HttpStatusCode = HttpStatusCode.BadRequest,
     message: String? = null,
     data: T? = null,
     stackTrace: String? = null
