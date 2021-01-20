@@ -25,11 +25,11 @@ class UserRepository {
             }
     }
 
-    fun getByIdOrNull(id: Long): User? {
+    fun getByIdOrNull(id: Long): UserResponse? {
         return UsersTable
             .leftJoin(RolesTable)
             .select { UsersTable.id eq id }
-            .map { toUser(it) }
+            .map { toUserResponse(it) }
             .singleOrNull()
     }
 

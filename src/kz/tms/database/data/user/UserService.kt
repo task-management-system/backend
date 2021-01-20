@@ -21,7 +21,7 @@ class UserService(
         }
     }
 
-    suspend fun getByIdOrNull(id: Long): User? {
+    suspend fun getByIdOrNull(id: Long): UserResponse? {
         return transactionService.transaction {
             repository.getByIdOrNull(id)
         }

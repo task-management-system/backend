@@ -21,6 +21,7 @@ fun toUser(resultRow: ResultRow): User {
 
 fun toUserResponse(resultRow: ResultRow): UserResponse {
     return UserResponse(
+        id = resultRow[UsersTable.id],
         username = resultRow[UsersTable.username],
         name = resultRow[UsersTable.name],
         email = resultRow[UsersTable.email],
@@ -30,6 +31,7 @@ fun toUserResponse(resultRow: ResultRow): UserResponse {
 
 fun toUserResponse(user: User, role: Role): UserResponse {
     return UserResponse(
+        id = user.id,
         username = user.username,
         name = user.name,
         email = user.email,
@@ -39,6 +41,7 @@ fun toUserResponse(user: User, role: Role): UserResponse {
 
 infix fun User.merge(role: Role): UserResponse {
     return UserResponse(
+        id = id,
         username = username,
         name = name,
         email = email,
