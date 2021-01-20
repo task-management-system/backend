@@ -13,10 +13,11 @@ suspend fun <T> ApplicationCall.respond(
 }
 
 suspend fun <T> ApplicationCall.success(
+    statusCode: HttpStatusCode = HttpStatusCode.OK,
     message: String? = null,
     data: T? = null
 ) {
-    respond(message = Response.Success(message, data))
+    respond(statusCode = statusCode, response = Response.Success(message, data))
 }
 
 suspend fun <T> ApplicationCall.error(
@@ -25,7 +26,7 @@ suspend fun <T> ApplicationCall.error(
     data: T? = null,
     stackTrace: String? = null
 ) {
-    respond(status = statusCode, message = Response.Error(message, data, stackTrace))
+    respond(statusCode = statusCode, response = Response.Error(message, data, stackTrace))
 }
 
 suspend fun <T> ApplicationCall.warning(
@@ -33,5 +34,5 @@ suspend fun <T> ApplicationCall.warning(
     message: String? = null,
     data: T? = null
 ) {
-    respond(status = statusCode, message = Response.Warning(message, data))
+    respond(statusCode = statusCode, response = Response.Warning(message, data))
 }
