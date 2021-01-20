@@ -1,6 +1,7 @@
 package kz.tms.route.api.v1
 
 import io.ktor.application.*
+import io.ktor.auth.*
 import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
@@ -18,37 +19,52 @@ fun Route.user() {
     val userService: UserService by inject()
     val roleService: RoleService by inject()
 
-    put("/insert_user") {
-        val userPayload = call.receive<UserPayload>()
-        val roleId = roleService.getIdByPowerOrNull(userPayload.rolePower) ?: return@put call.error<Nothing>(
-            message = "Не удалось найти роль"
-        )
+    route("/user") {
+        get {
+            val id = call.parameters["id"]?.toLong() ?: return@get call.warning<Nothing>(
+                message = "Укажите идентификатор пользователя",
+            )
 
-        val user = userPayload merge roleId
-        val insertResult = userService.insert(user)
+            val user = userService.getByIdOrNull(id) ?: return@get call.error<Nothing>(
+                message = "Не удалось найти пользователя по указанному идентификатору"
+            )
 
-        call.success(
-            statusCode = HttpStatusCode.Accepted,
-            message = "Данные успешно добавлены",
-            data = insertResult.resultedValues
-        )
-    }
+            call.success(data = user)
+        }
 
-    get("/user") {
-        val id = call.parameters["id"]?.toLong() ?: return@get call.warning<Nothing>(
-            message = "Укажите идентификатор пользователя",
-        )
+        put {
+            val userPayload = call.receive<UserPayload>()
+            val roleId = roleService.getIdByPowerOrNull(userPayload.rolePower) ?: return@put call.error<Nothing>(
+                message = "Не удалось найти роль"
+            )
 
-        val user = userService.getByIdOrNull(id) ?: return@get call.error<Nothing>(
-            message = "Не удалось найти пользователя по указанному идентификатору"
-        )
+            val user = userPayload merge roleId
+            val insertResult = userService.insert(user)
 
-        call.success(data = user)
+            call.success(
+                statusCode = HttpStatusCode.Accepted,
+                message = "Пользователь успешно добавлен",
+                data = insertResult.resultedValues
+            )
+        }
+
+        delete {
+            val id = call.parameters["id"]?.toLong() ?: return@delete call.warning<Nothing>(
+                message = "Укажите идентификатор пользователя",
+            )
+
+            when (userService.deleteById(id) != 0) {
+                true -> call.success<Nothing>(
+                    message = "Пользователь успешно удален"
+                )
+                false -> call.error<Nothing>(
+                    message = "Не удалось удалить пользователя, возможно его и не существует вовсе ¯\\_(ツ)_/¯"
+                )
+            }
+        }
     }
 
     get("/users") {
-        call.success(
-            data = userService.getAll()
-        )
+        call.success(data = userService.getAll())
     }
 }

@@ -15,6 +15,12 @@ class UserService(
         }
     }
 
+    suspend fun deleteById(id: Long): Int {
+        return transactionService.transaction {
+            repository.deleteById(id)
+        }
+    }
+
     suspend fun getAll(): List<UserResponse> {
         return transactionService.transaction {
             repository.getAll()
