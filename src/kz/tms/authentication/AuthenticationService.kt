@@ -14,26 +14,21 @@ class AuthenticationService(
     private val roleService: RoleService
 ) {
     suspend fun authenticate(credentials: AuthenticationCredential): Response<AuthenticationResponse> {
-        val user = userService.getByUsernameOrByEmailOrNull(credentials.usernameOrEmail)
+        val user = userService.getByUsernameOrByEmailOrNull(credentials.usernameOrEmail) ?: return Response.Error(
+            message = "Пользователь с указанным логином/почтой не найден, проверьте корректность введенных данных"
+        )
 
-        return when (user != null) {
+        return when (credentials.password == user.password) {
             true -> {
-                when (credentials.password == user.password) {
-                    true -> {
-                        val token = jwtConfig.makeToken(user.username)
-                        val role = roleService.getRoleById(user.roleId)
-                        Response.Success(
-                            message = "Аутентификация прошла успешно",
-                            data = AuthenticationResponse(token, user merge role)
-                        )
-                    }
-                    false -> Response.Error(
-                        message = "Вы ввели неверный пароль"
-                    )
-                }
+                val token = jwtConfig.makeToken(user.username)
+                val role = roleService.getRoleById(user.roleId)
+                Response.Success(
+                    message = "Аутентификация прошла успешно",
+                    data = AuthenticationResponse(token, user merge role)
+                )
             }
             false -> Response.Error(
-                message = "Пользователь с указанным логином/почтой не найден, проверьте корректность введенных данных"
+                message = "Вы ввели неверный пароль"
             )
         }
     }
