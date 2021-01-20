@@ -1,6 +1,7 @@
 package kz.tms.route.api.v1
 
 import io.ktor.application.*
+import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
@@ -19,18 +20,15 @@ fun Route.user() {
 
     put("/insert_user") {
         val userPayload = call.receive<UserPayload>()
-        val roleId = roleService.getIdByPowerOrNull(userPayload.rolePower)
-
-        if (roleId == null) {
-            call.error<Nothing>(
-                message = "Не удалось найти роль"
-            )
-            return@put
-        }
+        val roleId = roleService.getIdByPowerOrNull(userPayload.rolePower) ?: return@put call.error<Nothing>(
+            message = "Не удалось найти роль"
+        )
 
         val user = userPayload merge roleId
         val insertResult = userService.insert(user)
+
         call.success(
+            statusCode = HttpStatusCode.Accepted,
             message = "Данные успешно добавлены",
             data = insertResult.resultedValues
         )
