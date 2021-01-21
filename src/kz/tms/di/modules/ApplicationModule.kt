@@ -3,6 +3,7 @@ package kz.tms.di.modules
 import com.zaxxer.hikari.HikariDataSource
 import kz.tms.utils.ApplicationSettings
 import kz.tms.utils.JWTConfig
+import kz.tms.utils.Permission
 import org.koin.dsl.module
 import javax.sql.DataSource
 
@@ -12,4 +13,6 @@ val applicationModule = module(createdAtStart = true) {
     single<DataSource> { HikariDataSource(get<ApplicationSettings>().databaseConfig) }
 
     single { JWTConfig(jwtProperties = get<ApplicationSettings>().jwtProperties) }
+
+    single { Permission.Companion }
 }
