@@ -10,7 +10,7 @@ fun Route.v1() {
         authentication()
 
         authenticate("token") {
-            claims()
+            permission()
 
             user()
         }
