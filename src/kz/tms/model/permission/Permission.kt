@@ -1,6 +1,6 @@
-package kz.tms.model.claim
+package kz.tms.model.permission
 
-data class Claim(
+data class Permission(
     val name: String,
     val power: Long,
     val text: String
