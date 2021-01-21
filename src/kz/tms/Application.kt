@@ -52,6 +52,10 @@ private fun Application.setRestAPI() {
     //TODO Научиться писать собственные фичи, а не вот это вот все
     installAuthentication()
 
+    install(PermissionFeature) {
+        register { principal -> principal.power }
+    }
+
     installStatusPages()
 
     installRouting()
