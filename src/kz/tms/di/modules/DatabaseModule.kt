@@ -4,8 +4,8 @@ import kz.tms.authentication.AuthenticationService
 import kz.tms.database.DatabaseConnector
 import kz.tms.database.TransactionService
 import kz.tms.database.TransactionServiceImpl
-import kz.tms.database.data.claims.ClaimRepository
-import kz.tms.database.data.claims.ClaimService
+import kz.tms.database.data.permission.PermissionRepository
+import kz.tms.database.data.permission.PermissionService
 import kz.tms.database.data.roles.RoleRepository
 import kz.tms.database.data.roles.RoleService
 import kz.tms.database.data.user.UserRepository
@@ -27,7 +27,7 @@ val databaseModule = module(createdAtStart = true) {
 
     single { AuthenticationService(get(), get(), get()) }
 
-    single { ClaimRepository() }
+    single { PermissionRepository() }
 
-    single { ClaimService(get(), get()) }
+    single { PermissionService(get(), get()) }
 }
