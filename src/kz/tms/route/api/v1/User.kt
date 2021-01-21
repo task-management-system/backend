@@ -42,7 +42,7 @@ fun Route.user() {
             val insertResult = userService.insert(user)
 
             call.success(
-                statusCode = HttpStatusCode.Accepted,
+                statusCode = HttpStatusCode.Created,
                 message = "Пользователь успешно добавлен",
                 data = insertResult.resultedValues
             )
