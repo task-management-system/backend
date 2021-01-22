@@ -15,6 +15,7 @@ fun toUser(resultRow: ResultRow): User {
         password = resultRow[UserTable.password],
         name = resultRow[UserTable.name],
         email = resultRow[UserTable.email],
+        isActive = resultRow[UserTable.isActive],
         roleId = resultRow[UserTable.roleId]
     )
 }
@@ -25,17 +26,8 @@ fun toUserResponse(resultRow: ResultRow): UserResponse {
         username = resultRow[UserTable.username],
         name = resultRow[UserTable.name],
         email = resultRow[UserTable.email],
+        isActive = resultRow[UserTable.isActive],
         role = toRole(resultRow)
-    )
-}
-
-fun toUserResponse(user: User, role: Role): UserResponse {
-    return UserResponse(
-        id = user.id,
-        username = user.username,
-        name = user.name,
-        email = user.email,
-        role = role
     )
 }
 
@@ -45,17 +37,8 @@ infix fun User.merge(role: Role): UserResponse {
         username = username,
         name = name,
         email = email,
+        isActive = isActive,
         role = role
-    )
-}
-
-fun toUser(userPayload: UserPayload, roleId: Long): User {
-    return User(
-        username = userPayload.username,
-        password = userPayload.password,
-        name = userPayload.name,
-        email = userPayload.email,
-        roleId = roleId
     )
 }
 
@@ -65,6 +48,7 @@ infix fun UserPayload.merge(roleId: Long): User {
         password = password,
         name = name,
         email = email,
+        isActive = isActive ?: false,
         roleId = roleId
     )
 }
@@ -75,6 +59,7 @@ fun InsertStatement<Number>.toUser(user: User) {
         it[UserTable.password] = user.password
         it[UserTable.name] = user.name
         it[UserTable.email] = user.email
+        it[UserTable.isActive] = user.isActive
         it[UserTable.roleId] = user.roleId
     }
 }
