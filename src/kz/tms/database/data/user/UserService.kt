@@ -15,6 +15,12 @@ class UserService(
         }
     }
 
+    suspend fun updateById(id: Long, user: User): Int {
+        return transactionService.transaction {
+            repository.updateById(id, user)
+        }
+    }
+
     suspend fun deleteById(id: Long): Int {
         return transactionService.transaction {
             repository.deleteById(id)

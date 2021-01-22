@@ -13,6 +13,17 @@ class UserRepository {
         }
     }
 
+    fun updateById(id: Long, user: User): Int {
+        return UserTable.update(
+            where = {
+                UserTable.id eq id
+            },
+            body = { updateStatement ->
+                updateStatement.toUser(user)
+            }
+        )
+    }
+
     fun deleteById(id: Long): Int {
         return UserTable.deleteWhere {
             UserTable.id eq id

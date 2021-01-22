@@ -19,7 +19,6 @@ fun Route.user() {
     val roleService: RoleService by inject()
 
     route("/user") {
-
         withPermission(Permission.ViewUser.power) {
             get {
                 val id = call.parameters["id"]?.toLong() ?: return@get call.warning<Nothing>(
@@ -64,6 +63,30 @@ fun Route.user() {
                     )
                     false -> call.error<Nothing>(
                         message = "Не удалось удалить пользователя, возможно его и не существует вовсе ¯\\_(ツ)_/¯"
+                    )
+                }
+            }
+        }
+
+        withPermission(Permission.UpdateUser.power) {
+            patch {
+                val id = call.parameters["id"]?.toLong() ?: return@patch call.error<Nothing>(
+                    message = "Укажите идентификатор пользователя"
+                )
+                val userPayload = call.receive<UserPayload>()
+                val roleId = roleService.getIdByPowerOrNull(userPayload.rolePower) ?: return@patch call.error<Nothing>(
+                    message = "Не удалось найти роль"
+                )
+
+                val user = userPayload merge roleId
+
+                when (userService.updateById(id, user) != 0) {
+                    true -> call.success<Nothing>(
+                        statusCode = HttpStatusCode.Created,
+                        message = "Пользователь успешно обновлен"
+                    )
+                    false -> call.error<Nothing>(
+                        message = "Не удалось обновить данные пользователя, возможно его и не существует вовсе ¯\\_(ツ)_/¯"
                     )
                 }
             }
