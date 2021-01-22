@@ -3,16 +3,21 @@ package kz.tms.database.data.user
 import kz.tms.database.TransactionService
 import kz.tms.model.user.User
 import kz.tms.model.user.UserResponse
-import org.jetbrains.exposed.sql.statements.InsertStatement
 
 class UserService(
     private val transactionService: TransactionService,
     private val repository: UserRepository
 ) {
-    suspend fun insert(user: User): InsertStatement<Number> {
+    suspend fun insert(user: User): Int {
         return transactionService.transaction {
             repository.insert(user)
-        }
+        }?.size ?: 0
+    }
+
+    suspend fun batchInsert(users: List<User>): Int {
+        return transactionService.transaction {
+            repository.batchInsert(users)
+        }.size
     }
 
     suspend fun updateById(id: Long, user: User): Int {
