@@ -5,5 +5,5 @@ data class UserPayload(
     val password: String,
     val name: String?,
     val email: String?,
-    val rolePower: Long
+    val rolePower: Int
 )

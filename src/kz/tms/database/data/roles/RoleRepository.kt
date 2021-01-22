@@ -4,10 +4,10 @@ import kz.tms.model.role.Role
 import org.jetbrains.exposed.sql.select
 
 class RoleRepository {
-    fun getIdByPowerOrNull(power: Long): Long? {
+    fun getIdByPowerOrNull(power: Int): Long? {
         return RolesTable
             .select { RolesTable.power eq power }
-            .map { it[RolesTable.power] }
+            .map { it[RolesTable.id].value }
             .singleOrNull()
     }
 

@@ -27,7 +27,7 @@ fun Application.installAuthentication() {
                 }
 
                 if (user != null) {
-                    AuthenticationPrincipal(username, role?.power ?: 0L)
+                    AuthenticationPrincipal(username, role?.power ?: 0)
                 } else {
                     null
                 }

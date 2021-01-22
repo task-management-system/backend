@@ -4,5 +4,5 @@ import io.ktor.auth.*
 
 class AuthenticationPrincipal(
     val username: String,
-    val power: Long
+    val power: Int
 ) : Principal

@@ -1,30 +1,25 @@
 package kz.tms.utils
 
-class Permission {
+class Permission(
+    val name: String,
+    val power: Int,
+    val description: String
+) {
     companion object {
         //@formatter:off
-        const val ViewTask  : Long = 1 shl 0
-        const val CreateTask: Long = 1 shl 1
-        const val DeleteTask: Long = 1 shl 2
-        const val ViewUser  : Long = 1 shl 3
-        const val InsertUser: Long = 1 shl 4
-        const val DeleteUser: Long = 1 shl 5
+        val ViewTask   = Permission("ViewTask",   1 shl 0, "Просмотр задач"         )
+        val CreateTask = Permission("CreateTask", 1 shl 1, "Создание задач"         )
+        val DeleteTask = Permission("DeleteTask", 1 shl 2, "Удаление задач"         )
+        val ViewUser   = Permission("ViewUser",   1 shl 3, "Просмотр пользователя"  )
+        val InsertUser = Permission("InsertUser", 1 shl 4, "Добавление пользователя")
+        val DeleteUser = Permission("DeleteUser", 1 shl 5, "Удаление пользователя"  )
         //@formatter:on
 
-        val pair = allKeysAndValues()
+        val all = allPermissions()
     }
 }
 
-private fun allKeys(): List<String> = listOf(
-    "ViewTask",
-    "CreateTask",
-    "DeleteTask",
-    "ViewUser",
-    "InsertUser",
-    "DeleteUser"
-)
-
-private fun allValues(): List<Long> = listOf(
+internal fun allPermissions() = listOf(
     Permission.ViewTask,
     Permission.CreateTask,
     Permission.DeleteTask,
@@ -32,18 +27,3 @@ private fun allValues(): List<Long> = listOf(
     Permission.InsertUser,
     Permission.DeleteUser
 )
-
-internal fun allKeysAndValues(): List<Pair<String, Long>> {
-    val pairs = arrayListOf<Pair<String, Long>>()
-
-    val keys = allKeys()
-    val values = allValues()
-
-    if (keys.size != values.size) throw RuntimeException()
-
-    for (i in keys.indices) {
-        pairs.add(keys[i] to values[i])
-    }
-
-    return pairs
-}

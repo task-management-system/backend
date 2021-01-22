@@ -12,26 +12,26 @@ class PermissionFeature(config: Configuration) {
     private val permission = config.permission
 
     class Configuration {
-        internal var permission: (AuthenticationPrincipal) -> Long = { 0L }
+        internal var permission: (AuthenticationPrincipal) -> Int = { 0 }
 
-        fun register(block: (AuthenticationPrincipal) -> Long) {
+        fun register(block: (AuthenticationPrincipal) -> Int) {
             permission = block
         }
     }
 
     fun interceptPipeline(
         pipeline: ApplicationCallPipeline,
-        permission: Long
+        permission: Int
     ) {
         pipeline.insertPhaseAfter(ApplicationCallPipeline.Features, Authentication.ChallengePhase)
         pipeline.insertPhaseAfter(Authentication.ChallengePhase, AuthorizationPhase)
 
         pipeline.intercept(AuthorizationPhase) {
             val principal = call.authentication.principal<AuthenticationPrincipal>()
-                ?: throw PermissionException("У вас недостаточно прав для данной операции")
+                ?: throw PermissionException("Не удалось найти авторизационные данные")
             val role = permission(principal)
 
-            if (permission and role == 0L) throw PermissionException("Not stonk enough, gerarahere bitch")
+            if (permission and role == 0) throw PermissionException("У вас недостаточно прав для данной операции")
         }
     }
 
@@ -59,7 +59,7 @@ class PermissionRouteSelector(
 }
 
 private fun Route.authorizedRoute(
-    permission: Long,
+    permission: Int,
     build: Route.() -> Unit
 ): Route {
     val authorizedRoute = createChild(PermissionRouteSelector(permission.toString()))
@@ -68,11 +68,6 @@ private fun Route.authorizedRoute(
     return authorizedRoute
 }
 
-fun Route.withPermission(permission: Long, build: Route.() -> Unit): Route {
+fun Route.withPermission(permission: Int, build: Route.() -> Unit): Route {
     return authorizedRoute(permission = permission, build = build)
 }
-
-//TODO А оно нужно?
-//fun Route.withoutRole(vararg roles: Long, build: Route.() -> Unit): Route {
-//    return authorizedRoute()
-//}

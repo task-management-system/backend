@@ -20,7 +20,7 @@ fun Route.user() {
 
     route("/user") {
 
-        withPermission(Permission.ViewUser) {
+        withPermission(Permission.ViewUser.power) {
             get {
                 val id = call.parameters["id"]?.toLong() ?: return@get call.warning<Nothing>(
                     message = "Укажите идентификатор пользователя",
@@ -34,7 +34,7 @@ fun Route.user() {
             }
         }
 
-        withPermission(Permission.InsertUser) {
+        withPermission(Permission.InsertUser.power) {
             put {
                 val userPayload = call.receive<UserPayload>()
                 val roleId = roleService.getIdByPowerOrNull(userPayload.rolePower) ?: return@put call.error<Nothing>(
@@ -52,7 +52,7 @@ fun Route.user() {
             }
         }
 
-        withPermission(Permission.DeleteUser) {
+        withPermission(Permission.DeleteUser.power) {
             delete {
                 val id = call.parameters["id"]?.toLong() ?: return@delete call.warning<Nothing>(
                     message = "Укажите идентификатор пользователя",
@@ -70,7 +70,7 @@ fun Route.user() {
         }
     }
 
-    withPermission(Permission.ViewUser) {
+    withPermission(Permission.ViewUser.power) {
         get("/users") {
             call.success(data = userService.getAll())
         }
