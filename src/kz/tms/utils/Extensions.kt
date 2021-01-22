@@ -38,19 +38,65 @@ suspend fun <T> ApplicationCall.warning(
     respond(statusCode = statusCode, response = Response.Warning(message, data))
 }
 
-suspend fun Int.patchCall(
+suspend fun Int.respond(
     context: PipelineContext<Unit, ApplicationCall>,
-    successMessage: String? = null,
-    errorMessage: String? = null
+    successMessage: String,
+    errorMessage: String,
+    successStatusCode: HttpStatusCode,
+    errorStatusCode: HttpStatusCode,
 ) {
     context.apply {
-        when (this@patchCall != 0) {
+        when (this@respond != 0) {
             true -> call.success<Nothing>(
-                message = successMessage ?: "Данные успешно обновлены"
+                statusCode = successStatusCode,
+                message = successMessage
             )
             false -> call.error<Nothing>(
-                message = errorMessage ?: "Не удалось обновить данные"
+                statusCode = errorStatusCode,
+                message = errorMessage
             )
         }
     }
+}
+
+suspend fun Int.insertRespond(
+    context: PipelineContext<Unit, ApplicationCall>,
+    successStatusCode: HttpStatusCode = HttpStatusCode.Created,
+    errorStatusCode: HttpStatusCode = HttpStatusCode.InternalServerError,
+) {
+    respond(
+        context = context,
+        successMessage = "Данные успешно добавлены",
+        errorMessage = "Не удалось добавить данные",
+        successStatusCode = successStatusCode,
+        errorStatusCode = errorStatusCode
+    )
+}
+
+suspend fun Int.updateRespond(
+    context: PipelineContext<Unit, ApplicationCall>,
+    successStatusCode: HttpStatusCode = HttpStatusCode.OK,
+    errorStatusCode: HttpStatusCode = HttpStatusCode.InternalServerError,
+) {
+    respond(
+        context = context,
+        successMessage = "Данные успешно обновлены",
+        errorMessage = "Не удалось обновить данные",
+        successStatusCode = successStatusCode,
+        errorStatusCode = errorStatusCode
+    )
+}
+
+suspend fun Int.deleteRespond(
+    context: PipelineContext<Unit, ApplicationCall>,
+    successStatusCode: HttpStatusCode = HttpStatusCode.OK,
+    errorStatusCode: HttpStatusCode = HttpStatusCode.InternalServerError,
+) {
+    respond(
+        context = context,
+        successMessage = "Данные успешно удалены",
+        errorMessage = "Не удалось удалить данные",
+        successStatusCode = successStatusCode,
+        errorStatusCode = errorStatusCode
+    )
 }
