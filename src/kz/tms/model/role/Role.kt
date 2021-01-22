@@ -1,6 +1,6 @@
 package kz.tms.model.role
 
 data class Role(
-    val power: Long,
+    val power: Int,
     val text: String
 )

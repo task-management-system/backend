@@ -7,7 +7,7 @@ class RoleService(
     private val transactionService: TransactionService,
     private val repository: RoleRepository
 ) {
-    suspend fun getIdByPowerOrNull(power: Long): Long? {
+    suspend fun getIdByPowerOrNull(power: Int): Long? {
         return transactionService.transaction {
             repository.getIdByPowerOrNull(power)
         }

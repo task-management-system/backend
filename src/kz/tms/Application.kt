@@ -6,6 +6,7 @@ import io.ktor.gson.*
 import io.ktor.server.netty.*
 import kz.tms.di.modules.applicationModule
 import kz.tms.di.modules.databaseModule
+import kz.tms.features.PermissionFeature
 import kz.tms.features.installAuthentication
 import kz.tms.features.installRouting
 import kz.tms.features.installStatusPages
@@ -43,10 +44,11 @@ private fun Application.setRestAPI() {
     //TODO Научиться писать собственные фичи, а не вот это вот все
     installAuthentication()
 
+    install(PermissionFeature) {
+        register { principal -> principal.power }
+    }
+
     installStatusPages()
 
     installRouting()
 }
-
-
-
