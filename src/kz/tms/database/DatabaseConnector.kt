@@ -2,7 +2,7 @@ package kz.tms.database
 
 import kotlinx.coroutines.runBlocking
 import kz.tms.database.data.roles.RolesTable
-import kz.tms.database.data.user.UsersTable
+import kz.tms.database.data.user.UserTable
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.Transaction
@@ -15,7 +15,7 @@ class DatabaseConnector(dataSource: DataSource) {
     private val database = Database.connect(dataSource)
 
     private val tables = arrayOf(
-        UsersTable,
+        UserTable,
         RolesTable
     )
 

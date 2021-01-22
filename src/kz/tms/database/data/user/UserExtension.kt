@@ -10,21 +10,21 @@ import org.jetbrains.exposed.sql.statements.InsertStatement
 
 fun toUser(resultRow: ResultRow): User {
     return User(
-        id = resultRow[UsersTable.id],
-        username = resultRow[UsersTable.username],
-        password = resultRow[UsersTable.password],
-        name = resultRow[UsersTable.name],
-        email = resultRow[UsersTable.email],
-        roleId = resultRow[UsersTable.roleId]
+        id = resultRow[UserTable.id],
+        username = resultRow[UserTable.username],
+        password = resultRow[UserTable.password],
+        name = resultRow[UserTable.name],
+        email = resultRow[UserTable.email],
+        roleId = resultRow[UserTable.roleId]
     )
 }
 
 fun toUserResponse(resultRow: ResultRow): UserResponse {
     return UserResponse(
-        id = resultRow[UsersTable.id],
-        username = resultRow[UsersTable.username],
-        name = resultRow[UsersTable.name],
-        email = resultRow[UsersTable.email],
+        id = resultRow[UserTable.id],
+        username = resultRow[UserTable.username],
+        name = resultRow[UserTable.name],
+        email = resultRow[UserTable.email],
         role = toRole(resultRow)
     )
 }
@@ -71,10 +71,10 @@ infix fun UserPayload.merge(roleId: Long): User {
 
 fun InsertStatement<Number>.toUser(user: User) {
     let {
-        it[UsersTable.username] = user.username
-        it[UsersTable.password] = user.password
-        it[UsersTable.name] = user.name
-        it[UsersTable.email] = user.email
-        it[UsersTable.roleId] = user.roleId
+        it[UserTable.username] = user.username
+        it[UserTable.password] = user.password
+        it[UserTable.name] = user.name
+        it[UserTable.email] = user.email
+        it[UserTable.roleId] = user.roleId
     }
 }

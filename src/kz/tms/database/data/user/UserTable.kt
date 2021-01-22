@@ -4,7 +4,7 @@ import kz.tms.database.data.roles.RolesTable
 import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.Table
 
-object UsersTable : Table("users") {
+object UserTable : Table("user") {
     val id = long("id").autoIncrement()
     val username = varchar("username", 50)
     val password = varchar("password", 50)

@@ -8,19 +8,19 @@ import org.jetbrains.exposed.sql.statements.InsertStatement
 
 class UserRepository {
     fun insert(user: User): InsertStatement<Number> {
-        return UsersTable.insert { insertStatement ->
+        return UserTable.insert { insertStatement ->
             insertStatement.toUser(user)
         }
     }
 
     fun deleteById(id: Long): Int {
-        return UsersTable.deleteWhere {
-            UsersTable.id eq id
+        return UserTable.deleteWhere {
+            UserTable.id eq id
         }
     }
 
     fun getAll(): List<UserResponse> {
-        return UsersTable
+        return UserTable
             .leftJoin(RolesTable)
             .selectAll()
             .map {
@@ -29,16 +29,16 @@ class UserRepository {
     }
 
     fun getByIdOrNull(id: Long): UserResponse? {
-        return UsersTable
+        return UserTable
             .leftJoin(RolesTable)
-            .select { UsersTable.id eq id }
+            .select { UserTable.id eq id }
             .map { toUserResponse(it) }
             .singleOrNull()
     }
 
     fun getByUsernameOrByEmailOrNull(usernameOrEmail: String): User? {
-        return UsersTable
-            .select { (UsersTable.username eq usernameOrEmail) or (UsersTable.email eq usernameOrEmail) }
+        return UserTable
+            .select { (UserTable.username eq usernameOrEmail) or (UserTable.email eq usernameOrEmail) }
             .map { toUser(it) }
             .singleOrNull()
     }
