@@ -29,6 +29,8 @@ fun Application.installStatusPages() {
         }
 
         exception<Throwable> { e ->
+            //TODO configure with build variant
+            e.printStackTrace()
             call.error<Nothing>(
                 statusCode = HttpStatusCode.InternalServerError,
                 message = "Что-то пошло не так",

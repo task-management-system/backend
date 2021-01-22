@@ -42,13 +42,7 @@ fun Route.user() {
                 )
 
                 val user = userPayload merge roleId
-                val insertResult = userService.insert(user)
-
-                call.success(
-                    statusCode = HttpStatusCode.Created,
-                    message = "Пользователь успешно добавлен",
-                    data = insertResult.resultedValues
-                )
+                userService.insert(user).insertRespond(this)
             }
         }
 
@@ -58,14 +52,7 @@ fun Route.user() {
                     message = "Укажите идентификатор пользователя",
                 )
 
-                when (userService.deleteById(id) != 0) {
-                    true -> call.success<Nothing>(
-                        message = "Пользователь успешно удален"
-                    )
-                    false -> call.error<Nothing>(
-                        message = "Не удалось удалить пользователя, возможно его и не существует вовсе ¯\\_(ツ)_/¯"
-                    )
-                }
+                userService.deleteById(id).deleteRespond(this)
             }
         }
 
@@ -81,14 +68,7 @@ fun Route.user() {
 
                 val user = userPayload merge roleId
 
-                when (userService.updateById(id, user) != 0) {
-                    true -> call.success<Nothing>(
-                        message = "Пользователь успешно обновлен"
-                    )
-                    false -> call.error<Nothing>(
-                        message = "Не удалось обновить данные пользователя, возможно его и не существует вовсе ¯\\_(ツ)_/¯"
-                    )
-                }
+                userService.updateById(id, user).updateRespond(this)
             }
         }
 
@@ -98,7 +78,7 @@ fun Route.user() {
                     message = "Укажите идентификатор пользователя"
                 )
 
-                userService.lock(id).patchCall(
+                userService.lock(id).respond(
                     context = this,
                     successMessage = "Пользователь заблокирован",
                     errorMessage = "Не удалось заблокировать пользователя"
@@ -110,7 +90,7 @@ fun Route.user() {
                     message = "Укажите идентификатор пользователя"
                 )
 
-                userService.unlock(id).patchCall(
+                userService.unlock(id).respond(
                     context = this,
                     successMessage = "Пользователь разблокирован",
                     errorMessage = "Не удалось разблокировать пользователя"
@@ -120,8 +100,26 @@ fun Route.user() {
     }
 
     withPermission(Permission.ViewUser.power) {
-        get("/users") {
-            call.success(data = userService.getAll())
+        route("/users") {
+            get {
+                call.success(data = userService.getAll())
+            }
+
+            put {
+                val userPayloads = call.receive<Array<UserPayload>>()
+                val roleIds = arrayListOf<Long>()
+                userPayloads.forEachIndexed { index, item ->
+                    val roleId = roleService.getIdByPowerOrNull(item.rolePower) ?: return@put call.error(
+                        message = "Не удалось найти роль по индексу $index",
+                        data = mapOf("index" to index)
+                    )
+                    roleIds.add(roleId)
+                }
+
+                val users = userPayloads merge roleIds
+
+                userService.batchInsert(users).insertRespond(this)
+            }
         }
     }
 }

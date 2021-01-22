@@ -6,6 +6,7 @@ import kz.tms.model.user.User
 import kz.tms.model.user.UserPayload
 import kz.tms.model.user.UserResponse
 import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.statements.BatchInsertStatement
 import org.jetbrains.exposed.sql.statements.InsertStatement
 import org.jetbrains.exposed.sql.statements.UpdateStatement
 
@@ -54,7 +55,26 @@ infix fun UserPayload.merge(roleId: Long): User {
     )
 }
 
+infix fun Array<UserPayload>.merge(roleIds: List<Long>): List<User> {
+    val resultList = arrayListOf<User>()
+    for (i in roleIds.indices) {
+        resultList.add(this[i] merge roleIds[i])
+    }
+    return resultList
+}
+
 fun InsertStatement<Number>.toUser(user: User) {
+    let {
+        it[UserTable.username] = user.username
+        it[UserTable.password] = user.password
+        it[UserTable.name] = user.name
+        it[UserTable.email] = user.email
+        it[UserTable.isActive] = user.isActive
+        it[UserTable.roleId] = user.roleId
+    }
+}
+
+fun BatchInsertStatement.toUser(user: User) {
     let {
         it[UserTable.username] = user.username
         it[UserTable.password] = user.password

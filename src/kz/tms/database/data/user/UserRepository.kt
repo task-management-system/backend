@@ -4,37 +4,38 @@ import kz.tms.database.data.roles.RolesTable
 import kz.tms.model.user.User
 import kz.tms.model.user.UserResponse
 import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.statements.InsertStatement
 
 class UserRepository {
-    fun insert(user: User): InsertStatement<Number> {
+    fun insert(user: User): List<ResultRow>? {
         return UserTable.insert { insertStatement ->
             insertStatement.toUser(user)
+        }.resultedValues
+    }
+
+    fun batchInsert(users: List<User>): List<ResultRow> {
+        return UserTable.batchInsert(users) { user ->
+            toUser(user)
         }
     }
 
     fun updateById(id: Long, user: User): Int {
         return UserTable.update(
-            where = {
-                UserTable.id eq id
-            },
-            body = { updateStatement ->
-                updateStatement.toUser(user)
-            }
+            where = { UserTable.id eq id },
+            body = { statement -> statement.toUser(user) }
         )
     }
 
     fun lock(id: Long): Int {
         return UserTable.update(
             where = { UserTable.id eq id },
-            body = { it[isActive] = false }
+            body = { statement -> statement[isActive] = false }
         )
     }
 
     fun unlock(id: Long): Int {
         return UserTable.update(
             where = { UserTable.id eq id },
-            body = { it[isActive] = true }
+            body = { statement -> statement[isActive] = true }
         )
     }
 
