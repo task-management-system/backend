@@ -5,6 +5,10 @@ class Permission(
     val power: Int,
     val description: String
 ) {
+    /**
+     * After adding new permission
+     * Don't forget update [allPermissions] list
+     */
     companion object {
         //@formatter:off
         val ViewTask   = Permission("ViewTask",   1 shl 0, "Просмотр задач"         )
@@ -13,9 +17,11 @@ class Permission(
         val ViewUser   = Permission("ViewUser",   1 shl 3, "Просмотр пользователя"  )
         val InsertUser = Permission("InsertUser", 1 shl 4, "Добавление пользователя")
         val DeleteUser = Permission("DeleteUser", 1 shl 5, "Удаление пользователя"  )
+        val UpdateUser = Permission("UpdateUser", 1 shl 6, "Обновление пользователя")
         //@formatter:on
 
         val all = allPermissions()
+        val summaryPower = all.sumBy { it.power }
     }
 }
 
@@ -25,5 +31,6 @@ internal fun allPermissions() = listOf(
     Permission.DeleteTask,
     Permission.ViewUser,
     Permission.InsertUser,
-    Permission.DeleteUser
+    Permission.DeleteUser,
+    Permission.UpdateUser
 )
