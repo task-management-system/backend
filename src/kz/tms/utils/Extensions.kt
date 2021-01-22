@@ -42,8 +42,8 @@ suspend fun Int.respond(
     context: PipelineContext<Unit, ApplicationCall>,
     successMessage: String,
     errorMessage: String,
-    successStatusCode: HttpStatusCode,
-    errorStatusCode: HttpStatusCode,
+    successStatusCode: HttpStatusCode = HttpStatusCode.OK,
+    errorStatusCode: HttpStatusCode = HttpStatusCode.InternalServerError,
 ) {
     context.apply {
         when (this@respond != 0) {
