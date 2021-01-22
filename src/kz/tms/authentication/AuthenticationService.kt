@@ -18,6 +18,10 @@ class AuthenticationService(
             message = "Пользователь с указанным логином/почтой не найден, проверьте корректность введенных данных"
         )
 
+        if (!user.isActive) return Response.Error(
+            message = "Пользователь неактивен"
+        )
+
         return when (credentials.password == user.password) {
             true -> {
                 val token = jwtConfig.makeToken(user.username)
