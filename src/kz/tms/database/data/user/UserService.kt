@@ -21,6 +21,18 @@ class UserService(
         }
     }
 
+    suspend fun lock(id: Long): Int {
+        return transactionService.transaction {
+            repository.lock(id)
+        }
+    }
+
+    suspend fun unlock(id: Long): Int {
+        return transactionService.transaction {
+            repository.unlock(id)
+        }
+    }
+
     suspend fun deleteById(id: Long): Int {
         return transactionService.transaction {
             repository.deleteById(id)

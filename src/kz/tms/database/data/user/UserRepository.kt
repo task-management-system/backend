@@ -24,6 +24,20 @@ class UserRepository {
         )
     }
 
+    fun lock(id: Long): Int {
+        return UserTable.update(
+            where = { UserTable.id eq id },
+            body = { it[isActive] = false }
+        )
+    }
+
+    fun unlock(id: Long): Int {
+        return UserTable.update(
+            where = { UserTable.id eq id },
+            body = { it[isActive] = true }
+        )
+    }
+
     fun deleteById(id: Long): Int {
         return UserTable.deleteWhere {
             UserTable.id eq id

@@ -6,6 +6,7 @@ import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import io.ktor.util.pipeline.*
 import kz.tms.database.data.roles.RoleService
 import kz.tms.database.data.user.UserService
 import kz.tms.database.data.user.merge
@@ -82,13 +83,38 @@ fun Route.user() {
 
                 when (userService.updateById(id, user) != 0) {
                     true -> call.success<Nothing>(
-                        statusCode = HttpStatusCode.Created,
                         message = "Пользователь успешно обновлен"
                     )
                     false -> call.error<Nothing>(
                         message = "Не удалось обновить данные пользователя, возможно его и не существует вовсе ¯\\_(ツ)_/¯"
                     )
                 }
+            }
+        }
+
+        withPermission(Permission.UpdateUser.power) {
+            patch("/lock") {
+                val id = call.parameters["id"]?.toLong() ?: return@patch call.error<Nothing>(
+                    message = "Укажите идентификатор пользователя"
+                )
+
+                userService.lock(id).patchCall(
+                    context = this,
+                    successMessage = "Пользователь заблокирован",
+                    errorMessage = "Не удалось заблокировать пользователя"
+                )
+            }
+
+            patch("/unlock") {
+                val id = call.parameters["id"]?.toLong() ?: return@patch call.error<Nothing>(
+                    message = "Укажите идентификатор пользователя"
+                )
+
+                userService.unlock(id).patchCall(
+                    context = this,
+                    successMessage = "Пользователь разблокирован",
+                    errorMessage = "Не удалось разблокировать пользователя"
+                )
             }
         }
     }

@@ -3,6 +3,7 @@ package kz.tms.utils
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.response.*
+import io.ktor.util.pipeline.*
 import kz.tms.model.Response
 
 suspend fun <T> ApplicationCall.respond(
@@ -35,4 +36,21 @@ suspend fun <T> ApplicationCall.warning(
     data: T? = null
 ) {
     respond(statusCode = statusCode, response = Response.Warning(message, data))
+}
+
+suspend fun Int.patchCall(
+    context: PipelineContext<Unit, ApplicationCall>,
+    successMessage: String? = null,
+    errorMessage: String? = null
+) {
+    context.apply {
+        when (this@patchCall != 0) {
+            true -> call.success<Nothing>(
+                message = successMessage ?: "Данные успешно обновлены"
+            )
+            false -> call.error<Nothing>(
+                message = errorMessage ?: "Не удалось обновить данные"
+            )
+        }
+    }
 }
