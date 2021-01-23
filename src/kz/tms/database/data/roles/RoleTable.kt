@@ -1,9 +1,9 @@
 package kz.tms.database.data.roles
 
-import org.jetbrains.exposed.dao.id.IdTable
+import org.jetbrains.exposed.sql.Table
 
-object RoleTable : IdTable<Long>("role") {
-    override val id = long("id").autoIncrement().entityId()
+object RoleTable : Table("role") {
+    val id = long("id").autoIncrement()
     val power = integer("power")
     val text = varchar("text", 100)
 

@@ -13,7 +13,7 @@ class RoleRepository {
     fun getIdByPowerOrNull(power: Int): Long? {
         return RoleTable
             .select { RoleTable.power eq power }
-            .map { it[RoleTable.id].value }
+            .map { it[RoleTable.id] }
             .singleOrNull()
     }
 
