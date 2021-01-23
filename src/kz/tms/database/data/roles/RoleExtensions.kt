@@ -6,6 +6,7 @@ import org.jetbrains.exposed.sql.statements.InsertStatement
 
 fun toRole(resultRow: ResultRow): Role {
     return Role(
+        id = resultRow[RoleTable.id],
         power = resultRow[RoleTable.power],
         text = resultRow[RoleTable.text]
     )
