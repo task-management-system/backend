@@ -6,14 +6,14 @@ import org.jetbrains.exposed.sql.statements.InsertStatement
 
 fun toRole(resultRow: ResultRow): Role {
     return Role(
-        power = resultRow[RolesTable.power],
-        text = resultRow[RolesTable.text]
+        power = resultRow[RoleTable.power],
+        text = resultRow[RoleTable.text]
     )
 }
 
 fun InsertStatement<Number>.toRole(role: Role) {
     let {
-        it[RolesTable.power] = role.power
-        it[RolesTable.text] = role.text
+        it[RoleTable.power] = role.power
+        it[RoleTable.text] = role.text
     }
 }
