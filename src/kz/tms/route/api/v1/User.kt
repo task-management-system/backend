@@ -11,6 +11,8 @@ import kz.tms.database.data.roles.RoleService
 import kz.tms.database.data.user.UserService
 import kz.tms.database.data.user.merge
 import kz.tms.features.withPermission
+import kz.tms.model.paging.Paging
+import kz.tms.model.paging.PagingResponse
 import kz.tms.model.user.UserPayload
 import kz.tms.utils.*
 import org.koin.ktor.ext.inject
@@ -102,7 +104,23 @@ fun Route.user() {
     withPermission(Permission.ViewUser.power) {
         route("/users") {
             get {
-                call.success(data = userService.getAll())
+                val paging = call.receiveOrNull<Paging>() ?: return@get call.error<Nothing>(
+                    message = "Ожидался пейлоад, а получилось как всегда"
+                )
+
+                val result = paging.validate()
+                if (!result.isNullOrEmpty()) return@get call.error<Nothing>(
+                    message = result
+                )
+
+                call.success(
+                    data = PagingResponse(
+                        totalCount = userService.count(),
+                        currentPage = paging.page,
+                        currentSize = paging.size,
+                        data = userService.getAll(paging)
+                    )
+                )
             }
 
             put {
