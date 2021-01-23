@@ -1,7 +1,7 @@
 package kz.tms.database
 
 import kotlinx.coroutines.runBlocking
-import kz.tms.database.data.roles.RoleTable
+import kz.tms.database.data.role.RoleTable
 import kz.tms.database.data.task.TaskTable
 import kz.tms.database.data.user.UserTable
 import org.jetbrains.exposed.sql.Database

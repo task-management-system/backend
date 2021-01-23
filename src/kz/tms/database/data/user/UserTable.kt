@@ -1,6 +1,6 @@
 package kz.tms.database.data.user
 
-import kz.tms.database.data.roles.RoleTable
+import kz.tms.database.data.role.RoleTable
 import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.Table
 

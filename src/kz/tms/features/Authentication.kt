@@ -3,7 +3,7 @@ package kz.tms.features
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.auth.jwt.*
-import kz.tms.database.data.roles.RoleService
+import kz.tms.database.data.role.RoleService
 import kz.tms.database.data.user.UserService
 import kz.tms.model.authentication.AuthenticationPrincipal
 import kz.tms.utils.JWTConfig
