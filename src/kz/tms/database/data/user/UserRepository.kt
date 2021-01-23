@@ -1,8 +1,10 @@
 package kz.tms.database.data.user
 
 import kz.tms.database.data.roles.RolesTable
+import kz.tms.model.Paging
 import kz.tms.model.user.User
 import kz.tms.model.user.UserResponse
+import kz.tms.utils.selectAll
 import org.jetbrains.exposed.sql.*
 
 class UserRepository {
@@ -45,10 +47,10 @@ class UserRepository {
         }
     }
 
-    fun getAll(): List<UserResponse> {
+    fun getAll(paging: Paging): List<UserResponse> {
         return UserTable
             .leftJoin(RolesTable)
-            .selectAll()
+            .selectAll(UserTable.id, paging)
             .map {
                 toUserResponse(it)
             }

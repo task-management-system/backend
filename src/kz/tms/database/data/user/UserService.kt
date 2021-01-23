@@ -1,6 +1,7 @@
 package kz.tms.database.data.user
 
 import kz.tms.database.TransactionService
+import kz.tms.model.Paging
 import kz.tms.model.user.User
 import kz.tms.model.user.UserResponse
 
@@ -44,9 +45,9 @@ class UserService(
         }
     }
 
-    suspend fun getAll(): List<UserResponse> {
+    suspend fun getAll(paging: Paging): List<UserResponse> {
         return transactionService.transaction {
-            repository.getAll()
+            repository.getAll(paging)
         }
     }
 
