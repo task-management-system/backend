@@ -8,9 +8,7 @@ import kz.tms.utils.error
 
 fun Application.installStatusPages() {
     install(StatusPages) {
-        /**
-         * Errors by status code
-         */
+        /** Errors by status code */
         status(HttpStatusCode.Unauthorized) { code ->
             call.error<Nothing>(
                 statusCode = code,
@@ -18,9 +16,14 @@ fun Application.installStatusPages() {
             )
         }
 
-        /**
-         * Errors by exception
-         */
+        status(HttpStatusCode.NotFound) { code ->
+            call.error<Nothing>(
+                statusCode = code,
+                message = "Страница не найдена"
+            )
+        }
+
+        /** Errors by exception */
         exception<PermissionException> { e ->
             call.error<Nothing>(
                 statusCode = HttpStatusCode.Forbidden,
