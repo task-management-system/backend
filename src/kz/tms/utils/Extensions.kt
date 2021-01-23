@@ -4,7 +4,9 @@ import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.util.pipeline.*
+import kz.tms.model.Paging
 import kz.tms.model.Response
+import org.jetbrains.exposed.sql.*
 
 suspend fun <T> ApplicationCall.respond(
     statusCode: HttpStatusCode = HttpStatusCode.OK,
@@ -99,4 +101,10 @@ suspend fun Int.deleteRespond(
         successStatusCode = successStatusCode,
         errorStatusCode = errorStatusCode
     )
+}
+
+fun FieldSet.selectAll(id: Column<Long>, paging: Paging): Query {
+    return Query(this, null)
+        .orderBy(id to paging.sortOrder)
+        .limit(paging.limit, paging.offset)
 }
