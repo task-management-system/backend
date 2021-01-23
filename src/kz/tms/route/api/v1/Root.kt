@@ -12,6 +12,8 @@ fun Route.v1() {
         authenticate("token") {
             permission()
 
+            role()
+
             user()
         }
     }

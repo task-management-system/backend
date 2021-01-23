@@ -7,6 +7,12 @@ class RoleService(
     private val transactionService: TransactionService,
     private val repository: RoleRepository
 ) {
+    suspend fun getAllOrEmpty(): List<Role> {
+        return transactionService.transaction {
+            repository.getAllOrEmpty()
+        }
+    }
+
     suspend fun getIdByPowerOrNull(power: Int): Long? {
         return transactionService.transaction {
             repository.getIdByPowerOrNull(power)

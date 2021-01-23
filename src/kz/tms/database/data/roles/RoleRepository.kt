@@ -2,8 +2,15 @@ package kz.tms.database.data.roles
 
 import kz.tms.model.role.Role
 import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
 
 class RoleRepository {
+    fun getAllOrEmpty(): List<Role> {
+        return RolesTable
+            .selectAll()
+            .map { toRole(it) }
+    }
+
     fun getIdByPowerOrNull(power: Int): Long? {
         return RolesTable
             .select { RolesTable.power eq power }
