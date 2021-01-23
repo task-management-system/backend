@@ -15,42 +15,48 @@ class UserRepository {
     }
 
     fun insert(user: User): List<ResultRow>? {
-        return UserTable.insert { insertStatement ->
-            insertStatement.toUser(user)
-        }.resultedValues
+        return UserTable
+            .insert { insertStatement ->
+                insertStatement.toUser(user)
+            }.resultedValues
     }
 
     fun batchInsert(users: List<User>): List<ResultRow> {
-        return UserTable.batchInsert(users) { user ->
-            toUser(user)
-        }
+        return UserTable
+            .batchInsert(users) { user ->
+                toUser(user)
+            }
     }
 
     fun updateById(id: Long, user: User): Int {
-        return UserTable.update(
-            where = { UserTable.id eq id },
-            body = { statement -> statement.toUser(user) }
-        )
+        return UserTable
+            .update(
+                where = { UserTable.id eq id },
+                body = { statement -> statement.toUser(user) }
+            )
     }
 
     fun lock(id: Long): Int {
-        return UserTable.update(
-            where = { UserTable.id eq id },
-            body = { statement -> statement[isActive] = false }
-        )
+        return UserTable
+            .update(
+                where = { UserTable.id eq id },
+                body = { statement -> statement[isActive] = false }
+            )
     }
 
     fun unlock(id: Long): Int {
-        return UserTable.update(
-            where = { UserTable.id eq id },
-            body = { statement -> statement[isActive] = true }
-        )
+        return UserTable
+            .update(
+                where = { UserTable.id eq id },
+                body = { statement -> statement[isActive] = true }
+            )
     }
 
     fun deleteById(id: Long): Int {
-        return UserTable.deleteWhere {
-            UserTable.id eq id
-        }
+        return UserTable
+            .deleteWhere {
+                UserTable.id eq id
+            }
     }
 
     fun getAll(paging: Paging): List<UserResponse> {
