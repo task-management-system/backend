@@ -12,6 +12,7 @@ import kz.tms.database.data.user.UserService
 import kz.tms.database.data.user.merge
 import kz.tms.features.withPermission
 import kz.tms.model.paging.Paging
+import kz.tms.model.paging.PagingResponse
 import kz.tms.model.user.UserPayload
 import kz.tms.utils.*
 import org.koin.ktor.ext.inject
@@ -113,11 +114,11 @@ fun Route.user() {
                 )
 
                 call.success(
-                    data = mapOf(
-                        "totalCount" to userService.count(),
-                        "page" to paging.page,
-                        "size" to paging.size,
-                        "users" to userService.getAll(paging)
+                    data = PagingResponse(
+                        totalCount = userService.count(),
+                        currentPage = paging.page,
+                        currentSize = paging.size,
+                        data = userService.getAll(paging)
                     )
                 )
             }
