@@ -9,6 +9,12 @@ class UserService(
     private val transactionService: TransactionService,
     private val repository: UserRepository
 ) {
+    suspend fun count(): Long {
+        return transactionService.transaction {
+            repository.count()
+        }
+    }
+
     suspend fun insert(user: User): Int {
         return transactionService.transaction {
             repository.insert(user)

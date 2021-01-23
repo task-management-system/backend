@@ -8,6 +8,12 @@ import kz.tms.utils.selectAll
 import org.jetbrains.exposed.sql.*
 
 class UserRepository {
+    fun count(): Long {
+        return UserTable
+            .selectAll()
+            .count()
+    }
+
     fun insert(user: User): List<ResultRow>? {
         return UserTable.insert { insertStatement ->
             insertStatement.toUser(user)
