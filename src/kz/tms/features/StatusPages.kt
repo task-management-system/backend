@@ -12,7 +12,7 @@ fun Application.installStatusPages() {
         status(HttpStatusCode.Unauthorized) { code ->
             call.error<Nothing>(
                 statusCode = code,
-                message = "Дружок пирожок авторазьку то не прошел, купи мне питсы скину лог пасс от админки"
+                message = "Авторизационные данные недействительны"
             )
         }
 
