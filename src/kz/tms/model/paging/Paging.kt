@@ -1,4 +1,4 @@
-package kz.tms.model
+package kz.tms.model.paging
 
 import org.jetbrains.exposed.sql.SortOrder
 

@@ -4,8 +4,8 @@ import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.util.pipeline.*
-import kz.tms.model.Paging
 import kz.tms.model.Response
+import kz.tms.model.paging.Paging
 import org.jetbrains.exposed.sql.*
 
 suspend fun <T> ApplicationCall.respond(

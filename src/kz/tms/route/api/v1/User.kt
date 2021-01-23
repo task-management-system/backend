@@ -11,7 +11,7 @@ import kz.tms.database.data.roles.RoleService
 import kz.tms.database.data.user.UserService
 import kz.tms.database.data.user.merge
 import kz.tms.features.withPermission
-import kz.tms.model.Paging
+import kz.tms.model.paging.Paging
 import kz.tms.model.user.UserPayload
 import kz.tms.utils.*
 import org.koin.ktor.ext.inject

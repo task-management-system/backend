@@ -1,7 +1,7 @@
 package kz.tms.database.data.user
 
 import kz.tms.database.data.roles.RolesTable
-import kz.tms.model.Paging
+import kz.tms.model.paging.Paging
 import kz.tms.model.user.User
 import kz.tms.model.user.UserResponse
 import kz.tms.utils.selectAll
