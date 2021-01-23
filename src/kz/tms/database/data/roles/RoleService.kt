@@ -30,4 +30,10 @@ class RoleService(
             repository.insert(role)?.size ?: 0
         }
     }
+
+    suspend fun update(id: Long, role: Role): Int {
+        return transactionService.transaction {
+            repository.update(id, role)
+        }
+    }
 }

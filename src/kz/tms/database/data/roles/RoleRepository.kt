@@ -30,4 +30,12 @@ class RoleRepository {
                 insertStatement.toRole(role)
             }.resultedValues
     }
+
+    fun update(id: Long, role: Role): Int {
+        return RoleTable
+            .update(
+                where = { RoleTable.id eq id },
+                body = { statement -> statement.toRole(role) }
+            )
+    }
 }

@@ -8,22 +8,36 @@ import kz.tms.model.role.Role
 import kz.tms.utils.error
 import kz.tms.utils.insertRespond
 import kz.tms.utils.success
+import kz.tms.utils.updateRespond
 import org.koin.ktor.ext.inject
 
 fun Route.role() {
     val service: RoleService by inject()
 
-    route("/roles") {
-        get {
-            call.success(data = service.getAllOrEmpty())
-        }
-
+    route("/role") {
         put {
             val role = call.receiveOrNull<Role>() ?: return@put call.error<Nothing>(
                 message = "Да дай ты мне пейлоад падла"
             )
 
             service.insert(role).insertRespond(this)
+        }
+
+        patch {
+            val id = call.parameters["id"]?.toLong() ?: return@patch call.error<Nothing>(
+                message = "Да дай ты мне айдишник падла"
+            )
+            val role = call.receiveOrNull<Role>() ?: return@patch call.error<Nothing>(
+                message = "Да дай ты мне пейлоад падла"
+            )
+
+            service.update(id, role).updateRespond(this)
+        }
+    }
+
+    route("/roles") {
+        get {
+            call.success(data = service.getAllOrEmpty())
         }
     }
 }
