@@ -1,6 +1,6 @@
 package kz.tms.database.data.user
 
-import kz.tms.database.data.roles.RolesTable
+import kz.tms.database.data.roles.RoleTable
 import kz.tms.model.paging.Paging
 import kz.tms.model.user.User
 import kz.tms.model.user.UserResponse
@@ -61,7 +61,7 @@ class UserRepository {
 
     fun getAll(paging: Paging): List<UserResponse> {
         return UserTable
-            .leftJoin(RolesTable)
+            .leftJoin(RoleTable)
             .selectAll(UserTable.id, paging)
             .map {
                 toUserResponse(it)
@@ -70,7 +70,7 @@ class UserRepository {
 
     fun getByIdOrNull(id: Long): UserResponse? {
         return UserTable
-            .leftJoin(RolesTable)
+            .leftJoin(RoleTable)
             .select { UserTable.id eq id }
             .map { toUserResponse(it) }
             .singleOrNull()
