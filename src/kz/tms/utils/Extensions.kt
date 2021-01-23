@@ -61,6 +61,7 @@ suspend fun Int.respond(
     }
 }
 
+//TODO rename
 suspend fun Int.insertRespond(
     context: PipelineContext<Unit, ApplicationCall>,
     successStatusCode: HttpStatusCode = HttpStatusCode.Created,
@@ -75,6 +76,7 @@ suspend fun Int.insertRespond(
     )
 }
 
+//TODO rename
 suspend fun Int.updateRespond(
     context: PipelineContext<Unit, ApplicationCall>,
     successStatusCode: HttpStatusCode = HttpStatusCode.OK,
@@ -89,6 +91,7 @@ suspend fun Int.updateRespond(
     )
 }
 
+//TODO rename
 suspend fun Int.deleteRespond(
     context: PipelineContext<Unit, ApplicationCall>,
     successStatusCode: HttpStatusCode = HttpStatusCode.OK,

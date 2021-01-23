@@ -24,4 +24,10 @@ class RoleService(
             repository.getRoleById(id)
         }
     }
+
+    suspend fun insert(role: Role): Int {
+        return transactionService.transaction {
+            repository.insert(role)?.size ?: 0
+        }
+    }
 }
