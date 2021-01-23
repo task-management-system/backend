@@ -31,6 +31,12 @@ class RoleService(
         }
     }
 
+    suspend fun batchInsert(roles: List<Role>): Int {
+        return transactionService.transaction {
+            repository.batchInsert(roles)
+        }.size
+    }
+
     suspend fun update(id: Long, role: Role): Int {
         return transactionService.transaction {
             repository.update(id, role)

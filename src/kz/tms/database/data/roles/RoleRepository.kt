@@ -31,6 +31,13 @@ class RoleRepository {
             }.resultedValues
     }
 
+    fun batchInsert(roles: List<Role>): List<ResultRow> {
+        return RoleTable
+            .batchInsert(roles) { role ->
+                toRole(role)
+            }
+    }
+
     fun update(id: Long, role: Role): Int {
         return RoleTable
             .update(

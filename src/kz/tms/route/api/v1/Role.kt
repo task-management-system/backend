@@ -39,5 +39,13 @@ fun Route.role() {
         get {
             call.success(data = service.getAllOrEmpty())
         }
+
+        put {
+            val roles = call.receiveOrNull<List<Role>>() ?: return@put call.error<Nothing>(
+                message = "Да ты мне дай чертовые роли"
+            )
+
+            service.batchInsert(roles).insertRespond(this)
+        }
     }
 }
