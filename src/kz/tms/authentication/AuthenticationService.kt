@@ -1,6 +1,6 @@
 package kz.tms.authentication
 
-import kz.tms.database.data.roles.RoleService
+import kz.tms.database.data.role.RoleService
 import kz.tms.database.data.user.UserService
 import kz.tms.database.data.user.merge
 import kz.tms.model.Response

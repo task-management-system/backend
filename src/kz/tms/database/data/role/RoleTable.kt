@@ -1,4 +1,4 @@
-package kz.tms.database.data.roles
+package kz.tms.database.data.role
 
 import org.jetbrains.exposed.sql.Table
 

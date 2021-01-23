@@ -3,7 +3,7 @@ package kz.tms.route.api.v1
 import io.ktor.application.*
 import io.ktor.request.*
 import io.ktor.routing.*
-import kz.tms.database.data.roles.RoleService
+import kz.tms.database.data.role.RoleService
 import kz.tms.model.role.Role
 import kz.tms.utils.error
 import kz.tms.utils.insertRespond

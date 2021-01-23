@@ -1,6 +1,6 @@
 package kz.tms.database.data.user
 
-import kz.tms.database.data.roles.toRole
+import kz.tms.database.data.role.toRole
 import kz.tms.model.role.Role
 import kz.tms.model.user.User
 import kz.tms.model.user.UserPayload

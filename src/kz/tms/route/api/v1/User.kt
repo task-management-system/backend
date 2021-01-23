@@ -7,7 +7,7 @@ import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.util.pipeline.*
-import kz.tms.database.data.roles.RoleService
+import kz.tms.database.data.role.RoleService
 import kz.tms.database.data.user.UserService
 import kz.tms.database.data.user.merge
 import kz.tms.features.withPermission

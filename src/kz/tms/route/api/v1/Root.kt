@@ -14,6 +14,8 @@ fun Route.v1() {
 
             role()
 
+            task()
+
             user()
         }
     }
