@@ -21,7 +21,7 @@ data class Paging(
 
     private var _limit: Int = 0
 
-    /** Formula (limit = [size]) */
+    /** Formula limit = [size] */
     val limit: Int get() = _limit
 
     private var _offset: Long = 0L
@@ -43,9 +43,9 @@ data class Paging(
      */
     fun validate(): String? {
         return when {
-            page < MinPage -> "Минимальная значение page - $MinPage"
-            size < MinSize -> "Минимальный значение size - $MinSize"
-            size > MaxSize -> "Максимальный значение page - $MaxSize"
+            page < MinPage -> "Минимальное значение страницы - $MinPage"
+            size < MinSize -> "Минимальное значение размера - $MinSize"
+            size > MaxSize -> "Максимальное значение размера - $MaxSize"
             else -> {
                 _limit = size
                 _offset = page.dec() * limit
