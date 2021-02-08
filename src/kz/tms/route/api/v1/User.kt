@@ -7,19 +7,16 @@ import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.util.pipeline.*
-import kz.tms.database.data.role.RoleService
 import kz.tms.database.data.user.UserService
-import kz.tms.database.data.user.merge
 import kz.tms.features.withPermission
 import kz.tms.model.paging.Paging
 import kz.tms.model.paging.PagingResponse
-import kz.tms.model.user.UserPayload
+import kz.tms.model.user.User
 import kz.tms.utils.*
 import org.koin.ktor.ext.inject
 
 fun Route.user() {
-    val userService: UserService by inject()
-    val roleService: RoleService by inject()
+    val service: UserService by inject()
 
     route("/user") {
         withPermission(Permission.ViewUser.power) {
@@ -28,7 +25,7 @@ fun Route.user() {
                     message = "Укажите идентификатор пользователя",
                 )
 
-                val user = userService.getByIdOrNull(id) ?: return@get call.error<Nothing>(
+                val user = service.getByIdOrNull(id) ?: return@get call.error<Nothing>(
                     message = "Не удалось найти пользователя по указанному идентификатору"
                 )
 
@@ -38,13 +35,8 @@ fun Route.user() {
 
         withPermission(Permission.InsertUser.power) {
             put {
-                val userPayload = call.receive<UserPayload>()
-                val roleId = roleService.getIdByPowerOrNull(userPayload.rolePower) ?: return@put call.error<Nothing>(
-                    message = "Не удалось найти роль"
-                )
-
-                val user = userPayload merge roleId
-                userService.insert(user).insertRespond(this)
+                val user = call.receive<User>()
+                service.insert(user).insertRespond(this)
             }
         }
 
@@ -54,7 +46,7 @@ fun Route.user() {
                     message = "Укажите идентификатор пользователя",
                 )
 
-                userService.deleteById(id).deleteRespond(this)
+                service.deleteById(id).deleteRespond(this)
             }
         }
 
@@ -63,14 +55,11 @@ fun Route.user() {
                 val id = call.parameters["id"]?.toLong() ?: return@patch call.error<Nothing>(
                     message = "Укажите идентификатор пользователя"
                 )
-                val userPayload = call.receive<UserPayload>()
-                val roleId = roleService.getIdByPowerOrNull(userPayload.rolePower) ?: return@patch call.error<Nothing>(
-                    message = "Не удалось найти роль"
+                val user = call.receiveOrNull<User>() ?: return@patch call.error<Nothing>(
+                    message = "Заполни пейлоад а АААА"
                 )
 
-                val user = userPayload merge roleId
-
-                userService.updateById(id, user).updateRespond(this)
+                service.updateById(id, user).updateRespond(this)
             }
         }
 
@@ -80,7 +69,7 @@ fun Route.user() {
                     message = "Укажите идентификатор пользователя"
                 )
 
-                userService.lock(id).respond(
+                service.lock(id).respond(
                     context = this,
                     successMessage = "Пользователь заблокирован",
                     errorMessage = "Не удалось заблокировать пользователя"
@@ -92,7 +81,7 @@ fun Route.user() {
                     message = "Укажите идентификатор пользователя"
                 )
 
-                userService.unlock(id).respond(
+                service.unlock(id).respond(
                     context = this,
                     successMessage = "Пользователь разблокирован",
                     errorMessage = "Не удалось разблокировать пользователя"
@@ -103,40 +92,29 @@ fun Route.user() {
 
     withPermission(Permission.ViewUser.power) {
         route("/users") {
-            get {
-                val paging = call.receiveOrNull<Paging>() ?: return@get call.error<Nothing>(
+            post {
+                val paging = call.receiveOrNull<Paging>() ?: return@post call.error<Nothing>(
                     message = "Ожидался пейлоад, а получилось как всегда"
                 )
 
                 val result = paging.validate()
-                if (!result.isNullOrEmpty()) return@get call.error<Nothing>(
+                if (!result.isNullOrEmpty()) return@post call.error<Nothing>(
                     message = result
                 )
 
                 call.success(
                     data = PagingResponse(
-                        totalCount = userService.count(),
-                        currentPage = paging.page,
-                        currentSize = paging.size,
-                        data = userService.getAll(paging)
+                        totalCount = service.count(),
+                        list = service.getAll(paging)
                     )
                 )
             }
 
             put {
-                val userPayloads = call.receive<Array<UserPayload>>()
-                val roleIds = arrayListOf<Long>()
-                userPayloads.forEachIndexed { index, item ->
-                    val roleId = roleService.getIdByPowerOrNull(item.rolePower) ?: return@put call.error(
-                        message = "Не удалось найти роль по индексу $index",
-                        data = mapOf("index" to index)
-                    )
-                    roleIds.add(roleId)
-                }
-
-                val users = userPayloads merge roleIds
-
-                userService.batchInsert(users).insertRespond(this)
+                val users = call.receiveOrNull<Array<User>>()?.toList() ?: call.error<Nothing>(
+                    message = "Дай пейлоад братан"
+                )
+                service.batchInsert(users as List<User>).insertRespond(this)
             }
         }
     }
