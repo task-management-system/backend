@@ -26,8 +26,8 @@ fun Application.installAuthentication() {
                     roleService.getRoleById(it)
                 }
 
-                if (user != null && user.isActive) {
-                    AuthenticationPrincipal(username, role?.power ?: 0)
+                if (user != null && user.isActive!!) {
+                    AuthenticationPrincipal(user.id, username, role?.power ?: 0)
                 } else {
                     null
                 }
