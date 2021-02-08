@@ -31,9 +31,7 @@ fun Route.task() {
             call.success(
                 data = PagingResponse(
                     totalCount = service.count(),
-                    currentPage = paging.page,
-                    currentSize = paging.size,
-                    data = service.getAll(paging)
+                    list = service.getAll(paging)
                 )
             )
         }

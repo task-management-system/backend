@@ -10,7 +10,7 @@ object TaskTable : Table("task") {
     val title = varchar("title", 200)
     val description = text("description").nullable()
     val dueDate = datetime("due_date")
-    val userId = long("user_id").references(UserTable.id, onDelete = ReferenceOption.CASCADE)
+    val userId = long("creator_id").references(UserTable.id, onDelete = ReferenceOption.CASCADE)
 
     override val primaryKey = PrimaryKey(id, name = "task_pkey")
 }

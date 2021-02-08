@@ -4,6 +4,8 @@ import kz.tms.authentication.AuthenticationService
 import kz.tms.database.DatabaseConnector
 import kz.tms.database.TransactionService
 import kz.tms.database.TransactionServiceImpl
+import kz.tms.database.data.detail.DetailRepository
+import kz.tms.database.data.detail.DetailService
 import kz.tms.database.data.role.RoleRepository
 import kz.tms.database.data.role.RoleService
 import kz.tms.database.data.task.TaskRepository
@@ -16,6 +18,10 @@ val databaseModule = module(createdAtStart = true) {
     single { DatabaseConnector(dataSource = get()) }
 
     single<TransactionService> { TransactionServiceImpl(databaseConnector = get()) }
+
+    single { DetailRepository() }
+
+    single { DetailService(get(), get()) }
 
     single { RoleRepository() }
 

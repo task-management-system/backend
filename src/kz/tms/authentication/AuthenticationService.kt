@@ -18,7 +18,7 @@ class AuthenticationService(
             message = "Пользователь с указанным логином/почтой не найден, проверьте корректность введенных данных"
         )
 
-        if (!user.isActive) return Response.Error(
+        if (!user.isActive!!) return Response.Error(
             message = "Пользователь неактивен"
         )
 
