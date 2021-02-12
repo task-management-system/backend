@@ -1,10 +1,11 @@
 package kz.tms.model.paging
 
+import kz.tms.exceptions.PagingException
 import org.jetbrains.exposed.sql.SortOrder
 
 data class Paging(
-    val page: Long,
-    val size: Int,
+    val page: Long?,
+    val size: Int?,
     val order: String? = null
 ) {
     /** Available constants [[MinPage], [MinSize], [MaxSize]] */
@@ -41,9 +42,11 @@ data class Paging(
      *
      * The validation is considered passed if the returned value is null
      */
-    fun validate(): String? {
-        return when {
+    init {
+        val message = when {
+            page == null -> "Не указано значение страницы"
             page < MinPage -> "Минимальное значение страницы - $MinPage"
+            size == null -> "Не указано значение размера"
             size < MinSize -> "Минимальное значение размера - $MinSize"
             size > MaxSize -> "Максимальное значение размера - $MaxSize"
             else -> {
@@ -53,6 +56,8 @@ data class Paging(
                 null
             }
         }
+
+        if (message != null) throw PagingException(message)
     }
 
     @Suppress("MoveVariableDeclarationIntoWhen")
