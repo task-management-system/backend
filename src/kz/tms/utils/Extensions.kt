@@ -61,7 +61,7 @@ suspend fun Int.respond(
     }
 }
 
-//TODO rename
+//TODO remove
 suspend fun Int.insertRespond(
     context: PipelineContext<Unit, ApplicationCall>,
     successStatusCode: HttpStatusCode = HttpStatusCode.Created,
@@ -76,7 +76,7 @@ suspend fun Int.insertRespond(
     )
 }
 
-//TODO rename
+//TODO remove
 suspend fun Int.updateRespond(
     context: PipelineContext<Unit, ApplicationCall>,
     successStatusCode: HttpStatusCode = HttpStatusCode.OK,
@@ -91,7 +91,7 @@ suspend fun Int.updateRespond(
     )
 }
 
-//TODO rename
+//TODO remove
 suspend fun Int.deleteRespond(
     context: PipelineContext<Unit, ApplicationCall>,
     successStatusCode: HttpStatusCode = HttpStatusCode.OK,
@@ -110,4 +110,12 @@ fun FieldSet.selectAll(id: Column<Long>, paging: Paging): Query {
     return Query(this, null)
         .orderBy(id to paging.sortOrder)
         .limit(paging.limit, paging.offset)
+}
+
+fun Parameters.asPaging(): Paging {
+    return Paging(
+        page = get("page")?.toLong(),
+        size = get("size")?.toInt(),
+        order = get("order")
+    )
 }

@@ -9,7 +9,6 @@ import io.ktor.routing.*
 import io.ktor.util.pipeline.*
 import kz.tms.database.data.user.UserService
 import kz.tms.features.withPermission
-import kz.tms.model.paging.Paging
 import kz.tms.model.paging.PagingResponse
 import kz.tms.model.user.User
 import kz.tms.utils.*
@@ -92,19 +91,12 @@ fun Route.user() {
 
     withPermission(Permission.ViewUser.power) {
         route("/users") {
-            post {
-                val paging = call.receiveOrNull<Paging>() ?: return@post call.error<Nothing>(
-                    message = "Ожидался пейлоад, а получилось как всегда"
-                )
-
-                val result = paging.validate()
-                if (!result.isNullOrEmpty()) return@post call.error<Nothing>(
-                    message = result
-                )
+            get {
+                val paging = call.parameters.asPaging()
 
                 call.success(
                     data = PagingResponse(
-                        totalCount = service.count(),
+                        total = service.count(),
                         list = service.getAll(paging)
                     )
                 )

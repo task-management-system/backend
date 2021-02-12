@@ -3,6 +3,7 @@ package kz.tms.features
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.http.*
+import kz.tms.exceptions.PagingException
 import kz.tms.exceptions.PermissionException
 import kz.tms.utils.error
 
@@ -27,6 +28,13 @@ fun Application.installStatusPages() {
         exception<PermissionException> { e ->
             call.error<Nothing>(
                 statusCode = HttpStatusCode.Forbidden,
+                message = e.message
+            )
+        }
+
+        exception<PagingException> { e ->
+            call.error<Nothing>(
+                statusCode = HttpStatusCode.BadRequest,
                 message = e.message
             )
         }
