@@ -19,7 +19,7 @@ class AuthenticationService(
         )
 
         if (!user.isActive!!) return Response.Error(
-            message = "Пользователь неактивен"
+            message = "Пользователь неактивен, обратитесь к администратору"
         )
 
         return when (credentials.password == user.password) {
