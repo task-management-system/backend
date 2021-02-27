@@ -29,7 +29,7 @@ class DatabaseConnector(dataSource: DataSource) {
     init {
         runBlocking {
             newTransaction {
-                SchemaUtils.create(*tables)
+                SchemaUtils.createMissingTablesAndColumns(*tables)
             }
         }
     }
