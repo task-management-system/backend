@@ -65,6 +65,12 @@ class UserService(
         }
     }
 
+    suspend fun getAll(): List<UserWithRole> {
+        return transactionService.transaction {
+            repository.getAll()
+        }
+    }
+
     suspend fun getAll(paging: Paging): List<UserWithRole> {
         return transactionService.transaction {
             repository.getAll(paging)
