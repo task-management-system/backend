@@ -53,6 +53,21 @@ class UserRepository {
             )
     }
 
+    fun validatePassword(id: Long, currentPassword: String): UserEntity? {
+        return UserTable
+            .select { (UserTable.id eq id) and (UserTable.password eq currentPassword) }
+            .map { toUser(it) }
+            .singleOrNull()
+    }
+
+    fun changePassword(id: Long, newPassword: String): Int {
+        return UserTable
+            .update(
+                where = { UserTable.id eq id },
+                body = { statement -> statement[password] = newPassword }
+            )
+    }
+
     fun deleteById(id: Long): Int {
         return UserTable
             .deleteWhere {

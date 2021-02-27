@@ -5,6 +5,7 @@ import io.ktor.features.*
 import io.ktor.http.*
 import kz.tms.exceptions.PagingException
 import kz.tms.exceptions.PermissionException
+import kz.tms.exceptions.UserChangePasswordException
 import kz.tms.utils.error
 
 fun Application.installStatusPages() {
@@ -33,6 +34,13 @@ fun Application.installStatusPages() {
         }
 
         exception<PagingException> { e ->
+            call.error<Nothing>(
+                statusCode = HttpStatusCode.BadRequest,
+                message = e.message
+            )
+        }
+
+        exception<UserChangePasswordException> { e ->
             call.error<Nothing>(
                 statusCode = HttpStatusCode.BadRequest,
                 message = e.message

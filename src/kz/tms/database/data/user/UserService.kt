@@ -46,6 +46,19 @@ class UserService(
         }
     }
 
+    //TODO rewrite this shit
+    suspend fun validatePassword(id: Long, currentPassword: String): UserEntity? {
+        return transactionService.transaction {
+            repository.validatePassword(id, currentPassword)
+        }
+    }
+
+    suspend fun changePassword(id: Long, newPassword: String): Int {
+        return transactionService.transaction {
+            repository.changePassword(id, newPassword)
+        }
+    }
+
     suspend fun deleteById(id: Long): Int {
         return transactionService.transaction {
             repository.deleteById(id)

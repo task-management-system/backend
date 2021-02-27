@@ -1,4 +1,4 @@
 package kz.tms.utils
 
-//todo remove
-const val ROFL_UBEITE_MENYA = "password"
+const val MIN_PASSWORD_LENGTH = 8
+const val MAX_PASSWORD_LENGTH = 32

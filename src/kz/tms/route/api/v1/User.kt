@@ -11,6 +11,7 @@ import kz.tms.database.data.user.UserService
 import kz.tms.features.withPermission
 import kz.tms.model.Message
 import kz.tms.model.paging.PagingResponse
+import kz.tms.model.user.UserChangePassword
 import kz.tms.model.user.UserEntity
 import kz.tms.model.user.UserWithRoleId
 import kz.tms.utils.*
@@ -87,6 +88,28 @@ fun Route.user() {
                     successMessage = "Пользователь разблокирован",
                     errorMessage = "Не удалось разблокировать пользователя"
                 )
+            }
+        }
+
+        withPermission(Permission.UpdateUser.power) {
+            patch("/change-password") {
+                val id = call.parameters["id"]?.toLong() ?: return@patch call.error<Nothing>(
+                    message = Message.INDICATE_USER_ID
+                )
+                val userChangePassword = call.receiveOrNull<UserChangePassword>() ?: return@patch call.error<Nothing>(
+                    message = Message.FILL_PAYLOAD
+                )
+
+                userChangePassword.postValidate()
+
+                service.validatePassword(id, userChangePassword.currentPassword) ?: return@patch call.error<Nothing>(
+                    message = "Текущий пароль не совпадает с паролем в базе"
+                )
+
+                when (service.changePassword(id, userChangePassword.newPassword)) {
+                    0 -> call.error<Nothing>(message = "Не удалось изменить пароль")
+                    1 -> call.success<Nothing>(message = "Пароль успешно изменен")
+                }
             }
         }
     }
