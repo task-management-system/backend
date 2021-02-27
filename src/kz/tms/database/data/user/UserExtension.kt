@@ -4,6 +4,7 @@ import kz.tms.database.data.role.toRole
 import kz.tms.model.role.Role
 import kz.tms.model.user.User
 import kz.tms.model.user.UserResponse
+import kz.tms.utils.ROFL_UBEITE_MENYA
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.statements.BatchInsertStatement
 import org.jetbrains.exposed.sql.statements.InsertStatement
@@ -68,7 +69,7 @@ fun BatchInsertStatement.toUser(user: User) {
 fun UpdateStatement.toUser(user: User) {
     let {
         it[UserTable.username] = user.username
-        it[UserTable.password] = user.password
+        it[UserTable.password] = ROFL_UBEITE_MENYA
         it[UserTable.name] = user.name
         it[UserTable.email] = user.email
         it[UserTable.isActive] = user.isActive ?: false
