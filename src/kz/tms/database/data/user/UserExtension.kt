@@ -2,16 +2,17 @@ package kz.tms.database.data.user
 
 import kz.tms.database.data.role.toRole
 import kz.tms.model.role.Role
-import kz.tms.model.user.User
-import kz.tms.model.user.UserResponse
-import kz.tms.utils.ROFL_UBEITE_MENYA
+import kz.tms.model.user.IUser
+import kz.tms.model.user.UserEntity
+import kz.tms.model.user.UserWithRole
+import kz.tms.model.user.UserWithRoleId
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.statements.BatchInsertStatement
 import org.jetbrains.exposed.sql.statements.InsertStatement
 import org.jetbrains.exposed.sql.statements.UpdateStatement
 
-fun toUser(resultRow: ResultRow): User {
-    return User(
+fun toUser(resultRow: ResultRow): UserEntity {
+    return UserEntity(
         id = resultRow[UserTable.id],
         username = resultRow[UserTable.username],
         password = resultRow[UserTable.password],
@@ -22,8 +23,8 @@ fun toUser(resultRow: ResultRow): User {
     )
 }
 
-fun toUserResponse(resultRow: ResultRow): UserResponse {
-    return UserResponse(
+fun toUserResponse(resultRow: ResultRow): UserWithRole {
+    return UserWithRole(
         id = resultRow[UserTable.id],
         username = resultRow[UserTable.username],
         name = resultRow[UserTable.name],
@@ -33,8 +34,8 @@ fun toUserResponse(resultRow: ResultRow): UserResponse {
     )
 }
 
-infix fun User.merge(role: Role): UserResponse {
-    return UserResponse(
+infix fun UserEntity.merge(role: Role): UserWithRole {
+    return UserWithRole(
         id = id,
         username = username,
         name = name,
@@ -44,35 +45,35 @@ infix fun User.merge(role: Role): UserResponse {
     )
 }
 
-fun InsertStatement<Number>.toUser(user: User) {
+fun InsertStatement<Number>.toUser(userEntity: UserEntity) {
     let {
-        it[UserTable.username] = user.username
-        it[UserTable.password] = user.password
-        it[UserTable.name] = user.name
-        it[UserTable.email] = user.email
-        it[UserTable.isActive] = user.isActive ?: false
-        it[UserTable.roleId] = user.roleId
+        it[UserTable.username] = userEntity.username
+        it[UserTable.password] = userEntity.password
+        it[UserTable.name] = userEntity.name
+        it[UserTable.email] = userEntity.email
+        it[UserTable.isActive] = userEntity.isActive ?: false
+        it[UserTable.roleId] = userEntity.roleId
     }
 }
 
-fun BatchInsertStatement.toUser(user: User) {
+fun BatchInsertStatement.toUser(userEntity: UserEntity) {
     let {
-        it[UserTable.username] = user.username
-        it[UserTable.password] = user.password
-        it[UserTable.name] = user.name
-        it[UserTable.email] = user.email
-        it[UserTable.isActive] = user.isActive ?: false
-        it[UserTable.roleId] = user.roleId
+        it[UserTable.username] = userEntity.username
+        it[UserTable.password] = userEntity.password
+        it[UserTable.name] = userEntity.name
+        it[UserTable.email] = userEntity.email
+        it[UserTable.isActive] = userEntity.isActive ?: false
+        it[UserTable.roleId] = userEntity.roleId
     }
 }
 
-fun UpdateStatement.toUser(user: User) {
-    let {
-        it[UserTable.username] = user.username
-        it[UserTable.password] = ROFL_UBEITE_MENYA
-        it[UserTable.name] = user.name
-        it[UserTable.email] = user.email
-        it[UserTable.isActive] = user.isActive ?: false
-        it[UserTable.roleId] = user.roleId
+fun UpdateStatement.toUser(user: IUser) {
+    when (user) {
+        is UserWithRoleId -> {
+            set(UserTable.username, user.username)
+            set(UserTable.name, user.name)
+            set(UserTable.email, user.email)
+            set(UserTable.roleId, user.roleId)
+        }
     }
 }

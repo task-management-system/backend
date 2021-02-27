@@ -2,8 +2,9 @@ package kz.tms.database.data.user
 
 import kz.tms.database.TransactionService
 import kz.tms.model.paging.Paging
-import kz.tms.model.user.User
-import kz.tms.model.user.UserResponse
+import kz.tms.model.user.IUser
+import kz.tms.model.user.UserEntity
+import kz.tms.model.user.UserWithRole
 
 class UserService(
     private val transactionService: TransactionService,
@@ -15,19 +16,19 @@ class UserService(
         }
     }
 
-    suspend fun insert(user: User): Int {
+    suspend fun insert(userEntity: UserEntity): Int {
         return transactionService.transaction {
-            repository.insert(user)
+            repository.insert(userEntity)
         }?.size ?: 0
     }
 
-    suspend fun batchInsert(users: List<User>): Int {
+    suspend fun batchInsert(userEntities: List<UserEntity>): Int {
         return transactionService.transaction {
-            repository.batchInsert(users)
+            repository.batchInsert(userEntities)
         }.size
     }
 
-    suspend fun updateById(id: Long, user: User): Int {
+    suspend fun updateById(id: Long, user: IUser): Int {
         return transactionService.transaction {
             repository.updateById(id, user)
         }
@@ -45,25 +46,38 @@ class UserService(
         }
     }
 
+    //TODO rewrite this shit
+    suspend fun validatePassword(id: Long, currentPassword: String): UserEntity? {
+        return transactionService.transaction {
+            repository.validatePassword(id, currentPassword)
+        }
+    }
+
+    suspend fun changePassword(id: Long, newPassword: String): Int {
+        return transactionService.transaction {
+            repository.changePassword(id, newPassword)
+        }
+    }
+
     suspend fun deleteById(id: Long): Int {
         return transactionService.transaction {
             repository.deleteById(id)
         }
     }
 
-    suspend fun getAll(paging: Paging): List<UserResponse> {
+    suspend fun getAll(paging: Paging): List<UserWithRole> {
         return transactionService.transaction {
             repository.getAll(paging)
         }
     }
 
-    suspend fun getByIdOrNull(id: Long): UserResponse? {
+    suspend fun getByIdOrNull(id: Long): UserWithRole? {
         return transactionService.transaction {
             repository.getByIdOrNull(id)
         }
     }
 
-    suspend fun getByUsernameOrByEmailOrNull(usernameOrEmail: String): User? {
+    suspend fun getByUsernameOrByEmailOrNull(usernameOrEmail: String): UserEntity? {
         return transactionService.transaction {
             repository.getByUsernameOrByEmailOrNull(usernameOrEmail)
         }

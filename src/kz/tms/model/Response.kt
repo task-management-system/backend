@@ -31,9 +31,3 @@ sealed class Response<out T>(
         data
     )
 }
-
-data class Message(
-    val type: MessageType,
-    val text: String,
-    val stackTrace: String? = null
-)
