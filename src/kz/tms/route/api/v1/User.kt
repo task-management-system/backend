@@ -9,8 +9,9 @@ import io.ktor.routing.*
 import io.ktor.util.pipeline.*
 import kz.tms.database.data.user.UserService
 import kz.tms.features.withPermission
+import kz.tms.model.Message
 import kz.tms.model.paging.PagingResponse
-import kz.tms.model.user.User
+import kz.tms.model.user.UserEntity
 import kz.tms.utils.*
 import org.koin.ktor.ext.inject
 
@@ -21,7 +22,7 @@ fun Route.user() {
         withPermission(Permission.ViewUser.power) {
             get {
                 val id = call.parameters["id"]?.toLong() ?: return@get call.warning<Nothing>(
-                    message = "Укажите идентификатор пользователя",
+                    message = Message.INDICATE_USER_ID,
                 )
 
                 val user = service.getByIdOrNull(id) ?: return@get call.error<Nothing>(
@@ -42,7 +43,7 @@ fun Route.user() {
         withPermission(Permission.DeleteUser.power) {
             delete {
                 val id = call.parameters["id"]?.toLong() ?: return@delete call.warning<Nothing>(
-                    message = "Укажите идентификатор пользователя",
+                    message = Message.INDICATE_USER_ID,
                 )
 
                 service.deleteById(id).deleteRespond(this)
@@ -52,10 +53,10 @@ fun Route.user() {
         withPermission(Permission.UpdateUser.power) {
             patch {
                 val id = call.parameters["id"]?.toLong() ?: return@patch call.error<Nothing>(
-                    message = "Укажите идентификатор пользователя"
+                    message = Message.INDICATE_USER_ID
                 )
                 val user = call.receiveOrNull<User>() ?: return@patch call.error<Nothing>(
-                    message = "Заполни пейлоад а АААА"
+                    message = Message.FILL_PAYLOAD
                 )
 
                 service.updateById(id, user).updateRespond(this)
@@ -65,7 +66,7 @@ fun Route.user() {
         withPermission(Permission.UpdateUser.power) {
             patch("/lock") {
                 val id = call.parameters["id"]?.toLong() ?: return@patch call.error<Nothing>(
-                    message = "Укажите идентификатор пользователя"
+                    message = Message.INDICATE_USER_ID
                 )
 
                 service.lock(id).respond(
@@ -77,7 +78,7 @@ fun Route.user() {
 
             patch("/unlock") {
                 val id = call.parameters["id"]?.toLong() ?: return@patch call.error<Nothing>(
-                    message = "Укажите идентификатор пользователя"
+                    message = Message.INDICATE_USER_ID
                 )
 
                 service.unlock(id).respond(
@@ -104,7 +105,7 @@ fun Route.user() {
 
             put {
                 val users = call.receiveOrNull<Array<User>>()?.toList() ?: call.error<Nothing>(
-                    message = "Дай пейлоад братан"
+                    message = Message.FILL_PAYLOAD
                 )
                 service.batchInsert(users as List<User>).insertRespond(this)
             }
