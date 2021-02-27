@@ -7,8 +7,18 @@ import kz.tms.model.task.Task
 import kz.tms.utils.selectAll
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.andWhere
+import org.jetbrains.exposed.sql.selectAll
 
 class DetailRepository {
+    fun count(userId: Long, statusId: Short): Long {
+        return DetailTable
+            .selectAll()
+            .andWhere {
+                (DetailTable.executorId eq userId) and (DetailTable.statusId eq statusId)
+            }
+            .count()
+    }
+
     fun getAll(userId: Long, statusId: Short, paging: Paging): List<Task> {
         return DetailTable
             .leftJoin(TaskTable)
