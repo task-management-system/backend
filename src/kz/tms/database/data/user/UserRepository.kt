@@ -4,7 +4,7 @@ import kz.tms.database.data.role.RoleTable
 import kz.tms.model.paging.Paging
 import kz.tms.model.user.IUser
 import kz.tms.model.user.UserEntity
-import kz.tms.model.user.UserResponse
+import kz.tms.model.user.UserWithRole
 import kz.tms.utils.selectAll
 import org.jetbrains.exposed.sql.*
 
@@ -60,7 +60,7 @@ class UserRepository {
             }
     }
 
-    fun getAll(paging: Paging): List<UserResponse> {
+    fun getAll(paging: Paging): List<UserWithRole> {
         return UserTable
             .leftJoin(RoleTable)
             .selectAll(UserTable.id, paging)
@@ -69,7 +69,7 @@ class UserRepository {
             }
     }
 
-    fun getByIdOrNull(id: Long): UserResponse? {
+    fun getByIdOrNull(id: Long): UserWithRole? {
         return UserTable
             .leftJoin(RoleTable)
             .select { UserTable.id eq id }

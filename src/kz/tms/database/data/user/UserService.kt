@@ -4,7 +4,7 @@ import kz.tms.database.TransactionService
 import kz.tms.model.paging.Paging
 import kz.tms.model.user.IUser
 import kz.tms.model.user.UserEntity
-import kz.tms.model.user.UserResponse
+import kz.tms.model.user.UserWithRole
 
 class UserService(
     private val transactionService: TransactionService,
@@ -52,13 +52,13 @@ class UserService(
         }
     }
 
-    suspend fun getAll(paging: Paging): List<UserResponse> {
+    suspend fun getAll(paging: Paging): List<UserWithRole> {
         return transactionService.transaction {
             repository.getAll(paging)
         }
     }
 
-    suspend fun getByIdOrNull(id: Long): UserResponse? {
+    suspend fun getByIdOrNull(id: Long): UserWithRole? {
         return transactionService.transaction {
             repository.getByIdOrNull(id)
         }

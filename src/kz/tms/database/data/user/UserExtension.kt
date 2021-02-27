@@ -4,7 +4,7 @@ import kz.tms.database.data.role.toRole
 import kz.tms.model.role.Role
 import kz.tms.model.user.IUser
 import kz.tms.model.user.UserEntity
-import kz.tms.model.user.UserResponse
+import kz.tms.model.user.UserWithRole
 import kz.tms.model.user.UserWithRoleId
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.statements.BatchInsertStatement
@@ -23,8 +23,8 @@ fun toUser(resultRow: ResultRow): UserEntity {
     )
 }
 
-fun toUserResponse(resultRow: ResultRow): UserResponse {
-    return UserResponse(
+fun toUserResponse(resultRow: ResultRow): UserWithRole {
+    return UserWithRole(
         id = resultRow[UserTable.id],
         username = resultRow[UserTable.username],
         name = resultRow[UserTable.name],
@@ -34,8 +34,8 @@ fun toUserResponse(resultRow: ResultRow): UserResponse {
     )
 }
 
-infix fun UserEntity.merge(role: Role): UserResponse {
-    return UserResponse(
+infix fun UserEntity.merge(role: Role): UserWithRole {
+    return UserWithRole(
         id = id,
         username = username,
         name = name,
