@@ -10,6 +10,7 @@ import io.ktor.util.pipeline.*
 import kz.tms.database.data.user.UserService
 import kz.tms.features.withPermission
 import kz.tms.model.Message
+import kz.tms.model.authentication.AuthenticationPrincipal
 import kz.tms.model.paging.PagingResponse
 import kz.tms.model.user.UserChangePassword
 import kz.tms.model.user.UserEntity
@@ -21,6 +22,15 @@ fun Route.user() {
     val service: UserService by inject()
 
     route("/user") {
+        get("current") {
+            val principal = call.principal<AuthenticationPrincipal>() ?: return@get call.error<Nothing>(
+                statusCode = HttpStatusCode.Unauthorized,
+                message = Message.PRINCIPAL_NOT_FOUND
+            )
+
+            call.success(data = service.getByIdOrNull(principal.userId!!))
+        }
+
         withPermission(Permission.ViewUser.power) {
             get {
                 val id = call.parameters["id"]?.toLong() ?: return@get call.warning<Nothing>(
