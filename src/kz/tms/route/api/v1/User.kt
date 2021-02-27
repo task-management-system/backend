@@ -12,6 +12,7 @@ import kz.tms.features.withPermission
 import kz.tms.model.Message
 import kz.tms.model.paging.PagingResponse
 import kz.tms.model.user.UserEntity
+import kz.tms.model.user.UserWithRoleId
 import kz.tms.utils.*
 import org.koin.ktor.ext.inject
 
@@ -35,7 +36,7 @@ fun Route.user() {
 
         withPermission(Permission.InsertUser.power) {
             put {
-                val user = call.receive<User>()
+                val user = call.receive<UserEntity>()
                 service.insert(user).insertRespond(this)
             }
         }
@@ -55,7 +56,7 @@ fun Route.user() {
                 val id = call.parameters["id"]?.toLong() ?: return@patch call.error<Nothing>(
                     message = Message.INDICATE_USER_ID
                 )
-                val user = call.receiveOrNull<User>() ?: return@patch call.error<Nothing>(
+                val user = call.receiveOrNull<UserWithRoleId>() ?: return@patch call.error<Nothing>(
                     message = Message.FILL_PAYLOAD
                 )
 
@@ -104,10 +105,10 @@ fun Route.user() {
             }
 
             put {
-                val users = call.receiveOrNull<Array<User>>()?.toList() ?: call.error<Nothing>(
+                val users = call.receiveOrNull<Array<UserEntity>>()?.toList() ?: call.error<Nothing>(
                     message = Message.FILL_PAYLOAD
                 )
-                service.batchInsert(users as List<User>).insertRespond(this)
+                service.batchInsert(users as List<UserEntity>).insertRespond(this)
             }
         }
     }
