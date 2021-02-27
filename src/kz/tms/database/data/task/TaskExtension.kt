@@ -8,5 +8,5 @@ fun ResultRow.toTask() = Task(
     title = this[TaskTable.title],
     description = this[TaskTable.description],
     dueDate = this[TaskTable.dueDate].millis,
-    userId = this[TaskTable.userId]
+    creatorId = this[TaskTable.creatorId]
 )
