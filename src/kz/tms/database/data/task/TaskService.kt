@@ -8,15 +8,15 @@ class TaskService(
     private val transactionService: TransactionService,
     private val repository: TaskRepository
 ) {
-    suspend fun count(): Long {
+    suspend fun count(userId: Long): Long {
         return transactionService.transaction {
-            repository.count()
+            repository.count(userId)
         }
     }
 
-    suspend fun getAll(paging: Paging): List<Task> {
+    suspend fun getAll(userId: Long, paging: Paging): List<Task> {
         return transactionService.transaction {
-            repository.getAll(paging)
+            repository.getAll(userId, paging)
         }
     }
 }

@@ -35,7 +35,17 @@ fun Route.task() {
             call.success(data = PagingResponse(total = totalCount, list = tasks))
         }
 
-    route("/task") {
+        get("/created") {
+            val userId = call.principal<AuthenticationPrincipal>()?.userId ?: return@get call.error<Nothing>(
+                statusCode = HttpStatusCode.Unauthorized,
+                message = Message.PRINCIPAL_NOT_FOUND
+            )
+            val paging = call.parameters.asPaging()
 
+            val totalCount = taskService.count(userId)
+            val tasks = taskService.getAll(userId, paging)
+
+            call.success(data = PagingResponse(total = totalCount, list = tasks))
+        }
     }
 }
