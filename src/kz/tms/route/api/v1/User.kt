@@ -127,12 +127,10 @@ fun Route.user() {
     withPermission(Permission.ViewUser.power) {
         route("/users") {
             get {
-                val paging = call.parameters.asPaging()
-
                 call.success(
                     data = PagingResponse(
                         total = service.count(),
-                        list = service.getAll(paging)
+                        list = service.getAll()
                     )
                 )
             }

@@ -75,6 +75,14 @@ class UserRepository {
             }
     }
 
+    fun getAll(): List<UserWithRole> {
+        return UserTable
+            .leftJoin(RoleTable)
+            .selectAll()
+            .orderBy(UserTable.id)
+            .map { toUserResponse(it) }
+    }
+
     fun getAll(paging: Paging): List<UserWithRole> {
         return UserTable
             .leftJoin(RoleTable)
