@@ -8,6 +8,8 @@ import kz.tms.database.data.detail.DetailRepository
 import kz.tms.database.data.detail.DetailService
 import kz.tms.database.data.role.RoleRepository
 import kz.tms.database.data.role.RoleService
+import kz.tms.database.data.status.StatusRepository
+import kz.tms.database.data.status.StatusService
 import kz.tms.database.data.task.TaskRepository
 import kz.tms.database.data.task.TaskService
 import kz.tms.database.data.user.UserRepository
@@ -26,6 +28,10 @@ val databaseModule = module(createdAtStart = true) {
     single { RoleRepository() }
 
     single { RoleService(get(), get()) }
+
+    single { StatusRepository() }
+
+    single { StatusService(get(), get()) }
 
     single { TaskRepository() }
 
