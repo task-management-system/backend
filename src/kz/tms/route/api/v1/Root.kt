@@ -12,8 +12,6 @@ fun Route.v1() {
         authenticate("token") {
             permission()
 
-            detail()
-
             role()
 
             task()
