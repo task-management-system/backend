@@ -3,7 +3,7 @@ package kz.tms.database.data.detail
 import kz.tms.database.TransactionService
 import kz.tms.model.paging.Paging
 import kz.tms.model.task.DetailCreate
-import kz.tms.model.task.TaskEntity
+import kz.tms.model.task.TaskWithCreatorAndDetailId
 
 class DetailService(
     private val transactionService: TransactionService,
@@ -15,7 +15,7 @@ class DetailService(
         }
     }
 
-    suspend fun getAll(userId: Long, statusId: Short, paging: Paging): List<TaskEntity> {
+    suspend fun getAll(userId: Long, statusId: Short, paging: Paging): List<TaskWithCreatorAndDetailId> {
         return transactionService.transaction {
             repository.getAll(userId, statusId, paging)
         }

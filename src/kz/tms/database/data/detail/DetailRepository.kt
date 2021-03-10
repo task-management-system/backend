@@ -1,10 +1,11 @@
 package kz.tms.database.data.detail
 
 import kz.tms.database.data.task.TaskTable
-import kz.tms.database.data.task.toTask
+import kz.tms.database.data.task.toTaskWithCreatorAndDetailId
+import kz.tms.database.data.user.UserTable
 import kz.tms.model.paging.Paging
 import kz.tms.model.task.DetailCreate
-import kz.tms.model.task.TaskEntity
+import kz.tms.model.task.TaskWithCreatorAndDetailId
 import kz.tms.utils.selectAll
 import org.jetbrains.exposed.sql.*
 
@@ -18,15 +19,15 @@ class DetailRepository {
             .count()
     }
 
-    fun getAll(userId: Long, statusId: Short, paging: Paging): List<TaskEntity> {
+    fun getAll(userId: Long, statusId: Short, paging: Paging): List<TaskWithCreatorAndDetailId> {
         return DetailTable
             .leftJoin(TaskTable)
-            .slice(TaskTable.columns)
-            .selectAll(TaskTable.id, paging)
+            .join(UserTable, JoinType.LEFT, UserTable.id, TaskTable.creatorId)
+            .selectAll(DetailTable.id, paging)
             .andWhere {
                 (DetailTable.executorId eq userId) and (DetailTable.statusId eq statusId)
             }
-            .map { it.toTask() }
+            .map { resultRow -> resultRow.toTaskWithCreatorAndDetailId() }
     }
 
     fun batchInsert(details: List<DetailCreate>): List<ResultRow> {

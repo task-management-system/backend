@@ -37,14 +37,14 @@ fun Route.task() {
 
             val details = arrayListOf<DetailCreate>()
             taskCreate.executorIds.forEach { executorId ->
-                details.add(DetailCreate(task.id, executorId, 1))
+                details.add(DetailCreate(task.taskId, executorId, 1))
             }
 
             val batchInsertResult = detailService.batchInsert(details)
 
             when {
                 batchInsertResult == 0 -> {
-                    taskService.delete(task.id)
+                    taskService.delete(task.taskId)
                     call.error<Nothing>(message = "Не удалось добавить детали")
                 }
                 batchInsertResult >= 1 -> call.success<Nothing>(message = "Задача создана")

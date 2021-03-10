@@ -2,16 +2,13 @@ package kz.tms.database.data.user
 
 import kz.tms.database.data.role.toRole
 import kz.tms.model.role.Role
-import kz.tms.model.user.IUser
-import kz.tms.model.user.UserEntity
-import kz.tms.model.user.UserWithRole
-import kz.tms.model.user.UserWithRoleId
+import kz.tms.model.user.*
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.statements.BatchInsertStatement
 import org.jetbrains.exposed.sql.statements.InsertStatement
 import org.jetbrains.exposed.sql.statements.UpdateStatement
 
-fun toUser(resultRow: ResultRow): UserEntity {
+fun toUserEntity(resultRow: ResultRow): UserEntity {
     return UserEntity(
         id = resultRow[UserTable.id],
         username = resultRow[UserTable.username],
@@ -20,6 +17,15 @@ fun toUser(resultRow: ResultRow): UserEntity {
         email = resultRow[UserTable.email],
         isActive = resultRow[UserTable.isActive],
         roleId = resultRow[UserTable.roleId]
+    )
+}
+
+fun ResultRow.toUser(): User {
+    return User(
+        id = get(UserTable.id),
+        username = get(UserTable.username),
+        name = get(UserTable.name),
+        email = get(UserTable.email)
     )
 }
 
@@ -45,7 +51,7 @@ infix fun UserEntity.merge(role: Role): UserWithRole {
     )
 }
 
-fun InsertStatement<Number>.toUser(userEntity: UserEntity) {
+fun InsertStatement<Number>.toUserEntity(userEntity: UserEntity) {
     let {
         it[UserTable.username] = userEntity.username
         it[UserTable.password] = userEntity.password
@@ -56,7 +62,7 @@ fun InsertStatement<Number>.toUser(userEntity: UserEntity) {
     }
 }
 
-fun BatchInsertStatement.toUser(userEntity: UserEntity) {
+fun BatchInsertStatement.toUserEntity(userEntity: UserEntity) {
     let {
         it[UserTable.username] = userEntity.username
         it[UserTable.password] = userEntity.password
@@ -67,7 +73,7 @@ fun BatchInsertStatement.toUser(userEntity: UserEntity) {
     }
 }
 
-fun UpdateStatement.toUser(user: IUser) {
+fun UpdateStatement.toUserEntity(user: IUser) {
     when (user) {
         is UserWithRoleId -> {
             set(UserTable.username, user.username)

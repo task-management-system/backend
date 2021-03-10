@@ -18,14 +18,14 @@ class UserRepository {
     fun insert(userEntity: UserEntity): List<ResultRow>? {
         return UserTable
             .insert { insertStatement ->
-                insertStatement.toUser(userEntity)
+                insertStatement.toUserEntity(userEntity)
             }.resultedValues
     }
 
     fun batchInsert(userEntities: List<UserEntity>): List<ResultRow> {
         return UserTable
             .batchInsert(userEntities) { user ->
-                toUser(user)
+                toUserEntity(user)
             }
     }
 
@@ -33,7 +33,7 @@ class UserRepository {
         return UserTable
             .update(
                 where = { UserTable.id eq id },
-                body = { statement -> statement.toUser(user) }
+                body = { statement -> statement.toUserEntity(user) }
             )
     }
 
@@ -56,7 +56,7 @@ class UserRepository {
     fun validatePassword(id: Long, currentPassword: String): UserEntity? {
         return UserTable
             .select { (UserTable.id eq id) and (UserTable.password eq currentPassword) }
-            .map { toUser(it) }
+            .map { toUserEntity(it) }
             .singleOrNull()
     }
 
@@ -103,7 +103,7 @@ class UserRepository {
     fun getByUsernameOrByEmailOrNull(usernameOrEmail: String): UserEntity? {
         return UserTable
             .select { (UserTable.username eq usernameOrEmail) or (UserTable.email eq usernameOrEmail) }
-            .map { toUser(it) }
+            .map { toUserEntity(it) }
             .singleOrNull()
     }
 }

@@ -12,6 +12,13 @@ interface IUser {
     val email: String?
 }
 
+data class User(
+    override val id: Long?,
+    override val username: String,
+    override val name: String?,
+    override val email: String?
+) : IUser
+
 data class UserEntity(
     override val id: Long? = null,
     override val username: String,

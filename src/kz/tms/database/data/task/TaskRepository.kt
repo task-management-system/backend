@@ -1,8 +1,10 @@
 package kz.tms.database.data.task
 
+import kz.tms.database.data.user.UserTable
 import kz.tms.model.paging.Paging
-import kz.tms.model.task.ITask
+import kz.tms.model.task.TaskCreate
 import kz.tms.model.task.TaskEntity
+import kz.tms.model.task.TaskWithCreator
 import kz.tms.utils.selectAll
 import org.jetbrains.exposed.sql.andWhere
 import org.jetbrains.exposed.sql.deleteWhere
@@ -17,14 +19,15 @@ class TaskRepository {
             .count()
     }
 
-    fun getAll(userId: Long, paging: Paging): List<TaskEntity> {
+    fun getAll(userId: Long, paging: Paging): List<TaskWithCreator> {
         return TaskTable
+            .leftJoin(UserTable)
             .selectAll(TaskTable.id, paging)
             .andWhere { TaskTable.creatorId eq userId }
-            .map { resultRow -> resultRow.toTask() }
+            .map { resultRow -> resultRow.toTaskWithCreator() }
     }
 
-    fun insert(task: ITask): TaskEntity? {
+    fun insert(task: TaskCreate): TaskEntity? {
         return TaskTable
             .insert { insertStatement ->
                 insertStatement.toTask(task)
