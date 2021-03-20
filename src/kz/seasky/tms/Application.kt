@@ -19,11 +19,11 @@ fun main(args: Array<String>) {
 @Suppress("unused")
 @kotlin.jvm.JvmOverloads
 fun Application.module(testing: Boolean = false) {
-    setKoin()
+    setDI()
     setRestAPI()
 }
 
-private fun Application.setKoin() {
+private fun Application.setDI() {
     install(Koin) {
         modules(
             applicationModule,
