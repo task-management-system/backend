@@ -5,7 +5,9 @@ import io.ktor.features.*
 import io.ktor.gson.*
 import io.ktor.server.netty.*
 import kz.seasky.tms.di.modules.applicationModule
+import kz.seasky.tms.di.modules.authenticationModule
 import kz.seasky.tms.di.modules.databaseModule
+import kz.seasky.tms.di.modules.repositoryModule
 import kz.seasky.tms.features.PermissionFeature
 import kz.seasky.tms.features.installAuthentication
 import kz.seasky.tms.features.installRouting
@@ -13,7 +15,8 @@ import kz.seasky.tms.features.installStatusPages
 import org.koin.ktor.ext.Koin
 
 fun main(args: Array<String>) {
-    EngineMain.main(args)
+    //FIXME Убейте меня
+    EngineMain.main(args + arrayOf("-P:args=${args.toList()}"))
 }
 
 @Suppress("unused")
@@ -25,9 +28,18 @@ fun Application.module(testing: Boolean = false) {
 
 private fun Application.setDI() {
     install(Koin) {
+        //FIXME Убейте меня
+        var configuration = environment.config.property("args").getString()
+        val regex = "-config.*conf".toRegex()
+        configuration = regex.find(configuration, 0)?.value ?: "application.conf"
+        configuration = configuration.substringAfterLast('/')
+        koin.setProperty("conf", configuration)
+
         modules(
             applicationModule,
-            databaseModule
+            databaseModule,
+            authenticationModule,
+            repositoryModule
         )
     }
 }
