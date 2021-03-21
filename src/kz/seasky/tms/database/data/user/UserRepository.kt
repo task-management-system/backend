@@ -1,11 +1,11 @@
 package kz.seasky.tms.database.data.user
 
 import kz.seasky.tms.database.data.role.RoleTable
+import kz.seasky.tms.extensions.selectAll
 import kz.seasky.tms.model.paging.Paging
 import kz.seasky.tms.model.user.IUser
 import kz.seasky.tms.model.user.UserEntity
 import kz.seasky.tms.model.user.UserWithRole
-import kz.seasky.tms.utils.selectAll
 import org.jetbrains.exposed.sql.*
 
 class UserRepository {

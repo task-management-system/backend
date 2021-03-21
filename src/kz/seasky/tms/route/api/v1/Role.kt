@@ -1,14 +1,17 @@
 package kz.seasky.tms.route.api.v1
 
 import io.ktor.application.*
+import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.routing.*
 import kz.seasky.tms.database.data.role.RoleService
+import kz.seasky.tms.extensions.error
+import kz.seasky.tms.extensions.success
+import kz.seasky.tms.extensions.successfullyAdded
+import kz.seasky.tms.extensions.successfullyUpdated
+import kz.seasky.tms.model.Message
 import kz.seasky.tms.model.role.Role
-import kz.seasky.tms.utils.error
-import kz.seasky.tms.utils.insertRespond
-import kz.seasky.tms.utils.success
-import kz.seasky.tms.utils.updateRespond
+import kz.seasky.tms.utils.*
 import org.koin.ktor.ext.inject
 
 fun Route.role() {
@@ -17,21 +20,25 @@ fun Route.role() {
     route("/role") {
         put {
             val role = call.receiveOrNull<Role>() ?: return@put call.error<Nothing>(
-                message = "Да дай ты мне пейлоад падла"
+                message = Message.FILL_PAYLOAD
             )
 
-            service.insert(role).insertRespond(this)
+            service.insert(role)
+
+            call.successfullyAdded()
         }
 
         patch {
             val id = call.parameters["id"]?.toLong() ?: return@patch call.error<Nothing>(
-                message = "Да дай ты мне айдишник падла"
+                message = Message.INDICATE_ID + "роли"
             )
             val role = call.receiveOrNull<Role>() ?: return@patch call.error<Nothing>(
-                message = "Да дай ты мне пейлоад падла"
+                message = Message.FILL_PAYLOAD
             )
 
-            service.update(id, role).updateRespond(this)
+            service.update(id, role)
+
+            call.successfullyUpdated()
         }
     }
 
@@ -42,10 +49,12 @@ fun Route.role() {
 
         put {
             val roles = call.receiveOrNull<List<Role>>() ?: return@put call.error<Nothing>(
-                message = "Да ты мне дай чертовые роли"
+                message = Message.FILL_PAYLOAD
             )
 
-            service.batchInsert(roles).insertRespond(this)
+            service.batchInsert(roles)
+
+            call.successfullyAdded()
         }
     }
 }

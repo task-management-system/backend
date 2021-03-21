@@ -3,10 +3,12 @@ package kz.seasky.tms.features
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.http.*
+import kz.seasky.tms.enums.BuildVariant
 import kz.seasky.tms.exceptions.PagingException
 import kz.seasky.tms.exceptions.PermissionException
 import kz.seasky.tms.exceptions.UserChangePasswordException
-import kz.seasky.tms.utils.error
+import kz.seasky.tms.extensions.error
+import kz.seasky.tms.utils.BuildConfig
 
 fun Application.installStatusPages() {
     install(StatusPages) {
@@ -48,8 +50,10 @@ fun Application.installStatusPages() {
         }
 
         exception<Throwable> { e ->
-            //TODO configure with build variant
-            e.printStackTrace()
+            if (BuildConfig.buildVariant == BuildVariant.Develop) {
+                e.printStackTrace()
+            }
+
             call.error<Nothing>(
                 statusCode = HttpStatusCode.InternalServerError,
                 message = "Что-то пошло не так",

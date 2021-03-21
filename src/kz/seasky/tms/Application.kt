@@ -8,33 +8,39 @@ import kz.seasky.tms.di.modules.applicationModule
 import kz.seasky.tms.di.modules.authenticationModule
 import kz.seasky.tms.di.modules.databaseModule
 import kz.seasky.tms.di.modules.repositoryModule
+import kz.seasky.tms.enums.BuildVariant
 import kz.seasky.tms.features.PermissionFeature
 import kz.seasky.tms.features.installAuthentication
 import kz.seasky.tms.features.installRouting
 import kz.seasky.tms.features.installStatusPages
+import kz.seasky.tms.utils.BuildConfig
 import org.koin.ktor.ext.Koin
 
 fun main(args: Array<String>) {
-    //FIXME Убейте меня
     EngineMain.main(args + arrayOf("-P:args=${args.toList()}"))
 }
 
 @Suppress("unused")
-@kotlin.jvm.JvmOverloads
+@JvmOverloads
 fun Application.module(testing: Boolean = false) {
+    setBuildConfig()
     setDI()
     setRestAPI()
 }
 
+private fun Application.setBuildConfig() {
+    val configuration = environment.config.property("args").getString()
+    val buildVariant = when {
+        configuration.contains("-config=application-dev.conf") -> BuildVariant.Develop
+        configuration.contains("-config=application.conf") -> BuildVariant.Product
+        else -> throw IllegalArgumentException("Не удалось определить build variant")
+    }
+
+    BuildConfig.buildVariant = buildVariant
+}
+
 private fun Application.setDI() {
     install(Koin) {
-        //FIXME Убейте меня
-        var configuration = environment.config.property("args").getString()
-        val regex = "-config.*conf".toRegex()
-        configuration = regex.find(configuration, 0)?.value ?: "application.conf"
-        configuration = configuration.substringAfterLast('/')
-        koin.setProperty("conf", configuration)
-
         modules(
             applicationModule,
             databaseModule,
@@ -53,7 +59,6 @@ private fun Application.setRestAPI() {
         gson { serializeNulls() }
     }
 
-    //TODO Научиться писать собственные фичи, а не вот это вот все
     installAuthentication()
 
     install(PermissionFeature) {

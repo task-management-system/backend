@@ -25,7 +25,6 @@ class DatabaseConnector(dataSource: DataSource) {
         DetailTable
     )
 
-    //TODO Разобрать копипастную магию
     init {
         runBlocking {
             newTransaction {

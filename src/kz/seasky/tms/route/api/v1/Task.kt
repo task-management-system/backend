@@ -7,14 +7,14 @@ import io.ktor.request.*
 import io.ktor.routing.*
 import kz.seasky.tms.database.data.detail.DetailService
 import kz.seasky.tms.database.data.task.TaskService
+import kz.seasky.tms.extensions.asPaging
+import kz.seasky.tms.extensions.error
+import kz.seasky.tms.extensions.success
 import kz.seasky.tms.model.Message
 import kz.seasky.tms.model.authentication.AuthenticationPrincipal
 import kz.seasky.tms.model.paging.PagingResponse
 import kz.seasky.tms.model.task.DetailCreate
 import kz.seasky.tms.model.task.TaskCreate
-import kz.seasky.tms.utils.asPaging
-import kz.seasky.tms.utils.error
-import kz.seasky.tms.utils.success
 import org.koin.ktor.ext.inject
 
 fun Route.task() {

@@ -4,8 +4,8 @@ import io.ktor.application.*
 import io.ktor.request.*
 import io.ktor.routing.*
 import kz.seasky.tms.authentication.AuthenticationService
+import kz.seasky.tms.extensions.respond
 import kz.seasky.tms.model.authentication.AuthenticationCredential
-import kz.seasky.tms.utils.respond
 import org.koin.ktor.ext.inject
 
 fun Route.authentication() {

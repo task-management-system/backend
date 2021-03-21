@@ -3,15 +3,11 @@ package kz.seasky.tms.utils
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import com.zaxxer.hikari.HikariConfig
-import org.koin.core.component.KoinApiExtension
-import org.koin.core.component.KoinComponent
 import java.util.*
 
-@OptIn(KoinApiExtension::class)
-class ApplicationSettings : KoinComponent {
+class ApplicationSettings {
 
-    private val fileName = getKoin().getProperty("conf", "")
-    private val config = ConfigFactory.load(fileName)
+    private val config = ConfigFactory.load(BuildConfig.buildVariant.fileName)
 
     val hikariConfig by lazy {
         val databaseConfig = config.getConfig("database")

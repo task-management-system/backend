@@ -3,10 +3,10 @@ package kz.seasky.tms.database.data.detail
 import kz.seasky.tms.database.data.task.TaskTable
 import kz.seasky.tms.database.data.task.toTaskWithCreatorAndDetailId
 import kz.seasky.tms.database.data.user.UserTable
+import kz.seasky.tms.extensions.selectAll
 import kz.seasky.tms.model.paging.Paging
 import kz.seasky.tms.model.task.DetailCreate
 import kz.seasky.tms.model.task.TaskWithCreatorAndDetailId
-import kz.seasky.tms.utils.selectAll
 import org.jetbrains.exposed.sql.*
 
 class DetailRepository {

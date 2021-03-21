@@ -1,11 +1,11 @@
 package kz.seasky.tms.database.data.task
 
 import kz.seasky.tms.database.data.user.UserTable
+import kz.seasky.tms.extensions.selectAll
 import kz.seasky.tms.model.paging.Paging
 import kz.seasky.tms.model.task.TaskCreate
 import kz.seasky.tms.model.task.TaskEntity
 import kz.seasky.tms.model.task.TaskWithCreator
-import kz.seasky.tms.utils.selectAll
 import org.jetbrains.exposed.sql.andWhere
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert

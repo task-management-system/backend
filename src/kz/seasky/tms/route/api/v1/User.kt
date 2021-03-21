@@ -8,6 +8,7 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.util.pipeline.*
 import kz.seasky.tms.database.data.user.UserService
+import kz.seasky.tms.extensions.*
 import kz.seasky.tms.features.withPermission
 import kz.seasky.tms.model.Message
 import kz.seasky.tms.model.authentication.AuthenticationPrincipal
@@ -33,8 +34,8 @@ fun Route.user() {
 
         withPermission(Permission.ViewUser.power) {
             get {
-                val id = call.parameters["id"]?.toLong() ?: return@get call.warning<Nothing>(
-                    message = Message.INDICATE_USER_ID,
+                val id = call.parameters["id"]?.toLong() ?: return@get call.error<Nothing>(
+                    message = Message.INDICATE_ID + "пользователя"
                 )
 
                 val user = service.getByIdOrNull(id) ?: return@get call.error<Nothing>(
@@ -48,63 +49,66 @@ fun Route.user() {
         withPermission(Permission.InsertUser.power) {
             put {
                 val user = call.receive<UserEntity>()
-                service.insert(user).insertRespond(this)
+
+                service.insert(user)
+
+                call.successfullyAdded()
             }
         }
 
         withPermission(Permission.DeleteUser.power) {
             delete {
-                val id = call.parameters["id"]?.toLong() ?: return@delete call.warning<Nothing>(
-                    message = Message.INDICATE_USER_ID,
+                val id = call.parameters["id"]?.toLong() ?: return@delete call.error<Nothing>(
+                    message = Message.INDICATE_ID + "пользователя"
                 )
 
-                service.deleteById(id).deleteRespond(this)
+                service.deleteById(id)
+
+                call.successfullyDeleted()
             }
         }
 
         withPermission(Permission.UpdateUser.power) {
             patch {
                 val id = call.parameters["id"]?.toLong() ?: return@patch call.error<Nothing>(
-                    message = Message.INDICATE_USER_ID
+                    message = Message.INDICATE_ID + "пользователя"
                 )
                 val user = call.receiveOrNull<UserWithRoleId>() ?: return@patch call.error<Nothing>(
                     message = Message.FILL_PAYLOAD
                 )
 
-                service.updateById(id, user).updateRespond(this)
+                service.updateById(id, user)
+
+                call.successfullyUpdated()
             }
         }
 
         withPermission(Permission.UpdateUser.power) {
             patch("/lock") {
                 val id = call.parameters["id"]?.toLong() ?: return@patch call.error<Nothing>(
-                    message = Message.INDICATE_USER_ID
+                    message = Message.INDICATE_ID + "пользователя"
                 )
 
-                service.lock(id).respond(
-                    context = this,
-                    successMessage = "Пользователь заблокирован",
-                    errorMessage = "Не удалось заблокировать пользователя"
-                )
+                service.lock(id)
+
+                call.success<Nothing>(message = "Пользователь заблокирован")
             }
 
             patch("/unlock") {
                 val id = call.parameters["id"]?.toLong() ?: return@patch call.error<Nothing>(
-                    message = Message.INDICATE_USER_ID
+                    message = Message.INDICATE_ID + "пользователя"
                 )
 
-                service.unlock(id).respond(
-                    context = this,
-                    successMessage = "Пользователь разблокирован",
-                    errorMessage = "Не удалось разблокировать пользователя"
-                )
+                service.unlock(id)
+
+                call.success<Nothing>(message = "Пользователь разблокирован")
             }
         }
 
         withPermission(Permission.UpdateUser.power) {
             patch("/change-password") {
                 val id = call.parameters["id"]?.toLong() ?: return@patch call.error<Nothing>(
-                    message = Message.INDICATE_USER_ID
+                    message = Message.INDICATE_ID + "пользователя"
                 )
                 val userChangePassword = call.receiveOrNull<UserChangePassword>() ?: return@patch call.error<Nothing>(
                     message = Message.FILL_PAYLOAD
@@ -116,10 +120,9 @@ fun Route.user() {
                     message = "Текущий пароль не совпадает с паролем в базе"
                 )
 
-                when (service.changePassword(id, userChangePassword.newPassword)) {
-                    0 -> call.error<Nothing>(message = "Не удалось изменить пароль")
-                    1 -> call.success<Nothing>(message = "Пароль успешно изменен")
-                }
+                service.changePassword(id, userChangePassword.newPassword)
+
+                call.success<Nothing>(message = "Пароль успешно изменен")
             }
         }
     }
@@ -139,7 +142,9 @@ fun Route.user() {
                 val users = call.receiveOrNull<Array<UserEntity>>()?.toList() ?: call.error<Nothing>(
                     message = Message.FILL_PAYLOAD
                 )
-                service.batchInsert(users as List<UserEntity>).insertRespond(this)
+                service.batchInsert(users as List<UserEntity>)
+
+                call.successfullyAdded()
             }
         }
     }
