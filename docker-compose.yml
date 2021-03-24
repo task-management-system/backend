@@ -28,7 +28,6 @@ services:
       - .env
     environment:
       - TZ=${TMS_TZ}
-      - TMS_BE_USER=${TMS_BE_USER}
     expose:
       - ${TMS_BE_PORT}
     ports:
