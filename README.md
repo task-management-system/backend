@@ -20,10 +20,12 @@
 
 ### Run server with docker
 
-Default listen ports:
+#### You can get the .env file from [Muslim](https://github.com/SkyfaceD)
 
-- backend 7000
-- database 7100
+#### Default listen ports:
+
+- backend: 7000
+- database: 7100
 
 #### Requirements for Windows users
 
