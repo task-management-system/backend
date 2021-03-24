@@ -7,7 +7,8 @@ import java.util.*
 
 class ApplicationSettings {
 
-    private val config = ConfigFactory.load(BuildConfig.buildVariant.fileName)
+//    private val config = ConfigFactory.load(BuildConfig.buildVariant.fileName)
+private val config = ConfigFactory.load("application.conf")
 
     val hikariConfig by lazy {
         val databaseConfig = config.getConfig("database")

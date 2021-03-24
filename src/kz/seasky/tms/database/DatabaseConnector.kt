@@ -1,6 +1,8 @@
 package kz.seasky.tms.database
 
 import kotlinx.coroutines.runBlocking
+import kz.seasky.tms.database.data.DaoRoles
+import kz.seasky.tms.database.data.DaoUsers
 import kz.seasky.tms.database.data.detail.DetailTable
 import kz.seasky.tms.database.data.role.RoleTable
 import kz.seasky.tms.database.data.status.StatusTable
@@ -22,7 +24,9 @@ class DatabaseConnector(dataSource: DataSource) {
         RoleTable,
         TaskTable,
         StatusTable,
-        DetailTable
+        DetailTable,
+        DaoUsers,
+        DaoRoles
     )
 
     init {

@@ -17,13 +17,14 @@ import kz.seasky.tms.utils.BuildConfig
 import org.koin.ktor.ext.Koin
 
 fun main(args: Array<String>) {
-    EngineMain.main(args + arrayOf("-P:args=${args.toList()}"))
+//    EngineMain.main(args + arrayOf("-P:args=${args.toList()}"))
+    EngineMain.main(args)
 }
 
 @Suppress("unused")
 @JvmOverloads
 fun Application.module(testing: Boolean = false) {
-    setBuildConfig()
+//    setBuildConfig()
     setDI()
     setRestAPI()
 }
@@ -31,11 +32,10 @@ fun Application.module(testing: Boolean = false) {
 private fun Application.setBuildConfig() {
     val configuration = environment.config.property("args").getString()
     val buildVariant = when {
-        configuration.contains("-config=application-dev.conf") -> BuildVariant.Develop
-        configuration.contains("-config=application.conf") -> BuildVariant.Product
+        configuration.contains("-config=./resources/application-dev.conf") -> BuildVariant.Develop
+        configuration.contains("-config=./resources/application.conf") -> BuildVariant.Product
         else -> throw IllegalArgumentException("Не удалось определить build variant")
     }
-
     BuildConfig.buildVariant = buildVariant
 }
 
