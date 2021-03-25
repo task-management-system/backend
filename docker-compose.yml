@@ -33,7 +33,7 @@ services:
     ports:
       - ${TMS_BE_PORT}:${TMS_BE_PORT}
     depends_on:
-      - database
+      - tms-database
     networks:
       - tms-network
 
