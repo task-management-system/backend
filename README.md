@@ -35,8 +35,9 @@
 
 #### TL;DR
 
-Just type one simple command for up whole server (Currently unstable, if do nothing or exit with error see 'full
-instruction' section)
+Just type one simple command for up whole server (Currently unstable, if do nothing or exit with error
+see [full instruction](https://github.com/task-management-system/backend/tree/feat/global-refactor#full-instruction)
+section)
 
 ```
 muslim do-magic
