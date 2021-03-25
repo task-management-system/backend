@@ -61,3 +61,17 @@ Explanation of each row
 4. Run database
 5. Copy all data from sql file and put it on psql as dev to insert dump to tms database
 6. Run backend
+
+#### Cheat sheet
+
+```
+create extension "uuid-ossp" //Extension for generate uuid's, build in postgresql
+
+gradlew clean build -x test //Exclude test task when build
+
+docker exec -i database pg_dump -U dev -d tms -p 7100 > dump.sql //Create db dump from container. Passed options (-U user; -d database; -p listen port)
+docker exec -i database pg_dump -U dev -d tms -p 7100 | gzip -9 > dump.sql.gz //With compress. Passed option (-9 or --best best compress value)
+docker exec -i database pg_dump -U dev -d tms -p 7100 > dump_%date%_%time:~0,8%.sql //With current datetime.
+
+cat dump.sql | docker exec -i tms-database psql -U dev -d tms //Restore db dump into container
+```
