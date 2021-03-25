@@ -20,7 +20,7 @@
 
 ### Run server with docker
 
-#### You can get the .env file from [Muslim](https://github.com/SkyfaceD)
+#### You can get the .env file from pm [Muslim](https://github.com/SkyfaceD) or directly from [draft](https://github.com/task-management-system/draft/blob/main/.env) repository. (Don't ask me why I did this and not this. I don't know myself) 
 
 #### Default listen ports:
 
