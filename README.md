@@ -20,7 +20,7 @@
 
 ### Run server with docker
 
-#### You can get the .env file from pm [Muslim](https://github.com/SkyfaceD) or directly from [draft](https://github.com/task-management-system/draft/blob/main/.env) repository. (Don't ask me why I did this and not this. I don't know myself) 
+#### You can get the .env file from pm [Muslim](https://github.com/SkyfaceD) or directly from [draft](https://github.com/task-management-system/draft/blob/main/.env) repository. (Don't ask me why I did this and not this. I don't know myself)
 
 #### Default listen ports:
 
@@ -63,16 +63,42 @@ Explanation of each row
 5. Copy all data from sql file and put it on psql as dev to insert dump to tms database
 6. Run backend
 
-#### Cheat sheet
+## Cheat sheet
 
 ```
 create extension "uuid-ossp" //Extension for generate uuid's, build in postgresql
 
 gradlew clean build -x test //Exclude test task when build
 
-docker exec -i database pg_dump -U dev -d tms -p 7100 > dump.sql //Create db dump from container. Passed options (-U user; -d database; -p listen port)
-docker exec -i database pg_dump -U dev -d tms -p 7100 | gzip -9 > dump.sql.gz //With compress. Passed option (-9 or --best best compress value)
-docker exec -i database pg_dump -U dev -d tms -p 7100 > dump_%date%_%time:~0,8%.sql //With current datetime.
+docker exec -i $container pg_dump -U $user -d $database -p $port > dump.sql //Create db dump from container. Passed options (-U user; -d database; -p listen port)
+docker exec -i $container pg_dump -U $user -d $database -p $port | gzip -9 > dump.sql.gz //With compress. Passed option (-9 or --best best compress value)
+docker exec -i $container pg_dump -U $user -d $database -p $port > dump_%date%_%time:~0,8%.sql //With current datetime.
 
-cat dump.sql | docker exec -i tms-database psql -U dev -d tms //Restore db dump into container
+cat *.sql | docker exec -i $container psql -U $user -d $database //Restore db dump into container
 ```
+
+# Wiki
+
+## Database rules
+
+1. Name of the tables in the singular;
+2. For multiple words use `snake_case` for both table and column names;
+3. Override default constraint names, ex. in table below;
+
+   Name|Value|Example
+         ---|---|---
+   Primary Key|pk_$tableName|constraint pk_user<br>primary key(id)
+   Foreign Key|Default postgresql fk value<br>fk_$tableName_$columnName_$referenceColumnName|constraint fk_user_role_id_id<br>foreign key(role_id)<br>references role(id)
+   Unique|key_$tableName_$columnName|constraint key_user_username<br>unique(username)
+4. For UUID tables use extension `uuid-ossp`, for default value use a fourth version of uuid generator.
+
+   Ex.
+
+   ```
+   create extension if not exists "uuid-ossp";
+   create table user(
+      id uuid default uuid_generate_v4(),
+      ...
+   )
+   ```
+5. ?WIP?
