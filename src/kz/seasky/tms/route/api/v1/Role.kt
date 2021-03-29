@@ -1,56 +1,63 @@
 package kz.seasky.tms.route.api.v1
 
 import io.ktor.application.*
-import io.ktor.http.*
-import io.ktor.request.*
 import io.ktor.routing.*
-import kz.seasky.tms.extensions.error
-import kz.seasky.tms.model.Message
-import kz.seasky.tms.model.role.Role
+import kz.seasky.tms.extensions.getId
+import kz.seasky.tms.extensions.receiveAndValidate
+import kz.seasky.tms.extensions.receiveOrException
+import kz.seasky.tms.extensions.success
+import kz.seasky.tms.model.role.RoleInsert
+import kz.seasky.tms.model.role.RoleUpdate
 import kz.seasky.tms.repository.role.RoleService
-import kz.seasky.tms.utils.*
 import org.koin.ktor.ext.inject
 
 fun Route.role() {
     val service: RoleService by inject()
 
     route("/role") {
-//        put {
-//            val role = call.receiveOrNull<Role>() ?: return@put call.error<Nothing>(
-//                message = Message.FILL_PAYLOAD
-//            )
-//
-//            service.insert(role)
-//
-//            call.successfullyAdded()
-//        }
+        put {
+            val role = call.receiveAndValidate<RoleInsert>()
+
+            call.success(
+                message = "Роль успешно добавлена",
+                data = service.insert(role)
+            )
+        }
 
         patch {
-            val id = call.parameters["id"]?.toLong() ?: return@patch call.error<Nothing>(
-                message = Message.INDICATE_ID + "роли"
-            )
-            val role = call.receiveOrNull<Role>() ?: return@patch call.error<Nothing>(
-                message = Message.FILL_PAYLOAD
-            )
+            val role = call.receiveAndValidate<RoleUpdate>()
 
-//            service.update(id, role)
+            call.success(
+                message = "Роль успешно обновлена",
+                data = service.update(role)
+            )
+        }
 
+        delete {
+            val id = call.getId<Short>()
+
+            service.delete(id)
+
+            call.success(
+                message = "Роль успешно удалена",
+                data = mapOf("id" to id)
+            )
         }
     }
 
-//    route("/roles") {
-//        get {
-//            call.success(data = service.getAllOrEmpty())
-//        }
-//
-//        put {
-//            val roles = call.receiveOrNull<List<Role>>() ?: return@put call.error<Nothing>(
-//                message = Message.FILL_PAYLOAD
-//            )
-//
-//            service.batchInsert(roles)
-//
-//            call.successfullyAdded()
-//        }
-//    }
+    route("/roles") {
+        get {
+            call.success(data = service.getAll())
+        }
+
+        //FIXME
+        put {
+            val roles = call.receiveOrException<Array<RoleInsert>>().toList()
+
+            call.success(
+                message = "Роли успешно добавлены",
+                data = service.batchInsert(roles)
+            )
+        }
+    }
 }

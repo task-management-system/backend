@@ -44,6 +44,10 @@ suspend fun <T> ApplicationCall.warning(
     respond(statusCode = statusCode, response = Response.Warning(message, data))
 }
 
+suspend inline fun <reified T> ApplicationCall.receiveOrException(): T {
+    return receiveOrNull() ?: throw ErrorException(Message.FILL_PAYLOAD)
+}
+
 suspend inline fun <reified T : ReceiveValidator> ApplicationCall.receiveAndValidate(): T {
     return validate(receiveOrNull())
 }

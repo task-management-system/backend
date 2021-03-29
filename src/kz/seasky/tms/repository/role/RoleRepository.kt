@@ -1,45 +1,33 @@
 package kz.seasky.tms.repository.role
 
+import kz.seasky.tms.database.tables.role.RoleEntity
+import kz.seasky.tms.model.role.Role
+import kz.seasky.tms.model.role.RoleInsert
+import kz.seasky.tms.model.role.RoleUpdate
+
 class RoleRepository {
-//    fun getAllOrEmpty(): List<Role> {
-//        return RoleTable
-//            .selectAll()
-//            .map { toRole(it) }
-//    }
+    fun getAll(): List<Role> {
+        return RoleEntity
+            .all()
+            .map(RoleEntity::toRole)
+    }
 
-//    fun getIdByPowerOrNull(power: Int): Long? {
-//        return RoleTable
-//            .select { RoleTable.power eq power }
-//            .map { it[RoleTable.id] }
-//            .singleOrNull()
-//    }
+    fun insert(role: RoleInsert): Role {
+        return RoleEntity
+            .insert(role)
+    }
 
-//    fun getRoleById(id: Long): Role {
-//        return RoleTable
-//            .select { RoleTable.id eq id }
-//            .map { toRole(it) }
-//            .single()
-//    }
+    fun update(role: RoleUpdate): Role {
+        return RoleEntity
+            .update(role)
+    }
 
-//    fun insert(role: Role): List<ResultRow>? {
-//        return RoleTable
-//            .insert { insertStatement ->
-//                insertStatement.toRole(role)
-//            }.resultedValues
-//    }
-//
-//    fun batchInsert(roles: List<Role>): List<ResultRow> {
-//        return RoleTable
-//            .batchInsert(roles) { role ->
-//                toRole(role)
-//            }
-//    }
+    fun delete(id: Short) {
+        RoleEntity[id].delete()
+    }
 
-//    fun update(id: Long, role: Role): Int {
-//        return RoleTable
-//            .update(
-//                where = { RoleTable.id eq id },
-//                body = { statement -> statement.toRole(role) }
-//            )
-//    }
+    fun batchInsert(roles: List<RoleInsert>): List<Role> {
+        return RoleEntity
+            .batchInsert(roles)
+    }
 }
