@@ -3,8 +3,8 @@ package kz.seasky.tms.features
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.auth.jwt.*
-import kz.seasky.tms.database.data.user.UserService
 import kz.seasky.tms.model.authentication.AuthenticationPrincipal
+import kz.seasky.tms.repository.user.UserService
 import kz.seasky.tms.utils.JWTConfig
 import kz.seasky.tms.utils.JWT_CLAIM_ID
 import kz.seasky.tms.utils.JWT_NAME_STANDARD

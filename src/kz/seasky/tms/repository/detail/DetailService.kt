@@ -1,4 +1,4 @@
-package kz.seasky.tms.database.data.detail
+package kz.seasky.tms.repository.detail
 
 import kz.seasky.tms.database.TransactionService
 

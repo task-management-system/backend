@@ -1,4 +1,4 @@
-package kz.seasky.tms.authentication
+package kz.seasky.tms.repository.authentication
 
 import kotlinx.uuid.UUID
 import kz.seasky.tms.database.TransactionService

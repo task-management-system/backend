@@ -1,4 +1,4 @@
-package kz.seasky.tms.database.data.role
+package kz.seasky.tms.repository.role
 
 class RoleRepository {
 //    fun getAllOrEmpty(): List<Role> {

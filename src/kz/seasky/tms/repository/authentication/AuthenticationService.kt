@@ -1,4 +1,4 @@
-package kz.seasky.tms.authentication
+package kz.seasky.tms.repository.authentication
 
 import kz.seasky.tms.enums.AuthenticationType
 import kz.seasky.tms.exceptions.ErrorException

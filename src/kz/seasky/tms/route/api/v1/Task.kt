@@ -1,8 +1,8 @@
 package kz.seasky.tms.route.api.v1
 
 import io.ktor.routing.*
-import kz.seasky.tms.database.data.detail.DetailService
-import kz.seasky.tms.database.data.task.TaskService
+import kz.seasky.tms.repository.detail.DetailService
+import kz.seasky.tms.repository.task.TaskService
 import org.koin.ktor.ext.inject
 
 fun Route.task() {

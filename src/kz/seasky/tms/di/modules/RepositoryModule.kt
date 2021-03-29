@@ -1,15 +1,15 @@
 package kz.seasky.tms.di.modules
 
-import kz.seasky.tms.database.data.detail.DetailRepository
-import kz.seasky.tms.database.data.detail.DetailService
-import kz.seasky.tms.database.data.role.RoleRepository
-import kz.seasky.tms.database.data.role.RoleService
-import kz.seasky.tms.database.data.status.StatusRepository
-import kz.seasky.tms.database.data.status.StatusService
-import kz.seasky.tms.database.data.task.TaskRepository
-import kz.seasky.tms.database.data.task.TaskService
-import kz.seasky.tms.database.data.user.UserRepository
-import kz.seasky.tms.database.data.user.UserService
+import kz.seasky.tms.repository.detail.DetailRepository
+import kz.seasky.tms.repository.detail.DetailService
+import kz.seasky.tms.repository.role.RoleRepository
+import kz.seasky.tms.repository.role.RoleService
+import kz.seasky.tms.repository.status.StatusRepository
+import kz.seasky.tms.repository.status.StatusService
+import kz.seasky.tms.repository.task.TaskRepository
+import kz.seasky.tms.repository.task.TaskService
+import kz.seasky.tms.repository.user.UserRepository
+import kz.seasky.tms.repository.user.UserService
 import org.koin.dsl.module
 
 val repositoryModule = module(createdAtStart = true) {

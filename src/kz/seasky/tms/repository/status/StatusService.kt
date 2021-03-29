@@ -1,4 +1,4 @@
-package kz.seasky.tms.database.data.status
+package kz.seasky.tms.repository.status
 
 import kz.seasky.tms.database.TransactionService
 import kz.seasky.tms.model.status.StatusEntity

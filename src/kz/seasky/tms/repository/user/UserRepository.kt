@@ -1,6 +1,8 @@
-package kz.seasky.tms.database.data.user
+package kz.seasky.tms.repository.user
 
 import kotlinx.uuid.UUID
+import kz.seasky.tms.database.data.user.UserEntity
+import kz.seasky.tms.database.data.user.UserTable
 import kz.seasky.tms.extensions.crypt
 import kz.seasky.tms.model.paging.Paging
 import kz.seasky.tms.model.user.User
@@ -18,18 +20,15 @@ class UserRepository {
     }
 
     fun insert(user: UserInsert): User? {
-        return UserEntity
-            .insert(user)
+        return UserEntity.insert(user)
     }
 
     fun batchInsert(users: List<UserInsert>): List<User?> {
-        return UserEntity
-            .batchInsert(users)
+        return UserEntity.batchInsert(users)
     }
 
     fun updateById(user: UserUpdate): User? {
-        return UserEntity
-            .update(user)
+        return UserEntity.update(user)
     }
 
     fun lock(id: UUID): User? {

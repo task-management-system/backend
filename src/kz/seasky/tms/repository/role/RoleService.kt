@@ -1,4 +1,4 @@
-package kz.seasky.tms.database.data.role
+package kz.seasky.tms.repository.role
 
 import kz.seasky.tms.database.TransactionService
 

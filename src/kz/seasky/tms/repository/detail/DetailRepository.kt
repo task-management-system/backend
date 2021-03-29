@@ -1,4 +1,4 @@
-package kz.seasky.tms.database.data.detail
+package kz.seasky.tms.repository.detail
 
 class DetailRepository {
 //    fun count(userId: Long, statusId: Short): Long {

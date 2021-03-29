@@ -4,10 +4,10 @@ import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.routing.*
-import kz.seasky.tms.database.data.role.RoleService
 import kz.seasky.tms.extensions.error
 import kz.seasky.tms.model.Message
 import kz.seasky.tms.model.role.Role
+import kz.seasky.tms.repository.role.RoleService
 import kz.seasky.tms.utils.*
 import org.koin.ktor.ext.inject
 

@@ -5,7 +5,6 @@ import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.routing.*
 import kotlinx.uuid.UUID
-import kz.seasky.tms.database.data.user.UserService
 import kz.seasky.tms.exceptions.ErrorException
 import kz.seasky.tms.extensions.*
 import kz.seasky.tms.features.withPermission
@@ -14,6 +13,7 @@ import kz.seasky.tms.model.authentication.AuthenticationPrincipal
 import kz.seasky.tms.model.user.UserChangePassword
 import kz.seasky.tms.model.user.UserInsert
 import kz.seasky.tms.model.user.UserUpdate
+import kz.seasky.tms.repository.user.UserService
 import kz.seasky.tms.utils.Permission
 import org.koin.ktor.ext.inject
 
