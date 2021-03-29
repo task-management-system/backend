@@ -1,6 +1,6 @@
 package kz.seasky.tms.model.status
 
-data class StatusEntity(
-    val id: Short?,
+class Status(
+    val id: Short,
     val name: String
 )

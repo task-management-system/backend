@@ -1,10 +1,9 @@
 package kz.seasky.tms.database.tables.status
 
-import org.jetbrains.exposed.sql.Table
+import kz.seasky.tms.database.utils.ShortIdTable
 
-object StatusTable : Table("status") {
-    val id = short("id").autoIncrement()
-    val name = varchar("name", 100)
+object StatusTable : ShortIdTable("status") {
+    val name = varchar("name", 128)
 
-    override val primaryKey = PrimaryKey(id, name = "status_pkey")
+    override val primaryKey = PrimaryKey(id, name = "pk_status_id")
 }
