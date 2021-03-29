@@ -1,7 +1,7 @@
-package kz.seasky.tms.database.data.task
+package kz.seasky.tms.database.tables.task
 
 import kotlinx.uuid.exposed.kotlinxUUID
-import kz.seasky.tms.database.data.user.UserTable
+import kz.seasky.tms.database.tables.user.UserTable
 import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.jodatime.datetime

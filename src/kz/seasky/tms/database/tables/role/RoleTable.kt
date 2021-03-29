@@ -1,4 +1,4 @@
-package kz.seasky.tms.database.data.role
+package kz.seasky.tms.database.tables.role
 
 import kz.seasky.tms.database.utils.ShortEntity
 import kz.seasky.tms.database.utils.ShortEntityClass

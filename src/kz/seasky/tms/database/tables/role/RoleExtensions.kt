@@ -1,4 +1,4 @@
-package kz.seasky.tms.database.data.role
+package kz.seasky.tms.database.tables.role
 
 //fun toRole(resultRow: ResultRow): Role {
 //    return Role(

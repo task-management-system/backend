@@ -1,9 +1,9 @@
-package kz.seasky.tms.database.data.detail
+package kz.seasky.tms.database.tables.detail
 
 import kotlinx.uuid.exposed.kotlinxUUID
-import kz.seasky.tms.database.data.status.StatusTable
-import kz.seasky.tms.database.data.task.TaskTable
-import kz.seasky.tms.database.data.user.UserTable
+import kz.seasky.tms.database.tables.status.StatusTable
+import kz.seasky.tms.database.tables.task.TaskTable
+import kz.seasky.tms.database.tables.user.UserTable
 import org.jetbrains.exposed.sql.Table
 
 object DetailTable : Table("detail") {

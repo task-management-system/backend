@@ -1,7 +1,7 @@
-package kz.seasky.tms.database.data.user
+package kz.seasky.tms.database.tables.user
 
 import kotlinx.uuid.exposed.KotlinxUUIDTable
-import kz.seasky.tms.database.data.role.RoleTable
+import kz.seasky.tms.database.tables.role.RoleTable
 import org.jetbrains.exposed.sql.jodatime.datetime
 
 object UserTable : KotlinxUUIDTable("user") {

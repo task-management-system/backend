@@ -1,4 +1,4 @@
-package kz.seasky.tms.database.data.task
+package kz.seasky.tms.database.tables.task
 
 //fun ResultRow.toTask() = TaskEntity(
 //    taskId = this[TaskTable.id],

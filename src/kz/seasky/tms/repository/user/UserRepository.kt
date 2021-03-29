@@ -1,8 +1,8 @@
 package kz.seasky.tms.repository.user
 
 import kotlinx.uuid.UUID
-import kz.seasky.tms.database.data.user.UserEntity
-import kz.seasky.tms.database.data.user.UserTable
+import kz.seasky.tms.database.tables.user.UserEntity
+import kz.seasky.tms.database.tables.user.UserTable
 import kz.seasky.tms.extensions.crypt
 import kz.seasky.tms.model.paging.Paging
 import kz.seasky.tms.model.user.User

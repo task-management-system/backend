@@ -1,6 +1,6 @@
 package kz.seasky.tms.repository.task
 
-import kz.seasky.tms.database.data.task.TaskTable
+import kz.seasky.tms.database.tables.task.TaskTable
 import org.jetbrains.exposed.sql.deleteWhere
 
 class TaskRepository {

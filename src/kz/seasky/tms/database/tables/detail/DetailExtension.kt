@@ -1,4 +1,4 @@
-package kz.seasky.tms.database.data.detail
+package kz.seasky.tms.database.tables.detail
 
 //fun BatchInsertStatement.toDetail(detail: DetailCreate) {
 //    set(DetailTable.taskId, detail.taskId)

@@ -1,9 +1,9 @@
-package kz.seasky.tms.database.data.user
+package kz.seasky.tms.database.tables.user
 
 import kotlinx.uuid.UUID
 import kotlinx.uuid.exposed.KotlinxUUIDEntity
 import kotlinx.uuid.exposed.KotlinxUUIDEntityClass
-import kz.seasky.tms.database.data.role.RoleEntity
+import kz.seasky.tms.database.tables.role.RoleEntity
 import kz.seasky.tms.extensions.asUUID
 import kz.seasky.tms.extensions.crypt
 import kz.seasky.tms.model.user.User

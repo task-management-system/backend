@@ -1,4 +1,4 @@
-package kz.seasky.tms.database.data.status
+package kz.seasky.tms.database.tables.status
 
 import org.jetbrains.exposed.sql.Table
 

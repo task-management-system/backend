@@ -2,8 +2,8 @@ package kz.seasky.tms.repository.authentication
 
 import kotlinx.uuid.UUID
 import kz.seasky.tms.database.TransactionService
-import kz.seasky.tms.database.data.user.UserEntity
-import kz.seasky.tms.database.data.user.UserTable
+import kz.seasky.tms.database.tables.user.UserEntity
+import kz.seasky.tms.database.tables.user.UserTable
 import kz.seasky.tms.enums.AuthenticationType
 import kz.seasky.tms.extensions.crypt
 import kz.seasky.tms.model.authentication.AuthenticationCredential
