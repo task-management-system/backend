@@ -5,33 +5,34 @@ import io.ktor.auth.*
 import io.ktor.routing.*
 import io.ktor.util.*
 import io.ktor.util.pipeline.*
-import kz.seasky.tms.exceptions.PermissionException
+import kz.seasky.tms.exceptions.ErrorException
+import kz.seasky.tms.extensions.getPrincipal
 import kz.seasky.tms.model.authentication.AuthenticationPrincipal
 
 class PermissionFeature(config: Configuration) {
     private val permission = config.permission
 
     class Configuration {
-        internal var permission: (AuthenticationPrincipal) -> Int = { 0 }
+        internal var permission: (AuthenticationPrincipal) -> Long = { 0 }
 
-        fun register(block: (AuthenticationPrincipal) -> Int) {
+        fun register(block: (AuthenticationPrincipal) -> Long) {
             permission = block
         }
     }
 
     fun interceptPipeline(
         pipeline: ApplicationCallPipeline,
-        permission: Int
+        permission: Long
     ) {
         pipeline.insertPhaseAfter(ApplicationCallPipeline.Features, Authentication.ChallengePhase)
         pipeline.insertPhaseAfter(Authentication.ChallengePhase, AuthorizationPhase)
 
         pipeline.intercept(AuthorizationPhase) {
-            val principal = call.authentication.principal<AuthenticationPrincipal>()
-                ?: throw PermissionException("Не удалось найти авторизационные данные")
+            val principal = call.getPrincipal<AuthenticationPrincipal>()
+
             val role = permission(principal)
 
-            if (permission and role == 0) throw PermissionException("У вас недостаточно прав для данной операции")
+            if (permission and role == 0L) throw ErrorException("У вас недостаточно прав для данной операции")
         }
     }
 
@@ -59,7 +60,7 @@ class PermissionRouteSelector(
 }
 
 private fun Route.authorizedRoute(
-    permission: Int,
+    permission: Long,
     build: Route.() -> Unit
 ): Route {
     val authorizedRoute = createChild(PermissionRouteSelector(permission.toString()))
@@ -68,6 +69,6 @@ private fun Route.authorizedRoute(
     return authorizedRoute
 }
 
-fun Route.withPermission(permission: Int, build: Route.() -> Unit): Route {
+fun Route.withPermission(permission: Long, build: Route.() -> Unit): Route {
     return authorizedRoute(permission = permission, build = build)
 }

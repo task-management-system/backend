@@ -4,12 +4,13 @@ import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.http.*
 import kz.seasky.tms.enums.BuildVariant
-import kz.seasky.tms.exceptions.PagingException
-import kz.seasky.tms.exceptions.PermissionException
-import kz.seasky.tms.exceptions.UserChangePasswordException
+import kz.seasky.tms.exceptions.ErrorException
+import kz.seasky.tms.exceptions.WarningException
 import kz.seasky.tms.extensions.error
-import kz.seasky.tms.route.api.v1.IndicateIdException
+import kz.seasky.tms.extensions.warning
 import kz.seasky.tms.utils.BuildConfig
+import org.jetbrains.exposed.dao.exceptions.EntityNotFoundException
+import org.jetbrains.exposed.exceptions.ExposedSQLException
 
 fun Application.installStatusPages() {
     install(StatusPages) {
@@ -50,30 +51,30 @@ fun StatusPages.Configuration.byStatusCode() {
 
 /** Errors by exception */
 fun StatusPages.Configuration.byException() {
-    exception<PermissionException> { e ->
+    exception<ErrorException> { e ->
         call.error<Nothing>(
-            statusCode = HttpStatusCode.Forbidden,
+            statusCode = e.statusCode ?: HttpStatusCode.BadRequest,
             message = e.message
         )
     }
 
-    exception<PagingException> { e ->
+    exception<WarningException> { e ->
+        call.warning<Nothing>(
+            statusCode = e.statusCode ?: HttpStatusCode.OK,
+            message = e.message
+        )
+    }
+
+    exception<ExposedSQLException> { e ->
         call.error<Nothing>(
             statusCode = HttpStatusCode.BadRequest,
             message = e.message
         )
     }
 
-    exception<UserChangePasswordException> { e ->
+    exception<EntityNotFoundException> { e ->
         call.error<Nothing>(
             statusCode = HttpStatusCode.BadRequest,
-            message = e.message
-        )
-    }
-
-    exception<IndicateIdException> { e ->
-        call.error<Nothing>(
-            statusCode = HttpStatusCode.NotFound,
             message = e.message
         )
     }

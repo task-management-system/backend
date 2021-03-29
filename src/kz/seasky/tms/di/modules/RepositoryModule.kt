@@ -12,7 +12,7 @@ import kz.seasky.tms.database.data.user.UserRepository
 import kz.seasky.tms.database.data.user.UserService
 import org.koin.dsl.module
 
-val repositoryModule = module {
+val repositoryModule = module(createdAtStart = true) {
     single { DetailRepository() }
 
     single { DetailService(get(), get()) }

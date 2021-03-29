@@ -1,10 +1,8 @@
 package kz.seasky.tms.model.authentication
 
-import com.google.gson.annotations.SerializedName
-import kz.seasky.tms.model.user.UserWithRole
+import kz.seasky.tms.model.user.User
 
 data class AuthenticationResponse(
     val token: String,
-    @SerializedName("user")
-    val userResponse: UserWithRole
+    val user: User
 )

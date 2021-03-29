@@ -1,6 +1,6 @@
 package kz.seasky.tms.model.paging
 
-import kz.seasky.tms.exceptions.PagingException
+import kz.seasky.tms.exceptions.ErrorException
 import org.jetbrains.exposed.sql.SortOrder
 
 data class Paging(
@@ -57,7 +57,7 @@ data class Paging(
             }
         }
 
-        if (message != null) throw PagingException(message)
+        if (message != null) throw ErrorException(message)
     }
 
     @Suppress("MoveVariableDeclarationIntoWhen")

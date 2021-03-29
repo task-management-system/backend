@@ -6,6 +6,7 @@ import kz.seasky.tms.database.TransactionService
 import kz.seasky.tms.database.TransactionServiceImpl
 import kz.seasky.tms.utils.ApplicationSettings
 import org.koin.dsl.module
+import org.koin.experimental.builder.singleBy
 import javax.sql.DataSource
 
 val databaseModule = module(createdAtStart = true) {
@@ -13,5 +14,7 @@ val databaseModule = module(createdAtStart = true) {
 
     single<DatabaseConnector> { DatabaseConnector(dataSource = get()) }
 
-    single<TransactionService> { TransactionServiceImpl(databaseConnector = get()) }
+    singleBy<TransactionService, TransactionServiceImpl>()
+
+//    single<TransactionService> { TransactionServiceImpl(databaseConnector = get()) }
 }

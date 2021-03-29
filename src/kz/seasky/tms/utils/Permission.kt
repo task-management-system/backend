@@ -2,7 +2,7 @@ package kz.seasky.tms.utils
 
 class Permission(
     val name: String,
-    val power: Int,
+    val power: Long,
     val description: String
 ) {
     /**
@@ -23,6 +23,14 @@ class Permission(
         val all = allPermissions()
         val summaryPower = all.sumBy { it.power }
     }
+}
+
+inline fun <T> Iterable<T>.sumBy(selector: (T) -> Long): Long {
+    var sum = 0L
+    for (element in this) {
+        sum += selector(element)
+    }
+    return sum
 }
 
 internal fun allPermissions() = listOf(

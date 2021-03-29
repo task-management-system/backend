@@ -1,109 +1,103 @@
 package kz.seasky.tms.database.data.user
 
-import kz.seasky.tms.database.data.role.RoleTable
-import kz.seasky.tms.extensions.selectAll
+import kotlinx.uuid.UUID
+import kz.seasky.tms.extensions.crypt
 import kz.seasky.tms.model.paging.Paging
-import kz.seasky.tms.model.user.IUser
-import kz.seasky.tms.model.user.UserEntity
-import kz.seasky.tms.model.user.UserWithRole
-import org.jetbrains.exposed.sql.*
+import kz.seasky.tms.model.user.User
+import kz.seasky.tms.model.user.UserInsert
+import kz.seasky.tms.model.user.UserUpdate
+import org.jetbrains.exposed.sql.or
+import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.update
 
 class UserRepository {
     fun count(): Long {
-        return UserTable
-            .selectAll()
+        return UserEntity
+            .all()
             .count()
     }
 
-    fun insert(userEntity: UserEntity): List<ResultRow>? {
-        return UserTable
-            .insert { insertStatement ->
-                insertStatement.toUserEntity(userEntity)
-            }.resultedValues
+    fun insert(user: UserInsert): User? {
+        return UserEntity
+            .insert(user)
     }
 
-    fun batchInsert(userEntities: List<UserEntity>): List<ResultRow> {
-        return UserTable
-            .batchInsert(userEntities) { user ->
-                toUserEntity(user)
-            }
+    fun batchInsert(users: List<UserInsert>): List<User?> {
+        return UserEntity
+            .batchInsert(users)
     }
 
-    fun updateById(id: Long, user: IUser): Int {
-        return UserTable
-            .update(
-                where = { UserTable.id eq id },
-                body = { statement -> statement.toUserEntity(user) }
-            )
+    fun updateById(user: UserUpdate): User? {
+        return UserEntity
+            .update(user)
     }
 
-    fun lock(id: Long): Int {
-        return UserTable
-            .update(
-                where = { UserTable.id eq id },
-                body = { statement -> statement[isActive] = false }
-            )
+    fun lock(id: UUID): User? {
+        val user = UserEntity[id]
+
+        if (!user.isActive) return null
+
+        user.isActive = false
+        return user.toUser()
     }
 
-    fun unlock(id: Long): Int {
-        return UserTable
-            .update(
-                where = { UserTable.id eq id },
-                body = { statement -> statement[isActive] = true }
-            )
+    fun unlock(id: UUID): User? {
+        val user = UserEntity[id]
+
+        if (user.isActive) return null
+
+        user.isActive = true
+        return user.toUser()
     }
 
-    fun validatePassword(id: Long, currentPassword: String): UserEntity? {
-        return UserTable
-            .select { (UserTable.id eq id) and (UserTable.password eq currentPassword) }
-            .map { toUserEntity(it) }
-            .singleOrNull()
+    fun deleteById(id: UUID) {
+        UserEntity[id].delete()
     }
 
-    fun changePassword(id: Long, newPassword: String): Int {
-        return UserTable
-            .update(
-                where = { UserTable.id eq id },
-                body = { statement -> statement[password] = newPassword }
-            )
+    fun getAll(): List<User> {
+        return UserEntity
+            .all()
+            .map(UserEntity::toUser)
     }
 
-    fun deleteById(id: Long): Int {
-        return UserTable
-            .deleteWhere {
-                UserTable.id eq id
-            }
+    fun getAll(paging: Paging): List<User> {
+        return UserEntity
+            .all()
+            .orderBy(UserTable.createdAt to paging.sortOrder)
+            .limit(paging.limit, paging.offset)
+            .map(UserEntity::toUser)
     }
 
-    fun getAll(): List<UserWithRole> {
-        return UserTable
-            .leftJoin(RoleTable)
-            .selectAll()
-            .orderBy(UserTable.id)
-            .map { toUserResponse(it) }
+    fun getByIdOrNull(id: UUID): User? {
+        return UserEntity
+            .findById(id)
+            ?.toUser()
     }
 
-    fun getAll(paging: Paging): List<UserWithRole> {
-        return UserTable
-            .leftJoin(RoleTable)
-            .selectAll(UserTable.id, paging)
-            .map {
-                toUserResponse(it)
-            }
+    fun getByUsernameOrByEmailOrNull(usernameOrEmail: String): User? {
+        return UserEntity
+            .find { (UserTable.username eq usernameOrEmail) or (UserTable.email eq usernameOrEmail) }
+            .firstOrNull()
+            ?.toUser()
     }
 
-    fun getByIdOrNull(id: Long): UserWithRole? {
+    fun validatePassword(id: UUID, password: String): Boolean? {
+        val match = UserTable.password.crypt(password)
         return UserTable
-            .leftJoin(RoleTable)
+            .slice(match)
             .select { UserTable.id eq id }
-            .map { toUserResponse(it) }
-            .singleOrNull()
+            .map { rs -> rs[match] }
+            .firstOrNull()
     }
 
-    fun getByUsernameOrByEmailOrNull(usernameOrEmail: String): UserEntity? {
-        return UserTable
-            .select { (UserTable.username eq usernameOrEmail) or (UserTable.email eq usernameOrEmail) }
-            .map { toUserEntity(it) }
-            .singleOrNull()
+    fun changePassword(id: UUID, newPassword: String): User? {
+        UserTable.update(
+            where = { UserTable.id eq id },
+            body = { statement ->
+                statement[password] = crypt(newPassword)
+            }
+        )
+
+        return UserEntity.findById(id)?.toUser()
     }
 }

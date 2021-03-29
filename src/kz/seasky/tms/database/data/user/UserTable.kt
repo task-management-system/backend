@@ -1,17 +1,17 @@
 package kz.seasky.tms.database.data.user
 
+import kotlinx.uuid.exposed.KotlinxUUIDTable
 import kz.seasky.tms.database.data.role.RoleTable
-import org.jetbrains.exposed.sql.ReferenceOption
-import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.sql.jodatime.datetime
 
-object UserTable : Table("user") {
-    val id = long("id").autoIncrement()
-    val username = varchar("username", 50)
-    val password = varchar("password", 50)
-    val name = varchar("name", 50).nullable()
-    val email = varchar("email", 50).nullable()
+object UserTable : KotlinxUUIDTable("user") {
+    val username = varchar("username", 32).uniqueIndex("uq_user_username")
+    val password = text("password").nullable()
+    val name = varchar("name", 255).nullable()
+    val email = varchar("email", 255).nullable()
     val isActive = bool("is_active")
-    val roleId = long("role_id").references(RoleTable.id, onDelete = ReferenceOption.CASCADE)
+    val createdAt = datetime("created_at")
+    val role = reference("role_id", RoleTable, fkName = "fk_user_role_id_id")
 
-    override val primaryKey = PrimaryKey(id, name = "user_pkey")
+    override val primaryKey by lazy { PrimaryKey(UserTable.id, name = "pk_user_id") }
 }

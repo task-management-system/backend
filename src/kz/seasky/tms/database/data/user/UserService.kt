@@ -1,10 +1,13 @@
 package kz.seasky.tms.database.data.user
 
+import kotlinx.uuid.UUID
 import kz.seasky.tms.database.TransactionService
+import kz.seasky.tms.exceptions.ErrorException
+import kz.seasky.tms.exceptions.WarningException
 import kz.seasky.tms.model.paging.Paging
-import kz.seasky.tms.model.user.IUser
-import kz.seasky.tms.model.user.UserEntity
-import kz.seasky.tms.model.user.UserWithRole
+import kz.seasky.tms.model.user.User
+import kz.seasky.tms.model.user.UserInsert
+import kz.seasky.tms.model.user.UserUpdate
 
 class UserService(
     private val transactionService: TransactionService,
@@ -16,76 +19,69 @@ class UserService(
         }
     }
 
-    suspend fun insert(userEntity: UserEntity): Int {
+    suspend fun insert(user: UserInsert): User {
         return transactionService.transaction {
-            repository.insert(userEntity)
-        }?.size ?: 0
-    }
-
-    suspend fun batchInsert(userEntities: List<UserEntity>): Int {
-        return transactionService.transaction {
-            repository.batchInsert(userEntities)
-        }.size
-    }
-
-    suspend fun updateById(id: Long, user: IUser): Int {
-        return transactionService.transaction {
-            repository.updateById(id, user)
+            repository.insert(user) ?: throw ErrorException("Не удалось добавить пользователя")
         }
     }
 
-    suspend fun lock(id: Long): Int {
+    suspend fun batchInsert(users: List<UserInsert>): List<User?> {
         return transactionService.transaction {
-            repository.lock(id)
+            repository.batchInsert(users)
         }
     }
 
-    suspend fun unlock(id: Long): Int {
+    suspend fun update(user: UserUpdate): User {
         return transactionService.transaction {
-            repository.unlock(id)
+            repository.updateById(user) ?: throw ErrorException("Не удалось обновить пользователя")
         }
     }
 
-    //TODO rewrite this shit
-    suspend fun validatePassword(id: Long, currentPassword: String): UserEntity? {
+    suspend fun lock(id: UUID): User {
         return transactionService.transaction {
-            repository.validatePassword(id, currentPassword)
+            repository.lock(id) ?: throw WarningException("Пользователь и так заблокирован")
         }
     }
 
-    suspend fun changePassword(id: Long, newPassword: String): Int {
+    suspend fun unlock(id: UUID): User {
         return transactionService.transaction {
-            repository.changePassword(id, newPassword)
+            repository.unlock(id) ?: throw WarningException("Пользователь и так разблокирован")
         }
     }
 
-    suspend fun deleteById(id: Long): Int {
+    suspend fun validatePassword(id: UUID, password: String): Boolean {
         return transactionService.transaction {
-            repository.deleteById(id)
+            repository.validatePassword(id, password) ?: false
         }
     }
 
-    suspend fun getAll(): List<UserWithRole> {
+    suspend fun changePassword(id: UUID, newPassword: String): User {
+        return transactionService.transaction {
+            repository.changePassword(id, newPassword) ?: throw ErrorException("Не удалось сменить пароль")
+        }
+    }
+
+    suspend fun deleteById(id: String) {
+        return transactionService.transaction {
+            repository.deleteById(UUID(id))
+        }
+    }
+
+    suspend fun getAll(): List<User> {
         return transactionService.transaction {
             repository.getAll()
         }
     }
 
-    suspend fun getAll(paging: Paging): List<UserWithRole> {
+    suspend fun getAll(paging: Paging): List<User> {
         return transactionService.transaction {
             repository.getAll(paging)
         }
     }
 
-    suspend fun getByIdOrNull(id: Long): UserWithRole? {
+    suspend fun getById(id: String): User {
         return transactionService.transaction {
-            repository.getByIdOrNull(id)
-        }
-    }
-
-    suspend fun getByUsernameOrByEmailOrNull(usernameOrEmail: String): UserEntity? {
-        return transactionService.transaction {
-            repository.getByUsernameOrByEmailOrNull(usernameOrEmail)
+            repository.getByIdOrNull(UUID(id)) ?: throw ErrorException("Не удалось найти пользователя")
         }
     }
 }
