@@ -10,6 +10,8 @@ import javax.sql.DataSource
 class DatabaseConnector(dataSource: DataSource) {
     private val database = Database.connect(dataSource)
 
+//    FIXME This initial block useless or I missing something 
+//
 //    private val tables = arrayOf(
 //        UserTable,
 //        RoleTable,
