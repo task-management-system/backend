@@ -81,15 +81,16 @@ cat *.sql | docker exec -i $container psql -U $user -d $database //Restore db du
 
 ## Database rules
 
-1. Name of the tables in the singular;
-2. For multiple words use `snake_case` for both table and column names;
-3. Override default constraint names, ex. in table below;
+1. Name of the tables in the singular.
+2. For multiple words use `snake_case` for both table and column names.
+3. Override default constraint names, ex. in table below.
 
    Name|Value|Example
-         ---|---|---
-   Primary Key|pk_$tableName|constraint pk_user<br>primary key(id)
-   Foreign Key|Default postgresql fk value<br>fk_$tableName_$columnName_$referenceColumnName|constraint fk_user_role_id_id<br>foreign key(role_id)<br>references role(id)
-   Unique|key_$tableName_$columnName|constraint key_user_username<br>unique(username)
+      ---|---|---
+   Primary Key|pk_$tableName_$columnName|constraint pk_user<br>primary key(id)
+   Foreign Key|fk_$tableName_$columnName_$referenceColumnName|constraint fk_user_role_id_id<br>foreign key(role_id)<br>references role(id)
+   Unique|uq_$tableName_$columnName|constraint uq_user_username<br>unique(username)
+   Check|ch_$tableName_$columnName|constraint ch_user_username<br>check(length(username) >= 4)
 4. For UUID tables use extension `uuid-ossp`, for default value use a fourth version of uuid generator.
 
    Ex.
@@ -101,4 +102,19 @@ cat *.sql | docker exec -i $container psql -U $user -d $database //Restore db du
       ...
    )
    ```
-5. ?WIP?
+5. For a password storing use `pgcrypto` extension.
+
+   Ex.
+   ```
+   create extension if not exists "pgcrypto";
+   create table "user"(
+      ...
+      "password" text not null,
+      ...
+   )
+   
+   insert into "user"(username, password)
+   values('username', crypt('pass', gen_salt('bf')))
+   
+   select username, (password = crypt('pass', password)) as password_match from "user"
+   ```
