@@ -2,13 +2,11 @@ package kz.seasky.tms.route.api.v1
 
 import io.ktor.application.*
 import io.ktor.http.*
-import io.ktor.request.*
 import io.ktor.routing.*
 import kotlinx.uuid.UUID
 import kz.seasky.tms.exceptions.ErrorException
 import kz.seasky.tms.extensions.*
 import kz.seasky.tms.features.withPermission
-import kz.seasky.tms.model.Message
 import kz.seasky.tms.model.authentication.AuthenticationPrincipal
 import kz.seasky.tms.model.user.UserChangePassword
 import kz.seasky.tms.model.user.UserInsert
@@ -27,7 +25,7 @@ fun Route.user() {
             call.success(data = service.getById(principal.id))
         }
 
-        withPermission(Permission.ViewUser.power and Permission.Administrator.power) {
+        withPermission(Permission.ViewUser.power or Permission.Administrator.power) {
             get {
                 val id = call.getId<String>()
 
@@ -35,7 +33,7 @@ fun Route.user() {
             }
         }
 
-        withPermission(Permission.InsertUser.power and Permission.Administrator.power) {
+        withPermission(Permission.InsertUser.power or Permission.Administrator.power) {
             put {
                 val user = call.receiveAndValidate<UserInsert>()
 
@@ -47,7 +45,7 @@ fun Route.user() {
             }
         }
 
-        withPermission(Permission.DeleteUser.power and Permission.Administrator.power) {
+        withPermission(Permission.DeleteUser.power or Permission.Administrator.power) {
             delete {
                 val id = call.getId<String>()
 
@@ -60,7 +58,7 @@ fun Route.user() {
             }
         }
 
-        withPermission(Permission.UpdateUser.power and Permission.Administrator.power) {
+        withPermission(Permission.UpdateUser.power or Permission.Administrator.power) {
             patch {
                 val user = call.receiveAndValidate<UserUpdate>()
 
@@ -104,18 +102,16 @@ fun Route.user() {
     }
 
     route("/users") {
-        withPermission(Permission.ViewUser.power and Permission.Administrator.power) {
+        withPermission(Permission.ViewUser.power or Permission.Administrator.power) {
             get {
                 call.success(data = service.getAll())
             }
         }
 
-        withPermission(Permission.UpdateUser.power and Permission.Administrator.power) {
+        withPermission(Permission.UpdateUser.power or Permission.Administrator.power) {
             //FIXME
             put {
-                val users = call.receiveOrNull<List<UserInsert>>() ?: throw ErrorException(
-                    message = Message.FILL_PAYLOAD
-                )
+                val users = call.receiveOrException<Array<UserInsert>>().toList()
 
                 call.success(
                     message = "Пользователи успешно добавлены",
