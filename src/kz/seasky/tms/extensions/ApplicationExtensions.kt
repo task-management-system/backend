@@ -82,25 +82,6 @@ inline fun <reified T> ApplicationCall.getId(idName: String = "id"): T {
     return result as T
 }
 
-@Suppress("UNCHECKED_CAST")
-@Deprecated("Experimental")
-fun <T> ApplicationCall.getId(type: T, idName: String = "id"): T {
-    val id = parameters[idName] ?: throw ErrorException(Message.INDICATE_ID + "'$idName'")
-
-    return when (type) {
-        is UUID -> UUID(id)
-        is Short -> id.toShortOrNull()
-        is Int -> id.toInt()
-        is Long -> id.toLong()
-        else -> throw ErrorException("Can't recognize passed type ${type}")
-    } as T
-}
-
-@Deprecated("Experimental")
-fun ApplicationCall.getId(idName: String = "id"): String {
-    return parameters[idName] ?: throw ErrorException(Message.INDICATE_ID + "'$idName'")
-}
-
 fun String.asUUID() = UUID(this)
 
 fun String.asLong() = toLongOrNull() ?: throw ErrorException("Can't convert string '$this' to long")

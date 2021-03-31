@@ -1,6 +1,6 @@
 package kz.seasky.tms.model.status
 
-class Status(
+data class Status(
     val id: Short,
     val name: String
 )

@@ -3,6 +3,7 @@ package kz.seasky.tms.model.paging
 import kz.seasky.tms.exceptions.ErrorException
 import org.jetbrains.exposed.sql.SortOrder
 
+//TODO rewrite
 data class Paging(
     val page: Long?,
     val size: Int?,

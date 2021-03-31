@@ -6,9 +6,14 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 import java.sql.ResultSet
 
-fun FieldSet.selectAll(id: Column<Long>, paging: Paging): Query {
+fun FieldSet.selectAll(column: Column<*>, paging: Paging): Query {
     return Query(this, null)
-        .orderBy(id to paging.sortOrder)
+        .orderBy(column to paging.sortOrder)
+        .limit(paging.limit, paging.offset)
+}
+
+fun <T> SizedIterable<T>.all(column: Column<*>, paging: Paging): SizedIterable<T> {
+    return orderBy(column to paging.sortOrder)
         .limit(paging.limit, paging.offset)
 }
 

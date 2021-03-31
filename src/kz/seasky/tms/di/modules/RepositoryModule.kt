@@ -1,7 +1,5 @@
 package kz.seasky.tms.di.modules
 
-import kz.seasky.tms.repository.detail.DetailRepository
-import kz.seasky.tms.repository.detail.DetailService
 import kz.seasky.tms.repository.role.RoleRepository
 import kz.seasky.tms.repository.role.RoleService
 import kz.seasky.tms.repository.status.StatusRepository
@@ -12,11 +10,7 @@ import kz.seasky.tms.repository.user.UserRepository
 import kz.seasky.tms.repository.user.UserService
 import org.koin.dsl.module
 
-val repositoryModule = module(createdAtStart = true) {
-    single { DetailRepository() }
-
-    single { DetailService(get(), get()) }
-
+val repositoryModule = module {
     single { RoleRepository() }
 
     single { RoleService(get(), get()) }

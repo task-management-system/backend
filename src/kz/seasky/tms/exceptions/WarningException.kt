@@ -4,7 +4,7 @@ import io.ktor.http.*
 import kz.seasky.tms.model.Response
 
 /**
- * Handles all exceptions what we want to convert into [Response.Error]
+ * Handles all exceptions what we want to convert into [Response.Warning]
  * afterwards omit it by StatusPage feature
  */
 class WarningException(

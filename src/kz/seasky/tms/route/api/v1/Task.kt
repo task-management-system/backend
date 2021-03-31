@@ -1,73 +1,43 @@
 package kz.seasky.tms.route.api.v1
 
+import io.ktor.application.*
 import io.ktor.routing.*
-import kz.seasky.tms.repository.detail.DetailService
+import kz.seasky.tms.extensions.*
+import kz.seasky.tms.model.authentication.AuthenticationPrincipal
+import kz.seasky.tms.model.task.TaskInsert
 import kz.seasky.tms.repository.task.TaskService
 import org.koin.ktor.ext.inject
 
 fun Route.task() {
-    val detailService: DetailService by inject()
-    val taskService: TaskService by inject()
+    val service: TaskService by inject()
 
     route("/task") {
-        //TODO
-//        put {
-//            val userId = call.principal<AuthenticationPrincipal>()?.userId ?: return@put call.error<Nothing>(
-//                statusCode = HttpStatusCode.Unauthorized,
-//                message = Message.PRINCIPAL_NOT_FOUND
-//            )
-//            val taskCreate = call.receive<TaskCreate>()
-//            taskCreate.creatorId = userId
-//
-//            val task = taskService.insert(taskCreate) ?: return@put call.error<Nothing>(
-//                message = "Не удалось создать задачу"
-//            )
-//
-//            val details = arrayListOf<DetailCreate>()
-//            taskCreate.executorIds.forEach { executorId ->
-//                details.add(DetailCreate(task.taskId, executorId, 1))
-//            }
-//
-//            val batchInsertResult = detailService.batchInsert(details)
-//
-//            when {
-//                batchInsertResult == 0 -> {
-//                    taskService.delete(task.taskId)
-//                    call.error<Nothing>(message = "Не удалось добавить детали")
-//                }
-//                batchInsertResult >= 1 -> call.success<Nothing>(message = "Задача создана")
-//            }
-//        }
+        put {
+            val userId = call.getPrincipal<AuthenticationPrincipal>().id
+            val task = call.receiveAndValidate<TaskInsert>()
+
+            call.success(
+                message = "Задача успешно создана",
+                data = service.createTaskAndDetails(userId, task)
+            )
+        }
     }
 
     route("/tasks") {
-//        get("/received") {
-//            val userId = call.principal<AuthenticationPrincipal>()?.userId ?: return@get call.error<Nothing>(
-//                statusCode = HttpStatusCode.Unauthorized,
-//                message = Message.PRINCIPAL_NOT_FOUND
-//            )
-//            val statusId = call.parameters["statusId"]?.toShort() ?: return@get call.error<Nothing>(
-//                message = "Вы не указали идентификатор статуса"
-//            )
-//            val paging = call.parameters.asPaging()
-//
-//            val totalCount = detailService.count(userId, statusId)
-//            val tasks = detailService.getAll(userId, statusId, paging)
-//
-//            call.success(data = PagingResponse(total = totalCount, list = tasks))
-//        }
-//
-//        get("/created") {
-//            val userId = call.principal<AuthenticationPrincipal>()?.userId ?: return@get call.error<Nothing>(
-//                statusCode = HttpStatusCode.Unauthorized,
-//                message = Message.PRINCIPAL_NOT_FOUND
-//            )
-//            val paging = call.parameters.asPaging()
-//
-//            val totalCount = taskService.count(userId)
-//            val tasks = taskService.getAll(userId, paging)
-//
-//            call.success(data = PagingResponse(total = totalCount, list = tasks))
-//        }
+        get("/received") {
+            val userId = call.getPrincipal<AuthenticationPrincipal>().id
+            val statusId = call.getId<Short>("statusId")
+            val paging = call.parameters.asPaging()
+
+            call.success(data = service.getReceived(userId, statusId, paging))
+        }
+
+        get("/created") {
+            val userId = call.getPrincipal<AuthenticationPrincipal>().id
+            val statusId = call.getId<Short>("statusId")
+            val paging = call.parameters.asPaging()
+
+            call.success(data = service.getCreated(userId, statusId, paging))
+        }
     }
 }

@@ -12,7 +12,5 @@ val authenticationModule = module(createdAtStart = true) {
     single { JWTConfig(jwtProperties = get<ApplicationSettings>().jwtProperties) }
 
     singleBy<AuthenticationService, AuthenticationServiceImpl>()
-    single<AuthenticationRepository> { AuthenticationRepository(transactionService = get()) }
-
-//    single { AuthenticationService(get(), get()) }
+    single { AuthenticationRepository(transactionService = get()) }
 }

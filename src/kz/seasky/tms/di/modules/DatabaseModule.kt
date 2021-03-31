@@ -12,9 +12,7 @@ import javax.sql.DataSource
 val databaseModule = module(createdAtStart = true) {
     single<DataSource> { HikariDataSource(get<ApplicationSettings>().hikariConfig) }
 
-    single<DatabaseConnector> { DatabaseConnector(dataSource = get()) }
+    single { DatabaseConnector(dataSource = get()) }
 
     singleBy<TransactionService, TransactionServiceImpl>()
-
-//    single<TransactionService> { TransactionServiceImpl(databaseConnector = get()) }
 }

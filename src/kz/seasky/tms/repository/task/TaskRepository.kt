@@ -1,34 +1,55 @@
 package kz.seasky.tms.repository.task
 
+import kotlinx.uuid.UUID
+import kz.seasky.tms.database.tables.detail.DetailEntity
+import kz.seasky.tms.database.tables.detail.DetailTable
+import kz.seasky.tms.database.tables.task.TaskEntity
 import kz.seasky.tms.database.tables.task.TaskTable
-import org.jetbrains.exposed.sql.deleteWhere
+import kz.seasky.tms.extensions.all
+import kz.seasky.tms.model.detail.Detail
+import kz.seasky.tms.model.paging.Paging
+import kz.seasky.tms.model.task.Task
+import kz.seasky.tms.model.task.TaskInsert
+import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.select
 
 class TaskRepository {
-//    fun count(userId: Long): Long {
-//        return TaskTable
-//            .selectAll()
-//            .andWhere { TaskTable.creatorId eq userId }
-//            .count()
-//    }
-//
-//    fun getAll(userId: Long, paging: Paging): List<TaskWithCreator> {
-//        return TaskTable
-//            .leftJoin(UserTable)
-//            .selectAll(TaskTable.id, paging)
-//            .andWhere { TaskTable.creatorId eq userId }
-//            .map { resultRow -> resultRow.toTaskWithCreator() }
-//    }
-//
-//    fun insert(task: TaskCreate): TaskEntity? {
-//        return TaskTable
-//            .insert { insertStatement ->
-//                insertStatement.toTask(task)
-//            }.resultedValues?.map { resultRow ->
-//                resultRow.toTask()
-//            }?.singleOrNull()
-//    }
+    fun countReceived(userId: UUID, statusId: Short): Long {
+        return DetailEntity
+            .find { (DetailTable.executor eq userId) and (DetailTable.status eq statusId) }
+            .count()
+    }
 
-    fun delete(id: Long): Int {
-        return TaskTable.deleteWhere { TaskTable.id eq id }
+    fun countCreated(userId: UUID, statusId: Short): Long {
+        return TaskEntity
+            .find { (TaskTable.creator eq userId) and (TaskTable.status eq statusId) }
+            .count()
+    }
+
+    fun getAllReceived(userId: UUID, statusId: Short, paging: Paging): List<Detail> {
+        return DetailTable
+            .innerJoin(TaskTable)
+            .select { (DetailTable.executor eq userId) and (DetailTable.status eq statusId) }
+            .all(TaskTable.id, paging)
+            .map { row ->
+                DetailEntity.wrapRow(row).toDetail()
+            }
+    }
+
+    fun getAllCreated(userId: UUID, statusId: Short, paging: Paging): List<Task> {
+        return TaskEntity
+            .find { (TaskTable.creator eq userId) and (TaskTable.status eq statusId) }
+            .all(TaskTable.createdAt, paging)
+            .map(TaskEntity::toTask)
+    }
+
+    fun insertTask(creatorId: UUID, task: TaskInsert): Task {
+        return TaskEntity
+            .insert(creatorId, task)
+    }
+
+    fun insertDetails(executorId: UUID, taskId: UUID): Detail {
+        return DetailEntity
+            .insert(executorId, taskId)
     }
 }

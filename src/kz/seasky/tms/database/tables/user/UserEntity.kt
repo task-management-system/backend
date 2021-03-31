@@ -24,9 +24,6 @@ class UserEntity(id: EntityID<UUID>) : KotlinxUUIDEntity(id) {
     //@formatter:on
 
     companion object : KotlinxUUIDEntityClass<UserEntity>(UserTable) {
-        /**
-         * Using non new lambda because password is a custom function
-         */
         fun insert(user: UserInsert): User? {
             val id = UserTable.insertAndGetId { statement ->
                 statement[username] = user.username
