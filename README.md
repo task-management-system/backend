@@ -30,8 +30,7 @@
 #### Requirements for Windows users
 
 1. [docker](https://docs.docker.com/get-docker/) (I am not joking, it's really necessary tool)
-2. [cmder](https://cmder.net/) or [conemu](https://conemu.github.io/en/Downloads.html) (I hope conemu has gzip tool
-   installed, if not you can install it yourself or just download cmder)
+2. [cmder](https://cmder.net/)
 
 #### TL;DR
 
@@ -47,11 +46,11 @@ muslim do-magic
 
 ```
 gradlew clean build 
-gzip -d -k assets/*.gz
+gzip -d -k assets/*.gz OR manually unzip
 docker compose create --build
-docker compose start database
-cat assets/*sql | docker exec -i tms-database psql -U dev -d tms
-docker compose start backend
+docker compose start tms-database
+cat assets/*sql | docker exec -i tms-database psql -U seasky-developer -d tms
+docker compose start tms-backend
 ```
 
 Explanation of each row

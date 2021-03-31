@@ -3,8 +3,7 @@ goto :init
 
 :header
     echo.
-    echo %BATCH_NAME% requires conemu or cmder and docker for correct work, you can install it from links below:
-    echo    conemu  - https://conemu.github.io/en/Downloads.html
+    echo %BATCH_NAME% requires cmder and docker for correct work, you can install it from links below:
     echo    cmder   - https://cmder.net/
     echo    docker  - https://docs.docker.com/get-docker/
     goto :end
@@ -81,11 +80,11 @@ goto :init
     echo Start doing mysterious shit
     rm -f assets/*.sql ^
     && gzip -d -k assets/*.gz ^
-    && gradlew clean build -x test ^
+    && gradlew clean build ^
     && docker compose create --build ^
     && docker compose start tms-database  ^
     && sleep 5 ^
-    && cat assets/*.sql | docker exec -i tms-database psql -U dev -d tms ^
+    && cat assets/*.sql | docker exec -i tms-database psql -U seasky-developer -d tms ^
     && docker compose start tms-backend
     goto :end
 
