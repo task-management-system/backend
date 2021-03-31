@@ -21,9 +21,10 @@ data class AuthenticationCredential(
     override fun <T> validate(): T {
         val usernameRegex by lazy { """\p{Alnum}+""".toRegex() } //[a-z][A-Z][0-9]
         val passwordRegex by lazy { """\p{Graph}+""".toRegex() } //[a-z][A-Z][0-9]!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
-        val emailRegex by lazy { """^(?=.{1,64}@)[\p{Alnum}_-]+(\\.[\p{Alnum}_-]+)*@[^-][\p{Alnum}-]+(\\.[\p{Alnum}-]+)*(\\.[\p{Alpha}]{2,})${'$'}""".toRegex() } //https://mkyong.com/regular-expressions/how-to-validate-email-address-with-regular-expression/
+        val emailRegex by lazy { """(?:[a-z0-9!#${'$'}%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#${'$'}%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])""".toRegex() }
 
         type = when {
+            username == null && email == null -> throw ErrorException("Укажите имя пользователя или почту")
             username == null -> AuthenticationType.Email
             email == null -> AuthenticationType.Username
             else -> throw ErrorException("Укажите имя пользователя или почту")
@@ -48,7 +49,7 @@ data class AuthenticationCredential(
             AuthenticationType.Email -> {
                 requireNotNull(email) //Cast to not null because it cannot be null
                 message = when {
-                    !email.matches(emailRegex)              -> """Неверный паттерн почты, доступные символы ^(?=.{1,64}@)[\\p{Alnum}_-]+(\\\\.[\\p{Alnum}_-]+)*@[^-][\\p{Alnum}-]+(\\\\.[\\p{Alnum}-]+)*(\\\\.[\\p{Alpha}]{2,})${'$'}"""
+                    !email.matches(emailRegex)              -> """Неверный паттерн почты, доступные символы (?:[a-z0-9!#${'$'}%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#${'$'}%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])"""
                     password.length < MIN_PASSWORD_LENGTH   -> "Минимальное длина пароля $MIN_PASSWORD_LENGTH"
                     password.length > MAX_PASSWORD_LENGTH   -> "Максимальная длина пароля $MAX_PASSWORD_LENGTH"
                     !password.matches(passwordRegex)        -> """Неверный паттерн пароля, доступные символы [a-z][A-Z][0-9]!\"#\$%&'()*+,-./:;<=>?@[\\]^_`{|}~"""
