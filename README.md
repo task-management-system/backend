@@ -90,6 +90,7 @@ cat *.sql | docker exec -i $container psql -U $user -d $database //Restore db du
    Foreign Key|fk_$tableName_$columnName_$referenceColumnName|constraint fk_user_role_id_id<br>foreign key(role_id)<br>references role(id)
    Unique|uq_$tableName_$columnName|constraint uq_user_username<br>unique(username)
    Check|ch_$tableName_$columnName|constraint ch_user_username<br>check(length(username) >= 4)
+
 4. For UUID tables use extension `uuid-ossp`, for default value use a fourth version of uuid generator.
 
    Ex.
