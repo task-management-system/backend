@@ -83,7 +83,7 @@ class TaskRepository {
     }
 
     /**
-     * @return true if update proceed else if not
+     * @return true if update succeeded else if not
      */
     fun updateInstanceStatusOrSkip(taskId: UUID): Boolean {
         return if (TaskInstanceEntity[taskId].status.id.value == 1.toShort()) {
