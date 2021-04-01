@@ -1,0 +1,48 @@
+version: "3.8"
+
+services:
+  tms-database:
+    container_name: tms-database
+    image: postgres:${TMS_DB_VERSION}
+    restart: always
+    environment:
+      - POSTGRES_DB=${TMS_DB_NAME}
+      - POSTGRES_USER=${TMS_DB_USER}
+      - POSTGRES_PASSWORD=${TMS_DB_PASSWORD}
+      - PGPORT=${TMS_DB_PORT}
+      - PGTZ=${TMS_TZ}
+    expose:
+      - ${TMS_DB_PORT}
+    ports:
+      - ${TMS_DB_PORT}:${TMS_DB_PORT}
+    volumes:
+      - tms-volume
+    networks:
+      - tms-network
+
+  tms-backend:
+    container_name: tms-backend
+    build: .
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - TZ=${TMS_TZ}
+    expose:
+      - ${TMS_BE_PORT}
+    ports:
+      - ${TMS_BE_PORT}:${TMS_BE_PORT}
+    depends_on:
+      - tms-database
+    networks:
+      - tms-network
+
+volumes:
+  tms-volume:
+    name: tms-volume
+    driver: local
+
+networks:
+  tms-network:
+    name: tms-network
+    driver: bridge
