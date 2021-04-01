@@ -3,6 +3,7 @@ package kz.seasky.tms.repository.task
 import kotlinx.uuid.UUID
 import kz.seasky.tms.database.TransactionService
 import kz.seasky.tms.exceptions.ErrorException
+import kz.seasky.tms.exceptions.WarningException
 import kz.seasky.tms.extensions.asUUID
 import kz.seasky.tms.model.paging.Paging
 import kz.seasky.tms.model.paging.PagingResponse
@@ -66,7 +67,9 @@ class TaskService(
 
             val task = repository.getReceived(userId, taskId) ?: throw ErrorException("Не удалось найти задачу")
 
-            repository.updateStatusOrSkip(taskId)
+            if (repository.updateInstanceStatusOrSkip(taskId)) {
+                repository.updateTaskStatus(task.task.id.asUUID())
+            }
 
             return@transaction TaskReceiveDetail(
                 id = task.id,
@@ -100,4 +103,56 @@ class TaskService(
         }
     }
 
+    @Suppress("NAME_SHADOWING")
+    suspend fun cancel(userId: String, taskId: UUID): TaskReceiveDetail {
+        return transactionService.transaction {
+            val userId = userId.asUUID()
+
+            val task = repository.cancel(userId, taskId)
+                ?: throw WarningException("Вы пытаетесь отменить не свое задание? А может задача уже отменена?!  А может вы хаццкер???")
+
+            repository.updateTaskStatus(task.task.id.asUUID())
+
+            return@transaction TaskReceiveDetail(
+                id = task.id,
+                title = task.task.title,
+                description = task.task.description,
+                markdown = task.task.markdown,
+                dueDate = task.task.dueDate,
+                createdAt = task.task.createdAt,
+                parent = TaskReceiveDetail.Task(task.task.id, task.status)
+            )
+        }
+    }
+
+    @Suppress("NAME_SHADOWING")
+    suspend fun close(userId: String, taskId: UUID): TaskReceiveDetail {
+        return transactionService.transaction {
+            val userId = userId.asUUID()
+
+            val task = repository.close(userId, taskId)
+                ?: throw WarningException("Вы пытаетесь закончить не свое задание? А может задача уже закончена?! А может вы хаццкер???")
+
+            repository.updateTaskStatus(task.task.id.asUUID())
+
+            return@transaction TaskReceiveDetail(
+                id = task.id,
+                title = task.task.title,
+                description = task.task.description,
+                markdown = task.task.markdown,
+                dueDate = task.task.dueDate,
+                createdAt = task.task.createdAt,
+                parent = TaskReceiveDetail.Task(task.task.id, task.status)
+            )
+        }
+    }
+
+    @Suppress("NAME_SHADOWING")
+    suspend fun delete(userId: String, taskId: UUID) {
+        return transactionService.transaction {
+            val userId = userId.asUUID()
+
+            repository.delete(userId, taskId) ?: throw WarningException("А задание уже удалить нельзя, вот беда")
+        }
+    }
 }

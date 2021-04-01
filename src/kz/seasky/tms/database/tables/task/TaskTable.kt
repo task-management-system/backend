@@ -11,8 +11,8 @@ object TaskTable : KotlinxUUIDTable("task") {
     val markdown = text("markdown").nullable()
     val dueDate = datetime("due_date")
     val createdAt = datetime("created_at")
-    val creator = reference("creator_id", UserTable.id, fkName = "fk_task_creator_id_id")
-    val status = reference("status_id", StatusTable.id, fkName = "fk_task_status_id_id")
+    val creator = reference("creator_id", UserTable, fkName = "fk_task_creator_id_id")
+    val status = reference("status_id", StatusTable, fkName = "fk_task_status_id_id")
 
     override val primaryKey = PrimaryKey(id, name = "pk_task_id")
 }

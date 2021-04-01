@@ -30,3 +30,5 @@ fun String.isValidTime(): Boolean {
 fun String.isValidUUID(): Boolean {
     return UUID.isValidUUIDString(this)
 }
+
+fun UUID.map(key: String = "id") = mapOf(key to toString())

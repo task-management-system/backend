@@ -36,6 +36,40 @@ fun Route.task() {
 
             call.success(data = service.getCreated(userId, taskId))
         }
+
+        route("action") {
+            patch("/cancel") {
+                val userId = call.getPrincipal<AuthenticationPrincipal>().id
+                val taskId = call.getId<UUID>()
+
+                call.success(
+                    message = "Задача успешно отменена",
+                    data = service.cancel(userId, taskId)
+                )
+            }
+
+            patch("/close") {
+                val userId = call.getPrincipal<AuthenticationPrincipal>().id
+                val taskId = call.getId<UUID>()
+
+                call.success(
+                    message = "Задача успешно закрыта",
+                    data = service.close(userId, taskId)
+                )
+            }
+
+            patch("/delete") {
+                val userId = call.getPrincipal<AuthenticationPrincipal>().id
+                val taskId = call.getId<UUID>()
+
+                service.delete(userId, taskId)
+
+                call.success(
+                    message = "Задача успешно удалена",
+                    data = taskId.map()
+                )
+            }
+        }
     }
 
     route("/tasks") {
