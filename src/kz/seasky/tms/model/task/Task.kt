@@ -1,6 +1,5 @@
 package kz.seasky.tms.model.task
 
-import kz.seasky.tms.model.status.Status
 import kz.seasky.tms.model.user.User
 
 /**
@@ -14,6 +13,5 @@ data class Task(
     val markdown: String?,
     val dueDate: String,
     val createdAt: String,
-    val creator: User,
-    val status: Status
+    val creator: User
 )

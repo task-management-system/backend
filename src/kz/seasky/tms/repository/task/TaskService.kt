@@ -1,19 +1,23 @@
 package kz.seasky.tms.repository.task
 
+import kotlinx.uuid.UUID
 import kz.seasky.tms.database.TransactionService
+import kz.seasky.tms.exceptions.ErrorException
 import kz.seasky.tms.extensions.asUUID
-import kz.seasky.tms.model.detail.Detail
 import kz.seasky.tms.model.paging.Paging
 import kz.seasky.tms.model.paging.PagingResponse
-import kz.seasky.tms.model.task.Task
-import kz.seasky.tms.model.task.TaskInsert
+import kz.seasky.tms.model.task.*
 
 class TaskService(
     private val transactionService: TransactionService,
     private val repository: TaskRepository,
 ) {
     @Suppress("NAME_SHADOWING")
-    suspend fun getReceived(userId: String, statusId: Short, paging: Paging): PagingResponse<List<Detail>> {
+    suspend fun getReceivedPreview(
+        userId: String,
+        statusId: Short,
+        paging: Paging
+    ): PagingResponse<List<TaskInstancePreview>> {
         return transactionService.transaction {
             val userId = userId.asUUID()
             val totalCount = repository.countReceived(userId, statusId)
@@ -28,7 +32,7 @@ class TaskService(
 
 
     @Suppress("NAME_SHADOWING")
-    suspend fun getCreated(userId: String, statusId: Short, paging: Paging): PagingResponse<List<Task>> {
+    suspend fun getCreatedPreview(userId: String, statusId: Short, paging: Paging): PagingResponse<List<TaskPreview>> {
         return transactionService.transaction {
             val userId = userId.asUUID()
             val totalCount = repository.countCreated(userId, statusId)
@@ -42,7 +46,7 @@ class TaskService(
     }
 
     @Suppress("NAME_SHADOWING")
-    suspend fun createTaskAndDetails(creatorId: String, newTask: TaskInsert): Task {
+    suspend fun createTaskAndTaskInstance(creatorId: String, newTask: TaskInsert): Task {
         return transactionService.transaction {
             val creatorId = creatorId.asUUID()
             val task = repository.insertTask(creatorId, newTask)
@@ -51,26 +55,49 @@ class TaskService(
                 repository.insertDetails(executorId.asUUID(), task.id.asUUID())
             }
 
-            task
+            return@transaction task
         }
     }
 
-//
-//    suspend fun getAll(userId: Long, paging: Paging): List<TaskWithCreator> {
-//        return transactionService.transaction {
-//            repository.getAll(userId, paging)
-//        }
-//    }
-//
-//    suspend fun insert(task: TaskCreate): TaskEntity? {
-//        return transactionService.transaction {
-//            repository.insert(task)
-//        }
-//    }
+    @Suppress("NAME_SHADOWING")
+    suspend fun getReceived(userId: String, taskId: UUID): TaskReceiveDetail {
+        return transactionService.transaction {
+            val userId = userId.asUUID()
 
-//    suspend fun delete(id: Long): Int {
-//        return transactionService.transaction {
-//            repository.delete(id)
-//        }
-//    }
+            val task = repository.getReceived(userId, taskId) ?: throw ErrorException("Не удалось найти задачу")
+
+            repository.updateStatusOrSkip(taskId)
+
+            return@transaction TaskReceiveDetail(
+                id = task.id,
+                title = task.task.title,
+                description = task.task.description,
+                markdown = task.task.markdown,
+                dueDate = task.task.dueDate,
+                createdAt = task.task.createdAt,
+                parent = TaskReceiveDetail.Task(task.task.id, task.status)
+            )
+        }
+    }
+
+    @Suppress("NAME_SHADOWING")
+    suspend fun getCreated(userId: String, taskId: UUID): TaskCreatedDetail {
+        return transactionService.transaction {
+            val userId = userId.asUUID()
+
+            val task = repository.getCreated(userId, taskId) ?: throw ErrorException("Не удалось найти задачу")
+            val taskInstances = repository.getCreatedInstances(taskId)
+
+            return@transaction TaskCreatedDetail(
+                id = task.id,
+                title = task.title,
+                description = task.description,
+                markdown = task.markdown,
+                dueDate = task.dueDate,
+                createdAt = task.createdAt,
+                taskInstances = taskInstances
+            )
+        }
+    }
+
 }

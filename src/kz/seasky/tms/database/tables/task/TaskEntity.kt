@@ -7,6 +7,7 @@ import kz.seasky.tms.database.tables.status.StatusEntity
 import kz.seasky.tms.database.tables.user.UserEntity
 import kz.seasky.tms.model.task.Task
 import kz.seasky.tms.model.task.TaskInsert
+import kz.seasky.tms.model.task.TaskPreview
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.joda.time.DateTime
@@ -44,8 +45,17 @@ class TaskEntity(id: EntityID<UUID>) : KotlinxUUIDEntity(id) {
             markdown = markdown,
             dueDate = dueDate.toString(),
             createdAt = createdAt.toString(),
-            creator = creator.toUser(),
-            status = status.toStatus()
+            creator = creator.toUser()
+        )
+    }
+
+    fun toTaskPreview(): TaskPreview {
+        return TaskPreview(
+            id = id.value.toString(),
+            title = title,
+            description = description,
+            dueDate = dueDate.toString(),
+            creator = creator.toUser()
         )
     }
 }
