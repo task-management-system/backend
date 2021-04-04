@@ -1,13 +1,18 @@
 package kz.seasky.tms.repository.task
 
+import io.ktor.http.content.*
 import kotlinx.uuid.UUID
 import kz.seasky.tms.database.TransactionService
 import kz.seasky.tms.exceptions.ErrorException
 import kz.seasky.tms.exceptions.WarningException
 import kz.seasky.tms.extensions.asUUID
+import kz.seasky.tms.extensions.copyToSuspend
+import kz.seasky.tms.extensions.fileSize
 import kz.seasky.tms.model.paging.Paging
 import kz.seasky.tms.model.paging.PagingResponse
 import kz.seasky.tms.model.task.*
+import kz.seasky.tms.utils.FILE_ROOT_DIR
+import java.io.File
 
 class TaskService(
     private val transactionService: TransactionService,
@@ -153,6 +158,45 @@ class TaskService(
             val userId = userId.asUUID()
 
             repository.delete(userId, taskId) ?: throw WarningException("А задание уже удалить нельзя, вот беда")
+        }
+    }
+
+    @Suppress("NAME_SHADOWING")
+    suspend fun addFile(
+        userId: UUID,
+        taskId: UUID,
+        parts: List<PartData.FileItem>
+    ): HashMap<String, MutableList<String>> {
+        return transactionService.transaction {
+            val keySuccess = "fileSuccess"
+            val keyError = "fileError"
+            val files = hashMapOf<String, MutableList<String>>(
+                keySuccess to mutableListOf(),
+                keyError to mutableListOf()
+            )
+
+            for (part in parts) {
+                val fileName = part.originalFileName ?: continue
+                val dirName = "$FILE_ROOT_DIR/$taskId"
+                val dir = File(dirName)
+                if (!dir.exists()) dir.mkdir()
+                val ext = File(fileName).extension
+                val file = File(dirName, "ts${System.currentTimeMillis()}hc${fileName.hashCode()}.$ext")
+                part.streamProvider().use { input ->
+                    if (input.fileSize()) {
+                        file.outputStream().buffered().use { output ->
+                            input.copyToSuspend(output)
+                        }
+                        files[keySuccess]?.add(fileName)
+                    } else {
+                        files[keyError]?.add(fileName)
+                    }
+                }
+
+                part.dispose()
+            }
+
+            return@transaction files
         }
     }
 }

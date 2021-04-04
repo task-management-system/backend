@@ -8,21 +8,19 @@ import org.joda.time.DateTime
 
 fun Parameters.asPaging(): Paging {
     return Paging(
-        page = get("page")?.toLong(),
-        size = get("size")?.toInt(),
+        page = get("page")?.toLongOrNull(),
+        size = get("size")?.toIntOrNull(),
         order = get("order")
     )
 }
 
+@Suppress("LiftReturnOrAssignment")
 fun String.isValidTime(): Boolean {
-//    val dtf = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZZ")
-
-    return try {
+    try {
         DateTime(this)
-//        dtf.parseDateTime(this)
-        true
+        return true
     } catch (e: IllegalArgumentException) {
-        false
+        return false
     }
 }
 
@@ -31,4 +29,14 @@ fun String.isValidUUID(): Boolean {
     return UUID.isValidUUIDString(this)
 }
 
-fun UUID.map(key: String = "id") = mapOf(key to toString())
+fun DateTime.plain(): String {
+    //@formatter:off
+    return  year().asString +
+            monthOfYear().asString +
+            dayOfMonth().asString +
+            hourOfDay().asString +
+            minuteOfHour().asString +
+            secondOfMinute().asString +
+            zone.getOffset(this)
+    //@formatter:on
+}

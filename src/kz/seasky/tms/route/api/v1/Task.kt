@@ -1,6 +1,8 @@
 package kz.seasky.tms.route.api.v1
 
 import io.ktor.application.*
+import io.ktor.http.content.*
+import io.ktor.request.*
 import io.ktor.routing.*
 import kotlinx.uuid.UUID
 import kz.seasky.tms.extensions.*
@@ -21,6 +23,29 @@ fun Route.task() {
                 message = "Задача успешно создана",
                 data = service.createTaskAndTaskInstance(userId, task)
             )
+        }
+
+        route("/file") {
+            post("/add") {
+                val userId = call.getPrincipal<AuthenticationPrincipal>().id
+                val taskId = call.getId<UUID>()
+                val parts = call.receiveMultipart().readAllParts()
+
+                service.addFile(userId.asUUID(), taskId, parts.filterIsInstance<PartData.FileItem>())
+
+//                if (files[keyFileSizeError].isNullOrEmpty()) {
+//                    call.success(
+//                        message = "Файл(ы) успешно загружен(ы)",
+//                        data = files[keySuccess]
+//                    )
+//                } else {
+//                    val errorCount = (files[keyFileSizeError]?.size ?: 0) + (files[keyFilenameError]?.size ?: 0)
+//                    call.warning(
+//                        message = "Максимальный размер файла ${FILE_DEFAULT_SIZE.asMiB()}МБ, по этой причине не удалось загрузить $errorCount файл(ов).",
+//                        data = files
+//                    )
+//                }
+            }
         }
 
         get("/received") {
@@ -66,7 +91,7 @@ fun Route.task() {
 
                 call.success(
                     message = "Задача успешно удалена",
-                    data = taskId.map()
+                    data = mapOf("id" to taskId.toString())
                 )
             }
         }
