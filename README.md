@@ -29,7 +29,7 @@
 
 #### Requirements for Windows users
 
-1. [docker](https://docs.docker.com/get-docker/) (I am not joking, it's really necessary tool)
+1. [docker](https://www.docker.com/products/docker-desktop) (I am not joking, it's really necessary tool)
 2. [cmder](https://cmder.net/)
 
 #### TL;DR

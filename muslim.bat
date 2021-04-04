@@ -5,7 +5,7 @@ goto :init
     echo.
     echo %BATCH_NAME% requires cmder and docker for correct work, you can install it from links below:
     echo    cmder   - https://cmder.net/
-    echo    docker  - https://docs.docker.com/get-docker/
+    echo    docker  - https://www.docker.com/products/docker-desktop
     goto :end
 
 :usage
