@@ -49,11 +49,7 @@ suspend inline fun <reified T> ApplicationCall.receiveOrException(): T {
 }
 
 suspend inline fun <reified T : ReceiveValidator> ApplicationCall.receiveAndValidate(): T {
-    return validate(receiveOrNull())
-}
-
-fun <T : ReceiveValidator> validate(whatToValidate: T?): T {
-    return whatToValidate?.validate() ?: throw ErrorException(Message.FILL_PAYLOAD)
+    return receiveOrNull<T>()?.validate<T>() ?: throw ErrorException(Message.FILL_PAYLOAD)
 }
 
 inline fun <reified P : Principal> ApplicationCall.getPrincipal(): P {
@@ -64,7 +60,7 @@ inline fun <reified P : Principal> ApplicationCall.getPrincipal(): P {
 }
 
 @Suppress("FoldInitializerAndIfToElvis")
-@OptIn(ExperimentalStdlibApi::class, UUIDExperimentalAPI::class)
+@OptIn(UUIDExperimentalAPI::class)
 inline fun <reified T> ApplicationCall.getId(idName: String = "id"): T {
     val id = parameters[idName] ?: throw ErrorException(Message.INDICATE_ID + "'$idName'")
 

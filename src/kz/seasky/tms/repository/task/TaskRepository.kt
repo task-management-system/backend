@@ -1,6 +1,7 @@
 package kz.seasky.tms.repository.task
 
 import kotlinx.uuid.UUID
+import kz.seasky.tms.database.tables.file.FileEntity
 import kz.seasky.tms.database.tables.status.StatusEntity
 import kz.seasky.tms.database.tables.task.TaskEntity
 import kz.seasky.tms.database.tables.task.TaskInstanceEntity
@@ -8,8 +9,11 @@ import kz.seasky.tms.database.tables.task.TaskInstanceTable
 import kz.seasky.tms.database.tables.task.TaskTable
 import kz.seasky.tms.enums.Status
 import kz.seasky.tms.extensions.all
+import kz.seasky.tms.model.file.File
+import kz.seasky.tms.model.file.FileInsert
 import kz.seasky.tms.model.paging.Paging
 import kz.seasky.tms.model.task.*
+import org.jetbrains.exposed.sql.SizedCollection
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.update
@@ -151,13 +155,53 @@ class TaskRepository {
         return task.delete()
     }
 
+    //TODO include custom exception or return pair with exception message
+    fun insertFile(userId: UUID, taskId: UUID, file: FileInsert): File? {
+        val taskInstance = TaskInstanceTable
+            .select { (TaskInstanceTable.task eq taskId) and (TaskInstanceTable.executor eq userId) }
+            .map { row ->
+                TaskInstanceEntity.wrapRow(row)
+            }
+            .firstOrNull()
+
+        if (taskInstance != null) {
+            if (taskInstance.status.id.value == Status.InWork.value) {
+                val task = taskInstance.task
+                val fe = FileEntity.insert(file)
+
+                task.file = SizedCollection(fe)
+
+                return task.file.firstOrNull()?.toFile()
+            }
+
+            return null
+        } else {
+            val task = TaskEntity[taskId]
+
+            val creatorId = task.creator.id.value
+            if (creatorId != userId) return null
+
+            val statusId = task.status.id.value
+            if (statusId == Status.New.value) {
+                val fe = FileEntity.insert(file)
+                task.file = SizedCollection(fe)
+
+                return task.file.firstOrNull()?.toFile()
+            }
+
+            return null
+        }
+    }
+
     private fun getStatus(tasks: List<TaskInstance>): Status {
+        //@formatter:off
         val counts = hashMapOf(
-            Status.New to tasks.filter { it.status.id == Status.New.value }.size,
-            Status.InWork to tasks.filter { it.status.id == Status.InWork.value }.size,
+            Status.New      to tasks.filter { it.status.id == Status.New.value }.size,
+            Status.InWork   to tasks.filter { it.status.id == Status.InWork.value }.size,
             Status.Canceled to tasks.filter { it.status.id == Status.Canceled.value }.size,
-            Status.Closed to tasks.filter { it.status.id == Status.Closed.value }.size
+            Status.Closed   to tasks.filter { it.status.id == Status.Closed.value }.size
         )
+        //@formatter:on
         val count = tasks.count()
 
         if (counts[Status.Canceled] == count) {

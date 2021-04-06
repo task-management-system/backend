@@ -15,16 +15,17 @@ fun Parameters.asPaging(): Paging {
 }
 
 @Suppress("LiftReturnOrAssignment")
-fun String.isValidTime(): Boolean {
-    try {
-        DateTime(this)
-        return true
-    } catch (e: IllegalArgumentException) {
-        return false
-    }
+fun String.isValidTime(): Boolean = try {
+    DateTime(this)
+    true
+} catch (e: IllegalArgumentException) {
+    false
 }
 
-@UUIDExperimentalAPI
+/**
+ * @return true if UUID is valid, false otherwise
+ */
+@OptIn(UUIDExperimentalAPI::class)
 fun String.isValidUUID(): Boolean {
     return UUID.isValidUUIDString(this)
 }

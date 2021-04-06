@@ -1,22 +1,28 @@
 package kz.seasky.tms.repository.task
 
 import io.ktor.http.content.*
+import io.ktor.util.*
+import io.ktor.utils.io.*
+import io.ktor.utils.io.jvm.javaio.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.uuid.UUID
 import kz.seasky.tms.database.TransactionService
 import kz.seasky.tms.exceptions.ErrorException
 import kz.seasky.tms.exceptions.WarningException
 import kz.seasky.tms.extensions.asUUID
-import kz.seasky.tms.extensions.copyToSuspend
-import kz.seasky.tms.extensions.fileSize
+import kz.seasky.tms.model.file.File
+import kz.seasky.tms.model.file.FileInsert
 import kz.seasky.tms.model.paging.Paging
 import kz.seasky.tms.model.paging.PagingResponse
 import kz.seasky.tms.model.task.*
-import kz.seasky.tms.utils.FILE_ROOT_DIR
-import java.io.File
+import kz.seasky.tms.utils.FILE_DEFAULT_SIZE
+import kz.seasky.tms.utils.FileHelper
 
 class TaskService(
     private val transactionService: TransactionService,
     private val repository: TaskRepository,
+    private val fileHelper: FileHelper
 ) {
     @Suppress("NAME_SHADOWING")
     suspend fun getReceivedPreview(
@@ -35,7 +41,6 @@ class TaskService(
             )
         }
     }
-
 
     @Suppress("NAME_SHADOWING")
     suspend fun getCreatedPreview(userId: String, statusId: Short, paging: Paging): PagingResponse<List<TaskPreview>> {
@@ -109,7 +114,7 @@ class TaskService(
     }
 
     @Suppress("NAME_SHADOWING")
-    suspend fun cancel(userId: String, taskId: UUID): TaskReceiveDetail {
+    suspend fun cancelTaskInstance(userId: String, taskId: UUID): TaskReceiveDetail {
         return transactionService.transaction {
             val userId = userId.asUUID()
 
@@ -131,7 +136,7 @@ class TaskService(
     }
 
     @Suppress("NAME_SHADOWING")
-    suspend fun close(userId: String, taskId: UUID): TaskReceiveDetail {
+    suspend fun closeTask(userId: String, taskId: UUID): TaskReceiveDetail {
         return transactionService.transaction {
             val userId = userId.asUUID()
 
@@ -153,7 +158,7 @@ class TaskService(
     }
 
     @Suppress("NAME_SHADOWING")
-    suspend fun delete(userId: String, taskId: UUID) {
+    suspend fun deleteTask(userId: String, taskId: UUID) {
         return transactionService.transaction {
             val userId = userId.asUUID()
 
@@ -161,42 +166,61 @@ class TaskService(
         }
     }
 
-    @Suppress("NAME_SHADOWING")
+    @Suppress("BlockingMethodInNonBlockingContext")
     suspend fun addFile(
         userId: UUID,
         taskId: UUID,
         parts: List<PartData.FileItem>
-    ): HashMap<String, MutableList<String>> {
+    ): HashMap<Char, MutableList<File>> {
         return transactionService.transaction {
-            val keySuccess = "fileSuccess"
-            val keyError = "fileError"
-            val files = hashMapOf<String, MutableList<String>>(
-                keySuccess to mutableListOf(),
-                keyError to mutableListOf()
+            val files = hashMapOf<Char, MutableList<File>>(
+                FileHelper.KEY_SUCCESS to mutableListOf(),
+                FileHelper.KEY_ERROR to mutableListOf()
             )
 
             for (part in parts) {
-                val fileName = part.originalFileName ?: continue
-                val dirName = "$FILE_ROOT_DIR/$taskId"
-                val dir = File(dirName)
-                if (!dir.exists()) dir.mkdir()
-                val ext = File(fileName).extension
-                val file = File(dirName, "ts${System.currentTimeMillis()}hc${fileName.hashCode()}.$ext")
+                val originalFilename = part.originalFileName ?: continue
                 part.streamProvider().use { input ->
-                    if (input.fileSize()) {
-                        file.outputStream().buffered().use { output ->
-                            input.copyToSuspend(output)
-                        }
-                        files[keySuccess]?.add(fileName)
+                    val bytes = input.readBytes() //TODO too long if big file sent
+                    val file = fileHelper.prepareFile(taskId, originalFilename, bytes)
+                    val fileInsert = FileInsert(originalFilename, bytes.size, file.canonicalPath)
+                    if (bytes.size in 1..FILE_DEFAULT_SIZE) {
+                        val fileDescriptor = repository.insertFile(userId, taskId, fileInsert)
+                        if (fileDescriptor != null) {
+                            file.outputStream().use { output ->
+                                withContext(Dispatchers.IO) {
+                                    output.write(bytes)
+                                }
+                            }
+                            files[FileHelper.KEY_SUCCESS]?.add(fileDescriptor)
+                        } else {
+                            Unit
+                            val errorFileDescriptor = File(
+                                id = "",
+                                name = fileInsert.name,
+                                size = fileInsert.size,
+                                path = ""
+                            )
+                            files[FileHelper.KEY_ERROR]?.add(errorFileDescriptor)
+                        } //My fucking god
                     } else {
-                        files[keyError]?.add(fileName)
+                        //fixme
+                        val errorFileDescriptor = File(
+                            id = "",
+                            name = fileInsert.name,
+                            size = fileInsert.size,
+                            path = ""
+                        )
+                        files[FileHelper.KEY_ERROR]?.add(errorFileDescriptor)
                     }
                 }
 
-                part.dispose()
+                part.dispose
             }
 
             return@transaction files
         }
     }
 }
+
+val Any?.ignoreResult get() = Unit

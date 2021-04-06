@@ -1,6 +1,5 @@
 package kz.seasky.tms.model.task
 
-import kotlinx.uuid.UUIDExperimentalAPI
 import kz.seasky.tms.exceptions.ErrorException
 import kz.seasky.tms.extensions.isValidTime
 import kz.seasky.tms.extensions.isValidUUID
@@ -17,9 +16,7 @@ class TaskInsert(
         const val MIN_TITLE_LENGTH = 4
     }
 
-    @OptIn(UUIDExperimentalAPI::class)
     override fun <T> validate(): T {
-
         //@formatter:off
         val message = when {
             title.isBlank()                 -> "Значение поля title не может быть пустым"

@@ -3,7 +3,9 @@ package kz.seasky.tms.database.tables.task
 import kotlinx.uuid.UUID
 import kotlinx.uuid.exposed.KotlinxUUIDEntity
 import kotlinx.uuid.exposed.KotlinxUUIDEntityClass
+import kz.seasky.tms.database.tables.file.FileEntity
 import kz.seasky.tms.database.tables.status.StatusEntity
+import kz.seasky.tms.database.tables.taskFile.TaskFileTable
 import kz.seasky.tms.database.tables.user.UserEntity
 import kz.seasky.tms.model.task.Task
 import kz.seasky.tms.model.task.TaskInsert
@@ -21,6 +23,7 @@ class TaskEntity(id: EntityID<UUID>) : KotlinxUUIDEntity(id) {
     var createdAt   by TaskTable.createdAt
     var creator     by UserEntity referencedOn TaskTable.creator
     var status      by StatusEntity referencedOn TaskTable.status
+    var file        by FileEntity via TaskFileTable
     //@formatter:on
 
     companion object : KotlinxUUIDEntityClass<TaskEntity>(TaskTable) {

@@ -9,6 +9,9 @@ import kz.seasky.tms.extensions.*
 import kz.seasky.tms.model.authentication.AuthenticationPrincipal
 import kz.seasky.tms.model.task.TaskInsert
 import kz.seasky.tms.repository.task.TaskService
+import kz.seasky.tms.utils.FILE_DEFAULT_SIZE
+import kz.seasky.tms.utils.FileHelper
+import kz.seasky.tms.utils.asMib
 import org.koin.ktor.ext.inject
 
 fun Route.task() {
@@ -31,20 +34,19 @@ fun Route.task() {
                 val taskId = call.getId<UUID>()
                 val parts = call.receiveMultipart().readAllParts()
 
-                service.addFile(userId.asUUID(), taskId, parts.filterIsInstance<PartData.FileItem>())
+                val files = service.addFile(userId.asUUID(), taskId, parts.filterIsInstance<PartData.FileItem>())
 
-//                if (files[keyFileSizeError].isNullOrEmpty()) {
-//                    call.success(
-//                        message = "Файл(ы) успешно загружен(ы)",
-//                        data = files[keySuccess]
-//                    )
-//                } else {
-//                    val errorCount = (files[keyFileSizeError]?.size ?: 0) + (files[keyFilenameError]?.size ?: 0)
-//                    call.warning(
-//                        message = "Максимальный размер файла ${FILE_DEFAULT_SIZE.asMiB()}МБ, по этой причине не удалось загрузить $errorCount файл(ов).",
-//                        data = files
-//                    )
-//                }
+                if (files[FileHelper.KEY_ERROR].isNullOrEmpty()) {
+                    call.success(
+                        message = "Файл(ы) успешно загружен(ы)",
+                        data = files[FileHelper.KEY_SUCCESS]
+                    )
+                } else {
+                    call.warning(
+                        message = "Максимальный размер файла ${FILE_DEFAULT_SIZE.asMib()}МБ, по этой причине не удалось загрузить ${files[FileHelper.KEY_ERROR]?.size} файл(ов).",
+                        data = files
+                    )
+                }
             }
         }
 
@@ -69,7 +71,7 @@ fun Route.task() {
 
                 call.success(
                     message = "Задача успешно отменена",
-                    data = service.cancel(userId, taskId)
+                    data = service.cancelTaskInstance(userId, taskId)
                 )
             }
 
@@ -79,7 +81,7 @@ fun Route.task() {
 
                 call.success(
                     message = "Задача успешно закрыта",
-                    data = service.close(userId, taskId)
+                    data = service.closeTask(userId, taskId)
                 )
             }
 
@@ -87,7 +89,7 @@ fun Route.task() {
                 val userId = call.getPrincipal<AuthenticationPrincipal>().id
                 val taskId = call.getId<UUID>()
 
-                service.delete(userId, taskId)
+                service.deleteTask(userId, taskId)
 
                 call.success(
                     message = "Задача успешно удалена",

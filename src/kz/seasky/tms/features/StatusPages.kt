@@ -54,7 +54,8 @@ fun StatusPages.Configuration.byException() {
     exception<ErrorException> { e ->
         call.error<Nothing>(
             statusCode = e.statusCode ?: HttpStatusCode.BadRequest,
-            message = e.message
+            message = e.message,
+            stackTrace = if (e.withStackTrace) e.stackTraceToString() else null
         )
     }
 
