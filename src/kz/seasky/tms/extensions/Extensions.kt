@@ -14,10 +14,13 @@ fun Parameters.asPaging(): Paging {
     )
 }
 
+/**
+ * @return true if datetime can be parsed and it bigger equals current time, false otherwise
+ */
 @Suppress("LiftReturnOrAssignment")
 fun String.isValidTime(): Boolean = try {
-    DateTime(this)
-    true
+    val date = DateTime(this)
+    date >= DateTime.now()
 } catch (e: IllegalArgumentException) {
     false
 }
