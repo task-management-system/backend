@@ -15,7 +15,10 @@ import kz.seasky.tms.model.file.FileInsert
 import kz.seasky.tms.model.paging.Paging
 import kz.seasky.tms.model.task.*
 import org.jetbrains.exposed.exceptions.ExposedSQLException
-import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.update
 
 class TaskRepository {
     fun countReceived(userId: UUID, statusId: Short): Long {
@@ -174,7 +177,7 @@ class TaskRepository {
         try {
             val task = TaskEntity[taskId]
 
-            if (task.creator.id.value != userId) return null to "Не удалось добавить запись, ты хто такой?"
+            if (task.creator.id.value != userId) return null to "Так не пойдет, ты хто такой?"
 
             val statusId = task.status.id.value
             if (statusId == Status.InWork.value || statusId == Status.Canceled.value || statusId == Status.Closed.value) return null to "Не удалось добавить запись, задачка уже в процессе"
@@ -192,29 +195,34 @@ class TaskRepository {
         }
     }
 
-    fun insertFileToReceived(userId: UUID, taskId: UUID, file: FileInsert): File? {
+    /**
+     * @return [Pair] where
+     * [Pair.first] is nullable created [File],
+     * [Pair.second] is nullable exception message
+     */
+    @Suppress("FoldInitializerAndIfToElvis")
+    fun insertFileToReceived(userId: UUID, taskId: UUID, file: FileInsert): Pair<File?, String?> {
         try {
-            val taskInstance = TaskInstanceTable
-                .select { (TaskInstanceTable.task eq taskId) and (TaskInstanceTable.executor eq userId) }
-                .map { row ->
-                    TaskInstanceEntity.wrapRow(row)
-                }
-                .firstOrNull()
+            val taskInstance = TaskInstanceEntity[taskId]
 
-            requireNotNull(taskInstance)
+            if (taskInstance.executor.id.value != userId) return null to "Так не пойдет, ты хто такой?"
 
             if (taskInstance.status.id.value == Status.InWork.value) {
                 val task = taskInstance.task
-                val fe = FileEntity.insert(file)
+                val fileEntity = FileEntity.insert(file)
 
-                task.file = SizedCollection(fe)
+                TaskFileTable.insert { statement ->
+                    statement[TaskFileTable.task] = task.id
+                    statement[TaskFileTable.file] = fileEntity.id
+                }
 
-                return task.file.firstOrNull()?.toFile()
+                return task.file.firstOrNull()?.toFile() to null
             }
 
-            return null
+            return null to "Не удалось добавить запись, задачка уже закрыта :/"
         } catch (e: ExposedSQLException) {
-            return null
+            e.printStackTrace()
+            return null to "Не удалось добавить запись, возможно дубликаты по коням!"
         }
     }
 

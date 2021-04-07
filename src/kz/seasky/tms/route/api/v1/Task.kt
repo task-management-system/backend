@@ -36,12 +36,28 @@ fun Route.task() {
             )
         }
 
-        route("/received/{id}") {
+        route("/received/{taskInstanceId}") {
             get {
                 val userId = call.getPrincipal<AuthenticationPrincipal>().id
-                val taskId = call.getId<UUID>()
+                val taskId = call.getId<UUID>("taskInstanceId")
 
                 call.success(data = service.getReceived(userId, taskId))
+            }
+
+            route("/file") {
+                post("/add") {
+                    val userId = call.getPrincipal<AuthenticationPrincipal>().id
+                    val taskId = call.getId<UUID>("taskInstanceId")
+                    val parts = call.receiveMultipart().readAllParts()
+
+                    val files = service.addFileToReceived(
+                        userId = userId.asUUID(),
+                        taskId = taskId,
+                        parts = parts.filterIsInstance<PartData.FileItem>()
+                    )
+
+                    call.file(files)
+                }
             }
         }
 
