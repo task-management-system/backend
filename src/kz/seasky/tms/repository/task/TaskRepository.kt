@@ -7,6 +7,7 @@ import kz.seasky.tms.database.tables.task.TaskEntity
 import kz.seasky.tms.database.tables.task.TaskInstanceEntity
 import kz.seasky.tms.database.tables.task.TaskInstanceTable
 import kz.seasky.tms.database.tables.task.TaskTable
+import kz.seasky.tms.database.tables.taskFile.TaskFileTable
 import kz.seasky.tms.enums.Status
 import kz.seasky.tms.extensions.all
 import kz.seasky.tms.model.file.File
@@ -14,10 +15,7 @@ import kz.seasky.tms.model.file.FileInsert
 import kz.seasky.tms.model.paging.Paging
 import kz.seasky.tms.model.task.*
 import org.jetbrains.exposed.exceptions.ExposedSQLException
-import org.jetbrains.exposed.sql.SizedCollection
-import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.update
+import org.jetbrains.exposed.sql.*
 
 class TaskRepository {
     fun countReceived(userId: UUID, statusId: Short): Long {
@@ -168,7 +166,6 @@ class TaskRepository {
     }
 
     /**
-     * @exception ExposedSQLException
      * @return [Pair] where
      * [Pair.first] is nullable created [File],
      * [Pair.second] is nullable exception message
@@ -183,7 +180,11 @@ class TaskRepository {
             if (statusId == Status.InWork.value || statusId == Status.Canceled.value || statusId == Status.Closed.value) return null to "Не удалось добавить запись, задачка уже в процессе"
 
             val fileEntity = FileEntity.insert(file)
-            task.file = SizedCollection(fileEntity)
+
+            TaskFileTable.insert { statement ->
+                statement[TaskFileTable.task] = taskId
+                statement[TaskFileTable.file] = fileEntity.id
+            }
 
             return task.file.firstOrNull()?.toFile() to null
         } catch (e: ExposedSQLException) {
