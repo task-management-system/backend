@@ -58,6 +58,20 @@ fun Route.task() {
 
                     call.file(files)
                 }
+
+
+                delete {
+                    val userId = call.getPrincipal<AuthenticationPrincipal>().id
+                    val taskId = call.getId<UUID>("taskInstanceId")
+                    val fileId = call.getId<UUID>()
+
+                    service.removeFileFromReceived(userId.asUUID(), taskId, fileId)
+
+                    call.success(
+                        message = "Файл успешно удален",
+                        data = mapOf("id" to fileId.toString())
+                    )
+                }
             }
         }
 
@@ -82,6 +96,19 @@ fun Route.task() {
                     )
 
                     call.file(files)
+                }
+
+                delete {
+                    val userId = call.getPrincipal<AuthenticationPrincipal>().id
+                    val taskId = call.getId<UUID>("taskId")
+                    val fileId = call.getId<UUID>()
+
+                    service.removeFileFromCreated(userId.asUUID(), taskId, fileId)
+
+                    call.success(
+                        message = "Файл успешно удален",
+                        data = mapOf("id" to fileId.toString())
+                    )
                 }
             }
         }

@@ -19,6 +19,7 @@ import kz.seasky.tms.model.task.*
 import kz.seasky.tms.utils.FILE_DEFAULT_SIZE
 import kz.seasky.tms.utils.FileHelper
 import kz.seasky.tms.utils.asMiB
+import java.io.File
 
 class TaskService(
     private val transactionService: TransactionService,
@@ -282,6 +283,22 @@ class TaskService(
             }
 
             return@transaction files
+        }
+    }
+
+    suspend fun removeFileFromCreated(userId: UUID, taskId: UUID, fileId: UUID) {
+        transactionService.transaction {
+            val fileDescriptor = repository.deleteFileFromCreated(userId, taskId, fileId)
+            val file = File(fileDescriptor.path)
+            if (!file.delete()) throw ErrorException("Не удалось удалить файл")
+        }
+    }
+
+    suspend fun removeFileFromReceived(userId: UUID, taskId: UUID, fileId: UUID) {
+        transactionService.transaction {
+            val fileDescriptor = repository.deleteFileFromReceived(userId, taskId, fileId)
+            val file = File(fileDescriptor.path)
+            if (!file.delete()) throw ErrorException("Не удалось удалить файл")
         }
     }
 }

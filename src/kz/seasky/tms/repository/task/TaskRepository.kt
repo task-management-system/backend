@@ -9,6 +9,7 @@ import kz.seasky.tms.database.tables.task.TaskInstanceTable
 import kz.seasky.tms.database.tables.task.TaskTable
 import kz.seasky.tms.database.tables.taskFile.TaskFileTable
 import kz.seasky.tms.enums.Status
+import kz.seasky.tms.exceptions.ErrorException
 import kz.seasky.tms.extensions.all
 import kz.seasky.tms.model.file.File
 import kz.seasky.tms.model.file.FileInsert
@@ -224,6 +225,35 @@ class TaskRepository {
             e.printStackTrace()
             return null to "Не удалось добавить запись, возможно дубликаты по коням!"
         }
+    }
+
+    fun deleteFileFromCreated(userId: UUID, taskId: UUID, fileId: UUID): File {
+        val task = TaskEntity[taskId]
+
+        if (task.creator.id.value != userId) throw ErrorException("Ты хто?")
+
+        val statusId = task.status.id.value
+        if (statusId == Status.InWork.value || statusId == Status.Canceled.value || statusId == Status.Closed.value) throw ErrorException(
+            "Задача уже в работе"
+        )
+
+        val file = FileEntity[fileId]
+        file.delete()
+
+        return file.toFile()
+    }
+
+    fun deleteFileFromReceived(userId: UUID, taskId: UUID, fileId: UUID): File {
+        val task = TaskInstanceEntity[taskId]
+
+        if (task.executor.id.value != userId) throw ErrorException("Ты хто?")
+
+        if (task.status.id.value != Status.InWork.value) throw ErrorException("Задача уже в работе")
+
+        val file = FileEntity[fileId]
+        file.delete()
+
+        return file.toFile()
     }
 
     private fun getStatus(tasks: List<TaskInstance>): Status {
