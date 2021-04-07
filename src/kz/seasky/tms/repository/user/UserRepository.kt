@@ -8,6 +8,7 @@ import kz.seasky.tms.model.paging.Paging
 import kz.seasky.tms.model.user.User
 import kz.seasky.tms.model.user.UserInsert
 import kz.seasky.tms.model.user.UserUpdate
+import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.or
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.update
@@ -56,6 +57,7 @@ class UserRepository {
     fun getAll(): List<User> {
         return UserEntity
             .all()
+            .orderBy(UserTable.createdAt to SortOrder.ASC)
             .map(UserEntity::toUser)
     }
 
