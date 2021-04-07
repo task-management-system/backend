@@ -88,11 +88,14 @@ cat *.sql | docker exec -i $container psql -U $user -d $database //Restore db du
 3. Override default constraint names, ex. in table below.
 
    Name|Value|Example
-   ---|---|---
+      ---|---|---
    Primary Key|pk_$tableName_$columnName|constraint pk_user<br>primary key(id)
    Foreign Key|fk_$tableName_$columnName_$referenceColumnName|constraint fk_user_role_id_id<br>foreign key(role_id)<br>references role(id)
    Unique|uq_$tableName_$columnName|constraint uq_user_username<br>unique(username)
    Check|ch_$tableName_$columnName|constraint ch_user_username<br>check(length(username) >= 4)
+
+   For multiple definitions separate column name with '_' sign,
+   ex. `pk_$tableName_$columnName0_$columnName1_#columnNameN`
 
 4. For UUID tables use extension `uuid-ossp`, for default value use a fourth version of uuid generator.
 
