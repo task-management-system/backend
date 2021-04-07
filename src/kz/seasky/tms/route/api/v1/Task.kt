@@ -45,7 +45,7 @@ fun Route.task() {
             }
 
             route("/file") {
-                post("/add") {
+                put {
                     val userId = call.getPrincipal<AuthenticationPrincipal>().id
                     val taskId = call.getId<UUID>("taskInstanceId")
                     val parts = call.receiveMultipart().readAllParts()
@@ -70,7 +70,7 @@ fun Route.task() {
             }
 
             route("/file") {
-                post("/add") {
+                put {
                     val userId = call.getPrincipal<AuthenticationPrincipal>().id
                     val taskId = call.getId<UUID>("taskId")
                     val parts = call.receiveMultipart().readAllParts()
