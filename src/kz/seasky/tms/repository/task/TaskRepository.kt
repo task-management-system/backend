@@ -13,6 +13,7 @@ import kz.seasky.tms.model.file.File
 import kz.seasky.tms.model.file.FileInsert
 import kz.seasky.tms.model.paging.Paging
 import kz.seasky.tms.model.task.*
+import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.SizedCollection
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.select
@@ -48,9 +49,20 @@ class TaskRepository {
             .map(TaskEntity::toTaskPreview)
     }
 
+    fun prepareTask(creatorId: UUID, task: TaskPrepare): Task {
+        return TaskEntity.insert(
+            creatorId = creatorId,
+            task = task,
+            statusId = Status.Prepared.value
+        ).toTask()
+    }
+
     fun insertTask(creatorId: UUID, task: TaskInsert): Task {
-        return TaskEntity
-            .insert(creatorId, task)
+        return TaskEntity.insert(
+            creatorId = creatorId,
+            task = task,
+            statusId = Status.New.value
+        ).toTask()
     }
 
     fun insertDetails(executorId: UUID, taskId: UUID): TaskInstance {
@@ -155,16 +167,41 @@ class TaskRepository {
         return task.delete()
     }
 
-    //TODO include custom exception or return pair with exception message
-    fun insertFile(userId: UUID, taskId: UUID, file: FileInsert): File? {
-        val taskInstance = TaskInstanceTable
-            .select { (TaskInstanceTable.task eq taskId) and (TaskInstanceTable.executor eq userId) }
-            .map { row ->
-                TaskInstanceEntity.wrapRow(row)
-            }
-            .firstOrNull()
+    /**
+     * @exception ExposedSQLException
+     * @return [Pair] where
+     * [Pair.first] is nullable created [File],
+     * [Pair.second] is nullable exception message
+     */
+    fun insertFileToCreated(userId: UUID, taskId: UUID, file: FileInsert): Pair<File?, String?> {
+        try {
+            val task = TaskEntity[taskId]
 
-        if (taskInstance != null) {
+            if (task.creator.id.value != userId) return null to "Не удалось добавить запись, ты хто такой?"
+
+            val statusId = task.status.id.value
+            if (statusId == Status.InWork.value || statusId == Status.Canceled.value || statusId == Status.Closed.value) return null to "Не удалось добавить запись, задачка уже в процессе"
+
+            val fileEntity = FileEntity.insert(file)
+            task.file = SizedCollection(fileEntity)
+
+            return task.file.firstOrNull()?.toFile() to null
+        } catch (e: ExposedSQLException) {
+            return null to "Не удалось добавить запись, возможно дубликаты по коням!"
+        }
+    }
+
+    fun insertFileToReceived(userId: UUID, taskId: UUID, file: FileInsert): File? {
+        try {
+            val taskInstance = TaskInstanceTable
+                .select { (TaskInstanceTable.task eq taskId) and (TaskInstanceTable.executor eq userId) }
+                .map { row ->
+                    TaskInstanceEntity.wrapRow(row)
+                }
+                .firstOrNull()
+
+            requireNotNull(taskInstance)
+
             if (taskInstance.status.id.value == Status.InWork.value) {
                 val task = taskInstance.task
                 val fe = FileEntity.insert(file)
@@ -175,20 +212,7 @@ class TaskRepository {
             }
 
             return null
-        } else {
-            val task = TaskEntity[taskId]
-
-            val creatorId = task.creator.id.value
-            if (creatorId != userId) return null
-
-            val statusId = task.status.id.value
-            if (statusId == Status.New.value) {
-                val fe = FileEntity.insert(file)
-                task.file = SizedCollection(fe)
-
-                return task.file.firstOrNull()?.toFile()
-            }
-
+        } catch (e: ExposedSQLException) {
             return null
         }
     }

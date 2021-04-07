@@ -1,7 +1,11 @@
 package kz.seasky.tms.utils
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.uuid.UUID
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.InputStream
 
 class FileHelper {
     companion object {
@@ -28,6 +32,31 @@ class FileHelper {
 
         return File(dirName, filenameHashCode + bytesHashCode + extension)
     }
+
+
+    /**
+     * Read all bytes from [input] and validate it size so that it is not less than or equal to [FILE_DEFAULT_SIZE]
+     *
+     * @param input the input stream to be read
+     * @return empty byte array if file size is more than [FILE_DEFAULT_SIZE], filled byte array otherwise
+     */
+    @Suppress("BlockingMethodInNonBlockingContext")
+    suspend fun readBytesAndValidate(input: InputStream): ByteArray {
+        return withContext(Dispatchers.IO) {
+            val output = ByteArrayOutputStream(DEFAULT_BUFFER_SIZE)
+            val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+            var bytesCopied = 0L
+            while (true) {
+                if (bytesCopied > FILE_DEFAULT_SIZE) {
+                    return@withContext ByteArray(0)
+                }
+                val bytes = input.read(buffer).takeIf { it >= 0 } ?: break
+                output.write(buffer, 0, bytes)
+                bytesCopied += bytes
+            }
+            return@withContext output.toByteArray()
+        }
+    }
 }
 
-fun Long.asMib() = this / (1024 * 1024)
+fun Long.asMiB() = this / (1024 * 1024)

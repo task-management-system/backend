@@ -11,13 +11,13 @@ import kz.seasky.tms.database.TransactionService
 import kz.seasky.tms.exceptions.ErrorException
 import kz.seasky.tms.exceptions.WarningException
 import kz.seasky.tms.extensions.asUUID
-import kz.seasky.tms.model.file.File
 import kz.seasky.tms.model.file.FileInsert
 import kz.seasky.tms.model.paging.Paging
 import kz.seasky.tms.model.paging.PagingResponse
 import kz.seasky.tms.model.task.*
 import kz.seasky.tms.utils.FILE_DEFAULT_SIZE
 import kz.seasky.tms.utils.FileHelper
+import kz.seasky.tms.utils.asMiB
 
 class TaskService(
     private val transactionService: TransactionService,
@@ -53,6 +53,12 @@ class TaskService(
                 total = totalCount,
                 list = tasks
             )
+        }
+    }
+
+    suspend fun prepareTask(creatorId: UUID, task: TaskPrepare): Task {
+        return transactionService.transaction {
+            return@transaction repository.prepareTask(creatorId, task)
         }
     }
 
@@ -167,13 +173,13 @@ class TaskService(
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
-    suspend fun addFile(
+    suspend fun addFileToCreated(
         userId: UUID,
         taskId: UUID,
         parts: List<PartData.FileItem>
-    ): HashMap<Char, MutableList<File>> {
-        return transactionService.transaction {
-            val files = hashMapOf<Char, MutableList<File>>(
+    ): HashMap<Char, MutableList<Any>> {
+        return transactionService.transaction { transaction ->
+            val files = hashMapOf<Char, MutableList<Any>>(
                 FileHelper.KEY_SUCCESS to mutableListOf(),
                 FileHelper.KEY_ERROR to mutableListOf()
             )
@@ -181,37 +187,37 @@ class TaskService(
             for (part in parts) {
                 val originalFilename = part.originalFileName ?: continue
                 part.streamProvider().use { input ->
-                    val bytes = input.readBytes() //TODO too long if big file sent
+                    val bytes = fileHelper.readBytesAndValidate(input)
+                    val bytesSize = bytes.size
                     val file = fileHelper.prepareFile(taskId, originalFilename, bytes)
-                    val fileInsert = FileInsert(originalFilename, bytes.size, file.canonicalPath)
-                    if (bytes.size in 1..FILE_DEFAULT_SIZE) {
-                        val fileDescriptor = repository.insertFile(userId, taskId, fileInsert)
-                        if (fileDescriptor != null) {
+                    val fileInsert = FileInsert(originalFilename, bytesSize, file.canonicalPath)
+                    if (bytesSize in 1..FILE_DEFAULT_SIZE) {
+                        val fileDescriptor = repository.insertFileToCreated(userId, taskId, fileInsert)
+                        if (fileDescriptor.first != null) {
                             file.outputStream().use { output ->
                                 withContext(Dispatchers.IO) {
                                     output.write(bytes)
                                 }
                             }
-                            files[FileHelper.KEY_SUCCESS]?.add(fileDescriptor)
+                            files[FileHelper.KEY_SUCCESS]?.add(fileDescriptor.first!!)
                         } else {
-                            Unit
-                            val errorFileDescriptor = File(
-                                id = "",
-                                name = fileInsert.name,
-                                size = fileInsert.size,
-                                path = ""
+                            transaction.rollback()
+                            files[FileHelper.KEY_ERROR]?.add(
+                                mapOf(
+                                    "name" to originalFilename,
+                                    "size" to bytesSize,
+                                    "cause" to (fileDescriptor.second
+                                        ?: "Запись добавлена, но вернуть ее не получилось маджик")
+                                )
                             )
-                            files[FileHelper.KEY_ERROR]?.add(errorFileDescriptor)
-                        } //My fucking god
+                        }
                     } else {
-                        //fixme
-                        val errorFileDescriptor = File(
-                            id = "",
-                            name = fileInsert.name,
-                            size = fileInsert.size,
-                            path = ""
+                        files[FileHelper.KEY_ERROR]?.add(
+                            mapOf(
+                                "name" to originalFilename,
+                                "cause" to "Максимальный размер файла ${FILE_DEFAULT_SIZE.asMiB()}MiB"
+                            )
                         )
-                        files[FileHelper.KEY_ERROR]?.add(errorFileDescriptor)
                     }
                 }
 
@@ -222,5 +228,3 @@ class TaskService(
         }
     }
 }
-
-val Any?.ignoreResult get() = Unit

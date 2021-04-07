@@ -8,10 +8,8 @@ import kotlinx.uuid.UUID
 import kz.seasky.tms.extensions.*
 import kz.seasky.tms.model.authentication.AuthenticationPrincipal
 import kz.seasky.tms.model.task.TaskInsert
+import kz.seasky.tms.model.task.TaskPrepare
 import kz.seasky.tms.repository.task.TaskService
-import kz.seasky.tms.utils.FILE_DEFAULT_SIZE
-import kz.seasky.tms.utils.FileHelper
-import kz.seasky.tms.utils.asMib
 import org.koin.ktor.ext.inject
 
 fun Route.task() {
@@ -28,40 +26,38 @@ fun Route.task() {
             )
         }
 
-        route("/file") {
-            post("/add") {
+        route("/received/{id}") {
+            get {
                 val userId = call.getPrincipal<AuthenticationPrincipal>().id
                 val taskId = call.getId<UUID>()
-                val parts = call.receiveMultipart().readAllParts()
 
-                val files = service.addFile(userId.asUUID(), taskId, parts.filterIsInstance<PartData.FileItem>())
-
-                if (files[FileHelper.KEY_ERROR].isNullOrEmpty()) {
-                    call.success(
-                        message = "Файл(ы) успешно загружен(ы)",
-                        data = files[FileHelper.KEY_SUCCESS]
-                    )
-                } else {
-                    call.warning(
-                        message = "Максимальный размер файла ${FILE_DEFAULT_SIZE.asMib()}МБ, по этой причине не удалось загрузить ${files[FileHelper.KEY_ERROR]?.size} файл(ов).",
-                        data = files
-                    )
-                }
+                call.success(data = service.getReceived(userId, taskId))
             }
         }
 
-        get("/received") {
-            val userId = call.getPrincipal<AuthenticationPrincipal>().id
-            val taskId = call.getId<UUID>()
+        route("/created/{taskId}") {
+            get {
+                val userId = call.getPrincipal<AuthenticationPrincipal>().id
+                val taskId = call.getId<UUID>("taskId")
 
-            call.success(data = service.getReceived(userId, taskId))
-        }
+                call.success(data = service.getCreated(userId, taskId))
+            }
 
-        get("/created") {
-            val userId = call.getPrincipal<AuthenticationPrincipal>().id
-            val taskId = call.getId<UUID>()
+            route("/file") {
+                post("/add") {
+                    val userId = call.getPrincipal<AuthenticationPrincipal>().id
+                    val taskId = call.getId<UUID>("taskId")
+                    val parts = call.receiveMultipart().readAllParts()
 
-            call.success(data = service.getCreated(userId, taskId))
+                    val files = service.addFileToCreated(
+                        userId = userId.asUUID(),
+                        taskId = taskId,
+                        parts = parts.filterIsInstance<PartData.FileItem>()
+                    )
+
+                    call.file(files)
+                }
+            }
         }
 
         route("action") {

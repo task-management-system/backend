@@ -8,7 +8,7 @@ import kz.seasky.tms.database.tables.status.StatusEntity
 import kz.seasky.tms.database.tables.taskFile.TaskFileTable
 import kz.seasky.tms.database.tables.user.UserEntity
 import kz.seasky.tms.model.task.Task
-import kz.seasky.tms.model.task.TaskInsert
+import kz.seasky.tms.model.task.TaskPrepare
 import kz.seasky.tms.model.task.TaskPreview
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.insertAndGetId
@@ -27,16 +27,17 @@ class TaskEntity(id: EntityID<UUID>) : KotlinxUUIDEntity(id) {
     //@formatter:on
 
     companion object : KotlinxUUIDEntityClass<TaskEntity>(TaskTable) {
-        fun insert(creatorId: UUID, task: TaskInsert): Task {
+        fun insert(creatorId: UUID, task: TaskPrepare, statusId: Short): TaskEntity {
             val id = TaskTable.insertAndGetId { statement ->
                 statement[title] = task.title
                 statement[description] = task.description
                 statement[dueDate] = DateTime(task.dueDate)
                 statement[markdown] = task.markdown
                 statement[creator] = creatorId
+                statement[status] = statusId
             }
 
-            return TaskEntity[id].toTask()
+            return TaskEntity[id]
         }
     }
 
