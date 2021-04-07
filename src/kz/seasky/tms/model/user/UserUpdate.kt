@@ -1,8 +1,8 @@
 package kz.seasky.tms.model.user
 
-import kotlinx.uuid.UUID
 import kotlinx.uuid.UUIDExperimentalAPI
 import kz.seasky.tms.exceptions.ErrorException
+import kz.seasky.tms.extensions.isValidUUID
 import kz.seasky.tms.model.ReceiveValidator
 import kz.seasky.tms.utils.MAX_USERNAME_LENGTH
 import kz.seasky.tms.utils.MIN_USERNAME_LENGTH
@@ -23,7 +23,7 @@ class UserUpdate(
             username.length < MIN_USERNAME_LENGTH   -> "Минимальное длина имени пользователя $MIN_USERNAME_LENGTH"
             username.length > MAX_USERNAME_LENGTH   -> "Максимальная длина имени пользователя $MAX_USERNAME_LENGTH"
             !username.matches(usernameRegex)        -> "Неверный паттерн имени пользователя, доступные символы [a-z][A-Z][0-9]"
-            !UUID.isValidUUIDString(id)             -> "Невалидный UUID"
+            !id.isValidUUID()                       -> "Невалидный UUID"
             else -> null
         }
         //@formatter:on
