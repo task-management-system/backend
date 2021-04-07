@@ -49,7 +49,8 @@ class TaskEntity(id: EntityID<UUID>) : KotlinxUUIDEntity(id) {
             markdown = markdown,
             dueDate = dueDate.toString(),
             createdAt = createdAt.toString(),
-            creator = creator.toUser()
+            creator = creator.toUser(),
+            file = file.map(FileEntity::toFile)
         )
     }
 

@@ -96,6 +96,7 @@ class TaskService(
                 markdown = task.task.markdown,
                 dueDate = task.task.dueDate,
                 createdAt = task.task.createdAt,
+                files = task.task.file,
                 parent = TaskReceiveDetail.Task(task.task.id, task.status)
             )
         }
@@ -116,6 +117,7 @@ class TaskService(
                 markdown = task.markdown,
                 dueDate = task.dueDate,
                 createdAt = task.createdAt,
+                files = task.file,
                 taskInstances = taskInstances
             )
         }
@@ -138,6 +140,7 @@ class TaskService(
                 markdown = task.task.markdown,
                 dueDate = task.task.dueDate,
                 createdAt = task.task.createdAt,
+                files = task.task.file,
                 parent = TaskReceiveDetail.Task(task.task.id, task.status)
             )
         }
@@ -160,6 +163,7 @@ class TaskService(
                 markdown = task.task.markdown,
                 dueDate = task.task.dueDate,
                 createdAt = task.task.createdAt,
+                files = task.task.file,
                 parent = TaskReceiveDetail.Task(task.task.id, task.status)
             )
         }
