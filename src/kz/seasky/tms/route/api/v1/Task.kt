@@ -16,7 +16,17 @@ fun Route.task() {
     val service: TaskService by inject()
 
     route("/task") {
-        put {
+        put("/prepare") {
+            val userId = call.getPrincipal<AuthenticationPrincipal>().id
+            val task = call.receiveAndValidate<TaskPrepare>()
+
+            call.success(
+                message = "Задача успешно подготовлена",
+                data = service.prepareTask(userId.asUUID(), task)
+            )
+        }
+
+        put("/create") {
             val userId = call.getPrincipal<AuthenticationPrincipal>().id
             val task = call.receiveAndValidate<TaskInsert>()
 

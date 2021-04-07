@@ -2,25 +2,24 @@ package kz.seasky.tms.model.task
 
 import kz.seasky.tms.exceptions.ErrorException
 import kz.seasky.tms.extensions.isValidTime
-import kz.seasky.tms.extensions.isValidUUID
+import kz.seasky.tms.model.ReceiveValidator
 
-class TaskInsert(
-    override val title: String,
-    override val description: String?,
-    override val markdown: String?,
-    override val dueDate: String,
-    val executorIds: Set<String>
-) : TaskPrepare(title, description, markdown, dueDate) {
+open class TaskPrepare(
+    @Transient open val title: String,
+    @Transient open val description: String?,
+    @Transient open val markdown: String?,
+    @Transient open val dueDate: String
+) : ReceiveValidator {
+    companion object {
+        const val MIN_TITLE_LENGTH = 4
+    }
+
     override fun <T> validate(): T {
         //@formatter:off
         val message = when {
             title.isBlank()                 -> "Значение поля title не может быть пустым"
             title.length < MIN_TITLE_LENGTH -> "Значение поля title не может быть меньше $MIN_TITLE_LENGTH"
             !dueDate.isValidTime()          -> "Невалидное значение поля dueDate"
-            executorIds.isEmpty()           -> "Значение поля executorIds не может быть пустым"
-            executorIds.any { executorId ->
-                !executorId.isValidUUID()
-            }                               -> "Невалидный UUID в поле executorsIds"
             else -> null
         }
         //@formatter:on
