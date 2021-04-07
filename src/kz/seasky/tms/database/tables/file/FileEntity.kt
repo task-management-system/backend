@@ -28,8 +28,7 @@ class FileEntity(id: EntityID<UUID>) : KotlinxUUIDEntity(id) {
         return File(
             id = id.value.toString(),
             name = name,
-            size = size,
-            path = path
+            size = size
         )
     }
 }
