@@ -65,13 +65,16 @@ Explanation of each row
 ## Cheat sheet
 
 ```
-create extension "uuid-ossp" //Extension for generate uuid's, build in postgresql
+create extension "uuid-ossp" //Extension for generate uuid's
+create extension "pgcrypto" //Extension for encode values especially passwords
 
 gradlew clean build -x test //Exclude test task when build
 
 docker exec -i $container pg_dump -U $user -d $database -p $port > dump.sql //Create db dump from container. Passed options (-U user; -d database; -p listen port)
 docker exec -i $container pg_dump -U $user -d $database -p $port | gzip -9 > dump.sql.gz //With compress. Passed option (-9 or --best best compress value)
 docker exec -i $container pg_dump -U $user -d $database -p $port > dump_%date%_%time:~0,8%.sql //With current datetime.
+
+docker exec -i tms-database pg_dump -U seasky-developer -d tms | gzip -9 > assets/dump_%date%.sql.gz
 
 cat *.sql | docker exec -i $container psql -U $user -d $database //Restore db dump into container
 ```
