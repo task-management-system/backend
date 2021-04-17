@@ -29,8 +29,9 @@
 
 #### Requirements for Windows users
 
-1. [docker](https://docs.docker.com/get-docker/) (I am not joking, it's really necessary tool)
-2. [cmder](https://cmder.net/)
+1. [docker](https://www.docker.com/products/docker-desktop)
+2. [gradle](https://gradle.org/install/)
+3. [cmder](https://cmder.net/) (I am not joking, it's really necessary tool)
 
 #### TL;DR
 
@@ -65,13 +66,16 @@ Explanation of each row
 ## Cheat sheet
 
 ```
-create extension "uuid-ossp" //Extension for generate uuid's, build in postgresql
+create extension "uuid-ossp" //Extension for generate uuid's
+create extension "pgcrypto" //Extension for encode values especially passwords
 
 gradlew clean build -x test //Exclude test task when build
 
 docker exec -i $container pg_dump -U $user -d $database -p $port > dump.sql //Create db dump from container. Passed options (-U user; -d database; -p listen port)
 docker exec -i $container pg_dump -U $user -d $database -p $port | gzip -9 > dump.sql.gz //With compress. Passed option (-9 or --best best compress value)
 docker exec -i $container pg_dump -U $user -d $database -p $port > dump_%date%_%time:~0,8%.sql //With current datetime.
+
+docker exec -i tms-database pg_dump -U seasky-developer -d tms | gzip -9 > assets/dump_%date%.sql.gz
 
 cat *.sql | docker exec -i $container psql -U $user -d $database //Restore db dump into container
 ```
@@ -85,11 +89,14 @@ cat *.sql | docker exec -i $container psql -U $user -d $database //Restore db du
 3. Override default constraint names, ex. in table below.
 
    Name|Value|Example
-   ---|---|---
+      ---|---|---
    Primary Key|pk_$tableName_$columnName|constraint pk_user<br>primary key(id)
    Foreign Key|fk_$tableName_$columnName_$referenceColumnName|constraint fk_user_role_id_id<br>foreign key(role_id)<br>references role(id)
    Unique|uq_$tableName_$columnName|constraint uq_user_username<br>unique(username)
    Check|ch_$tableName_$columnName|constraint ch_user_username<br>check(length(username) >= 4)
+
+   For multiple definitions separate column name with '_' sign,
+   ex. `pk_$tableName_$columnName0_$columnName1_#columnNameN`
 
 4. For UUID tables use extension `uuid-ossp`, for default value use a fourth version of uuid generator.
 

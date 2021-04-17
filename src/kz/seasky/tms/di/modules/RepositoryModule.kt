@@ -8,6 +8,7 @@ import kz.seasky.tms.repository.task.TaskRepository
 import kz.seasky.tms.repository.task.TaskService
 import kz.seasky.tms.repository.user.UserRepository
 import kz.seasky.tms.repository.user.UserService
+import kz.seasky.tms.utils.FileHelper
 import org.koin.dsl.module
 
 val repositoryModule = module {
@@ -19,9 +20,11 @@ val repositoryModule = module {
 
     single { StatusService(get(), get()) }
 
+    single { FileHelper() }
+
     single { TaskRepository() }
 
-    single { TaskService(get(), get()) }
+    single { TaskService(get(), get(), get()) }
 
     single { UserRepository() }
 

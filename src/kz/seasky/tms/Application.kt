@@ -51,9 +51,10 @@ private fun Application.setDI() {
 }
 
 private fun Application.setRestAPI() {
-    //TODO Детальнее изучить обе фичи
+    //TODO Детальнее изучить 3 фичи
     install(DefaultHeaders)
     install(CallLogging)
+    install(CORS)
 
     install(ContentNegotiation) {
         gson { serializeNulls() }

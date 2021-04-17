@@ -9,5 +9,6 @@ import kz.seasky.tms.model.Response
  */
 class ErrorException(
     override val message: String?,
-    val statusCode: HttpStatusCode? = null
+    val statusCode: HttpStatusCode? = null,
+    val withStackTrace: Boolean = false
 ) : Exception(message)

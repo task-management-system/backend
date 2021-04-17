@@ -11,6 +11,7 @@ import kz.seasky.tms.exceptions.ErrorException
 import kz.seasky.tms.model.Message
 import kz.seasky.tms.model.ReceiveValidator
 import kz.seasky.tms.model.Response
+import kz.seasky.tms.utils.FileHelper
 
 suspend fun <T> ApplicationCall.respond(
     statusCode: HttpStatusCode = HttpStatusCode.OK,
@@ -44,16 +45,37 @@ suspend fun <T> ApplicationCall.warning(
     respond(statusCode = statusCode, response = Response.Warning(message, data))
 }
 
+@Deprecated("WIP, can be replaced in future")
+suspend fun ApplicationCall.file(files: HashMap<Char, MutableList<Any>>) {
+    when {
+        files[FileHelper.KEY_SUCCESS].isNullOrEmpty() -> {
+            error(
+                message = "Не удалось загрузить файл(ы)",
+                data = files
+            )
+        }
+        files[FileHelper.KEY_ERROR].isNullOrEmpty() -> {
+            success(
+                message = "Файл(ы) успешно загружен(ы)",
+                data = files
+            )
+        }
+        else -> {
+            warning(
+                message = "${files[FileHelper.KEY_SUCCESS]?.size ?: 0} файл(а) успешно загружен(ы). ${files[FileHelper.KEY_ERROR]?.size ?: 0} файл(ов) не удалось загрузить",
+                data = files
+            )
+        }
+    }
+}
+
+
 suspend inline fun <reified T> ApplicationCall.receiveOrException(): T {
     return receiveOrNull() ?: throw ErrorException(Message.FILL_PAYLOAD)
 }
 
 suspend inline fun <reified T : ReceiveValidator> ApplicationCall.receiveAndValidate(): T {
-    return validate(receiveOrNull())
-}
-
-fun <T : ReceiveValidator> validate(whatToValidate: T?): T {
-    return whatToValidate?.validate() ?: throw ErrorException(Message.FILL_PAYLOAD)
+    return receiveOrException<T>().validate()
 }
 
 inline fun <reified P : Principal> ApplicationCall.getPrincipal(): P {
@@ -64,7 +86,7 @@ inline fun <reified P : Principal> ApplicationCall.getPrincipal(): P {
 }
 
 @Suppress("FoldInitializerAndIfToElvis")
-@OptIn(ExperimentalStdlibApi::class, UUIDExperimentalAPI::class)
+@OptIn(UUIDExperimentalAPI::class)
 inline fun <reified T> ApplicationCall.getId(idName: String = "id"): T {
     val id = parameters[idName] ?: throw ErrorException(Message.INDICATE_ID + "'$idName'")
 

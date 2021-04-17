@@ -3,9 +3,10 @@ goto :init
 
 :header
     echo.
-    echo %BATCH_NAME% requires cmder and docker for correct work, you can install it from links below:
+    echo %BATCH_NAME% requires docker, gradle and cmder for correct work, you can install it from links below:
+    echo    docker  - https://www.docker.com/products/docker-desktop
+    echo    gradle  - https://gradle.org/install/
     echo    cmder   - https://cmder.net/
-    echo    docker  - https://docs.docker.com/get-docker/
     goto :end
 
 :usage
