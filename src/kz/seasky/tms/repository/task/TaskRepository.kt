@@ -256,6 +256,16 @@ class TaskRepository {
         return file.toFile()
     }
 
+    fun getFileFromCreated(userId: UUID, taskId: UUID, fileId: UUID): File {
+        val task = TaskEntity[taskId]
+
+        if (task.creator.id.value != userId) throw ErrorException("Так не пойдет, ты хто такой?")
+
+        val file = FileEntity[fileId]
+
+        return file.toFile()
+    }
+
     private fun getStatus(tasks: List<TaskInstance>): Status {
         //@formatter:off
         val counts = hashMapOf(

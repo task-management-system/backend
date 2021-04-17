@@ -3,6 +3,7 @@ package kz.seasky.tms.route.api.v1
 import io.ktor.application.*
 import io.ktor.http.content.*
 import io.ktor.request.*
+import io.ktor.response.*
 import io.ktor.routing.*
 import kotlinx.uuid.UUID
 import kz.seasky.tms.extensions.*
@@ -75,18 +76,34 @@ fun Route.task() {
             }
         }
 
-        route("/created/{taskId}") {
+        //TODO Experimental
+        val createdTaskId = "taskId"
+        route("/created/{$createdTaskId}") {
             get {
                 val userId = call.getPrincipal<AuthenticationPrincipal>().id
-                val taskId = call.getId<UUID>("taskId")
+                val taskId = call.getId<UUID>(createdTaskId)
 
                 call.success(data = service.getCreated(userId, taskId))
             }
 
             route("/file") {
+                get {
+                    val userId = call.getPrincipal<AuthenticationPrincipal>().id
+                    val taskId = call.getId<UUID>(createdTaskId)
+                    val fileId = call.getId<UUID>()
+
+                    val file = service.getFileFromCreated(
+                        userId = userId.asUUID(),
+                        taskId = taskId,
+                        fileId = fileId
+                    )
+
+                    call.respondFile(file)
+                }
+
                 put {
                     val userId = call.getPrincipal<AuthenticationPrincipal>().id
-                    val taskId = call.getId<UUID>("taskId")
+                    val taskId = call.getId<UUID>(createdTaskId)
                     val parts = call.receiveMultipart().readAllParts()
 
                     val files = service.addFileToCreated(
@@ -100,7 +117,7 @@ fun Route.task() {
 
                 delete {
                     val userId = call.getPrincipal<AuthenticationPrincipal>().id
-                    val taskId = call.getId<UUID>("taskId")
+                    val taskId = call.getId<UUID>(createdTaskId)
                     val fileId = call.getId<UUID>()
 
                     service.removeFileFromCreated(userId.asUUID(), taskId, fileId)

@@ -1,9 +1,6 @@
 package kz.seasky.tms.repository.task
 
 import io.ktor.http.content.*
-import io.ktor.util.*
-import io.ktor.utils.io.*
-import io.ktor.utils.io.jvm.javaio.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.uuid.UUID
@@ -303,6 +300,13 @@ class TaskService(
             val fileDescriptor = repository.deleteFileFromReceived(userId, taskId, fileId)
             val file = File(fileDescriptor.path)
             if (!file.delete()) throw ErrorException("Не удалось удалить файл")
+        }
+    }
+
+    suspend fun getFileFromCreated(userId: UUID, taskId: UUID, fileId: UUID): File {
+        return transactionService.transaction {
+            val fileDescriptor = repository.getFileFromCreated(userId, taskId, fileId)
+            return@transaction File(fileDescriptor.path)
         }
     }
 }
