@@ -309,4 +309,11 @@ class TaskService(
             return@transaction File(fileDescriptor.path)
         }
     }
+
+    suspend fun getFileFromReceived(userId: UUID, taskId: UUID, fileId: UUID): File {
+        return transactionService.transaction {
+            val fileDescriptor = repository.getFileFromReceived(userId, taskId, fileId)
+            return@transaction File(fileDescriptor.path)
+        }
+    }
 }

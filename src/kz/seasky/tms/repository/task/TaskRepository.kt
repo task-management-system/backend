@@ -222,7 +222,6 @@ class TaskRepository {
 
             return null to "Не удалось добавить запись, задачка уже закрыта :/"
         } catch (e: ExposedSQLException) {
-            e.printStackTrace()
             return null to "Не удалось добавить запись, возможно дубликаты по коням!"
         }
     }
@@ -260,6 +259,16 @@ class TaskRepository {
         val task = TaskEntity[taskId]
 
         if (task.creator.id.value != userId) throw ErrorException("Так не пойдет, ты хто такой?")
+
+        val file = FileEntity[fileId]
+
+        return file.toFile()
+    }
+
+    fun getFileFromReceived(userId: UUID, taskId: UUID, fileId: UUID): File {
+        val task = TaskInstanceEntity[taskId]
+
+        if (task.executor.id.value != userId) throw ErrorException("Так не пойдет, ты хто такой?")
 
         val file = FileEntity[fileId]
 
