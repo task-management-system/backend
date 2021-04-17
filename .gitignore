@@ -3,6 +3,7 @@
 /out
 /build
 /_files
+/documentation
 *.iml
 *.ipr
 *.iws
@@ -13,4 +14,3 @@
 *.zip
 *.rar
 .env
-./documentation
