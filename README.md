@@ -29,8 +29,9 @@
 
 #### Requirements for Windows users
 
-1. [docker](https://www.docker.com/products/docker-desktop) (I am not joking, it's really necessary tool)
-2. [cmder](https://cmder.net/)
+1. [docker](https://www.docker.com/products/docker-desktop)
+2. [gradle](https://gradle.org/install/)
+3. [cmder](https://cmder.net/) (I am not joking, it's really necessary tool)
 
 #### TL;DR
 
