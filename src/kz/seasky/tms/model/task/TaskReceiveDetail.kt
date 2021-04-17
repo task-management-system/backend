@@ -1,5 +1,6 @@
 package kz.seasky.tms.model.task
 
+import kz.seasky.tms.model.file.File
 import kz.seasky.tms.model.status.Status
 
 data class TaskReceiveDetail(
@@ -9,6 +10,7 @@ data class TaskReceiveDetail(
     val markdown: String?,
     val dueDate: String,
     val createdAt: String,
+    val files: List<File>,
     val parent: Task
 ) {
     data class Task(

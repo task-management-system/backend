@@ -10,7 +10,6 @@ import kz.seasky.tms.extensions.error
 import kz.seasky.tms.extensions.warning
 import kz.seasky.tms.utils.BuildConfig
 import org.jetbrains.exposed.dao.exceptions.EntityNotFoundException
-import org.jetbrains.exposed.exceptions.ExposedSQLException
 
 fun Application.installStatusPages() {
     install(StatusPages) {
@@ -54,20 +53,14 @@ fun StatusPages.Configuration.byException() {
     exception<ErrorException> { e ->
         call.error<Nothing>(
             statusCode = e.statusCode ?: HttpStatusCode.BadRequest,
-            message = e.message
+            message = e.message,
+            stackTrace = if (e.withStackTrace) e.stackTraceToString() else null
         )
     }
 
     exception<WarningException> { e ->
         call.warning<Nothing>(
             statusCode = e.statusCode ?: HttpStatusCode.OK,
-            message = e.message
-        )
-    }
-
-    exception<ExposedSQLException> { e ->
-        call.error<Nothing>(
-            statusCode = HttpStatusCode.BadRequest,
             message = e.message
         )
     }
