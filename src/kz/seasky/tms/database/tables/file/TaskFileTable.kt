@@ -1,6 +1,5 @@
-package kz.seasky.tms.database.tables.taskFile
+package kz.seasky.tms.database.tables.file
 
-import kz.seasky.tms.database.tables.file.FileTable
 import kz.seasky.tms.database.tables.task.TaskTable
 import org.jetbrains.exposed.sql.Table
 

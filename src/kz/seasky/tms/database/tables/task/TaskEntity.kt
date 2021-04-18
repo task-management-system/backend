@@ -4,8 +4,8 @@ import kotlinx.uuid.UUID
 import kotlinx.uuid.exposed.KotlinxUUIDEntity
 import kotlinx.uuid.exposed.KotlinxUUIDEntityClass
 import kz.seasky.tms.database.tables.file.FileEntity
+import kz.seasky.tms.database.tables.file.TaskFileTable
 import kz.seasky.tms.database.tables.status.StatusEntity
-import kz.seasky.tms.database.tables.taskFile.TaskFileTable
 import kz.seasky.tms.database.tables.user.UserEntity
 import kz.seasky.tms.model.task.Task
 import kz.seasky.tms.model.task.TaskPrepare

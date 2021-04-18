@@ -2,12 +2,12 @@ package kz.seasky.tms.repository.task
 
 import kotlinx.uuid.UUID
 import kz.seasky.tms.database.tables.file.FileEntity
+import kz.seasky.tms.database.tables.file.TaskFileTable
 import kz.seasky.tms.database.tables.status.StatusEntity
 import kz.seasky.tms.database.tables.task.TaskEntity
 import kz.seasky.tms.database.tables.task.TaskInstanceEntity
 import kz.seasky.tms.database.tables.task.TaskInstanceTable
 import kz.seasky.tms.database.tables.task.TaskTable
-import kz.seasky.tms.database.tables.taskFile.TaskFileTable
 import kz.seasky.tms.enums.Status
 import kz.seasky.tms.exceptions.ErrorException
 import kz.seasky.tms.extensions.all
