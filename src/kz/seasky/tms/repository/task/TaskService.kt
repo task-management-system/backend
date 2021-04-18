@@ -121,27 +121,6 @@ class TaskService(
     }
 
     @Suppress("NAME_SHADOWING")
-    suspend fun getCreatedNew(userId: String, taskId: UUID): TaskCreatedDetail {
-        return transactionService.transaction {
-            val userId = userId.asUUID()
-
-            val task = repository.getCreated(userId, taskId) ?: throw ErrorException("Не удалось найти задачу")
-            val taskInstances = repository.getCreatedInstances(taskId)
-
-            return@transaction TaskCreatedDetail(
-                id = task.id,
-                title = task.title,
-                description = task.description,
-                markdown = task.markdown,
-                dueDate = task.dueDate,
-                createdAt = task.createdAt,
-                files = task.file,
-                taskInstances = taskInstances
-            )
-        }
-    }
-
-    @Suppress("NAME_SHADOWING")
     suspend fun cancelTaskInstance(userId: String, taskId: UUID): TaskReceiveDetail {
         return transactionService.transaction {
             val userId = userId.asUUID()
