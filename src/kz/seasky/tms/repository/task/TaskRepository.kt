@@ -95,7 +95,9 @@ class TaskRepository {
             .map { taskInstance ->
                 TaskCreatedDetail.TaskInstance(
                     id = taskInstance.id.toString(),
-                    status = taskInstance.status.toStatus()
+                    executor = taskInstance.executor.toUser(),
+                    status = taskInstance.status.toStatus(),
+                    files = taskInstance.file.map(FileEntity::toFile)
                 )
             }
     }

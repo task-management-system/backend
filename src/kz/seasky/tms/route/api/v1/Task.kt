@@ -101,6 +101,13 @@ fun Route.task() {
                 call.success(data = service.getCreated(userId, taskId))
             }
 
+            get("/new") {
+                val userId = call.getPrincipal<AuthenticationPrincipal>().id
+                val taskId = call.getId<UUID>(createdTaskId)
+
+                call.success(data = service.getCreatedNew(userId, taskId))
+            }
+
             route("/file") {
                 get {
                     val userId = call.getPrincipal<AuthenticationPrincipal>().id

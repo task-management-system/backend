@@ -2,6 +2,7 @@ package kz.seasky.tms.model.task
 
 import kz.seasky.tms.model.file.File
 import kz.seasky.tms.model.status.Status
+import kz.seasky.tms.model.user.User
 
 data class TaskCreatedDetail(
     val id: String,
@@ -15,6 +16,8 @@ data class TaskCreatedDetail(
 ) {
     data class TaskInstance(
         val id: String,
-        val status: Status
+        val executor: User,
+        val status: Status,
+        val files: List<File>
     )
 }
