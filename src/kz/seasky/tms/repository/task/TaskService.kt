@@ -80,21 +80,25 @@ class TaskService(
         return transactionService.transaction {
             val userId = userId.asUUID()
 
-            val task = repository.getReceived(userId, taskId) ?: throw ErrorException("Не удалось найти задачу")
+            val entry = repository.getReceived(userId, taskId) ?: throw ErrorException("Не удалось найти задачу")
 
             if (repository.updateInstanceStatusOrSkip(taskId)) {
-                repository.updateTaskStatus(task.task.id.asUUID())
+                repository.updateTaskStatus(entry.task.id.asUUID())
             }
 
             return@transaction TaskReceiveDetail(
-                id = task.id,
-                title = task.task.title,
-                description = task.task.description,
-                markdown = task.task.markdown,
-                dueDate = task.task.dueDate,
-                createdAt = task.task.createdAt,
-                files = task.task.file,
-                parent = TaskReceiveDetail.Task(task.task.id, task.status)
+                id = entry.id,
+                title = entry.task.title,
+                description = entry.task.description,
+                markdown = entry.task.markdown,
+                dueDate = entry.task.dueDate,
+                createdAt = entry.task.createdAt,
+                files = entry.files,
+                parent = TaskReceiveDetail.Task(
+                    id = entry.task.id,
+                    file = entry.task.file,
+                    status = entry.status
+                )
             )
         }
     }
@@ -125,20 +129,24 @@ class TaskService(
         return transactionService.transaction {
             val userId = userId.asUUID()
 
-            val task = repository.cancel(userId, taskId)
+            val entry = repository.cancel(userId, taskId)
                 ?: throw WarningException("Вы пытаетесь отменить не свое задание? А может задача уже отменена?!  А может вы хаццкер???")
 
-            repository.updateTaskStatus(task.task.id.asUUID())
+            repository.updateTaskStatus(entry.task.id.asUUID())
 
             return@transaction TaskReceiveDetail(
-                id = task.id,
-                title = task.task.title,
-                description = task.task.description,
-                markdown = task.task.markdown,
-                dueDate = task.task.dueDate,
-                createdAt = task.task.createdAt,
-                files = task.task.file,
-                parent = TaskReceiveDetail.Task(task.task.id, task.status)
+                id = entry.id,
+                title = entry.task.title,
+                description = entry.task.description,
+                markdown = entry.task.markdown,
+                dueDate = entry.task.dueDate,
+                createdAt = entry.task.createdAt,
+                files = entry.files,
+                parent = TaskReceiveDetail.Task(
+                    id = entry.task.id,
+                    file = entry.task.file,
+                    status = entry.status
+                )
             )
         }
     }
@@ -148,20 +156,24 @@ class TaskService(
         return transactionService.transaction {
             val userId = userId.asUUID()
 
-            val task = repository.close(userId, taskId)
+            val entry = repository.close(userId, taskId)
                 ?: throw WarningException("Вы пытаетесь закончить не свое задание? А может задача уже закончена?! А может вы хаццкер???")
 
-            repository.updateTaskStatus(task.task.id.asUUID())
+            repository.updateTaskStatus(entry.task.id.asUUID())
 
             return@transaction TaskReceiveDetail(
-                id = task.id,
-                title = task.task.title,
-                description = task.task.description,
-                markdown = task.task.markdown,
-                dueDate = task.task.dueDate,
-                createdAt = task.task.createdAt,
-                files = task.task.file,
-                parent = TaskReceiveDetail.Task(task.task.id, task.status)
+                id = entry.id,
+                title = entry.task.title,
+                description = entry.task.description,
+                markdown = entry.task.markdown,
+                dueDate = entry.task.dueDate,
+                createdAt = entry.task.createdAt,
+                files = entry.files,
+                parent = TaskReceiveDetail.Task(
+                    id = entry.task.id,
+                    file = entry.task.file,
+                    status = entry.status
+                )
             )
         }
     }

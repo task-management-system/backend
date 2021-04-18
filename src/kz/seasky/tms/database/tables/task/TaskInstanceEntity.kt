@@ -35,6 +35,7 @@ class TaskInstanceEntity(id: EntityID<UUID>) : KotlinxUUIDEntity(id) {
         return TaskInstance(
             id = id.value.toString(),
             task = task.toTask(),
+            files = file.map(FileEntity::toFile),
             status = status.toStatus()
         )
     }
