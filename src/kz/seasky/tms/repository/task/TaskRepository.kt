@@ -3,6 +3,7 @@ package kz.seasky.tms.repository.task
 import kotlinx.uuid.UUID
 import kz.seasky.tms.database.tables.file.FileEntity
 import kz.seasky.tms.database.tables.file.TaskFileTable
+import kz.seasky.tms.database.tables.file.TaskInstanceFileTable
 import kz.seasky.tms.database.tables.status.StatusEntity
 import kz.seasky.tms.database.tables.task.TaskEntity
 import kz.seasky.tms.database.tables.task.TaskInstanceEntity
@@ -16,10 +17,7 @@ import kz.seasky.tms.model.file.FileInsert
 import kz.seasky.tms.model.paging.Paging
 import kz.seasky.tms.model.task.*
 import org.jetbrains.exposed.exceptions.ExposedSQLException
-import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.update
+import org.jetbrains.exposed.sql.*
 
 class TaskRepository {
     fun countReceived(userId: UUID, statusId: Short): Long {
@@ -72,10 +70,10 @@ class TaskRepository {
             .insert(executorId, taskId)
     }
 
-    fun getReceived(userId: UUID, taskId: UUID): TaskInstance? {
+    fun getReceived(userId: UUID, taskInstanceId: UUID): TaskInstance? {
         return TaskInstanceTable
             .innerJoin(TaskTable)
-            .select { (TaskInstanceTable.executor eq userId) and (TaskInstanceTable.id eq taskId) }
+            .select { (TaskInstanceTable.executor eq userId) and (TaskInstanceTable.id eq taskInstanceId) }
             .map { row ->
                 TaskInstanceEntity.wrapRow(row).toTaskInstance()
             }
@@ -192,7 +190,7 @@ class TaskRepository {
                 statement[TaskFileTable.file] = fileEntity.id
             }
 
-            return task.file.firstOrNull()?.toFile() to null
+            return fileEntity.toFile() to null
         } catch (e: ExposedSQLException) {
             return null to "Не удалось добавить запись, возможно дубликаты по коням!"
         }
@@ -204,22 +202,21 @@ class TaskRepository {
      * [Pair.second] is nullable exception message
      */
     @Suppress("FoldInitializerAndIfToElvis")
-    fun insertFileToReceived(userId: UUID, taskId: UUID, file: FileInsert): Pair<File?, String?> {
+    fun insertFileToReceived(userId: UUID, taskInstanceId: UUID, file: FileInsert): Pair<File?, String?> {
         try {
-            val taskInstance = TaskInstanceEntity[taskId]
+            val taskInstance = TaskInstanceEntity[taskInstanceId]
 
             if (taskInstance.executor.id.value != userId) return null to "Так не пойдет, ты хто такой?"
 
             if (taskInstance.status.id.value == Status.InWork.value) {
-                val task = taskInstance.task
                 val fileEntity = FileEntity.insert(file)
 
-                TaskFileTable.insert { statement ->
-                    statement[TaskFileTable.task] = task.id
-                    statement[TaskFileTable.file] = fileEntity.id
+                TaskInstanceFileTable.insert { statement ->
+                    statement[TaskInstanceFileTable.taskInstance] = taskInstanceId
+                    statement[TaskInstanceFileTable.file] = fileEntity.id
                 }
 
-                return task.file.firstOrNull()?.toFile() to null
+                return fileEntity.toFile() to null
             }
 
             return null to "Не удалось добавить запись, задачка уже закрыта :/"
@@ -228,53 +225,28 @@ class TaskRepository {
         }
     }
 
-    fun deleteFileFromCreated(userId: UUID, taskId: UUID, fileId: UUID): File {
-        val task = TaskEntity[taskId]
-
-        if (task.creator.id.value != userId) throw ErrorException("Ты хто?")
-
-        val statusId = task.status.id.value
-        if (statusId == Status.InWork.value || statusId == Status.Canceled.value || statusId == Status.Closed.value) throw ErrorException(
-            "Задача уже в работе"
-        )
-
-        val file = FileEntity[fileId]
-        file.delete()
-
-        return file.toFile()
+    fun getFile(userId: UUID, fileId: UUID): File {
+        if (!validateFile(userId, fileId)) throw ErrorException("Не удалось провалидировать файл")
+        return FileEntity[fileId].toFile()
     }
 
-    fun deleteFileFromReceived(userId: UUID, taskId: UUID, fileId: UUID): File {
-        val task = TaskInstanceEntity[taskId]
+    /**
+     * @return true if file count > 0, false otherwise
+     */
+    private fun validateFile(userId: UUID, fileId: UUID): Boolean {
+        val count = TaskTable
+            .leftJoin(TaskFileTable)
+            .innerJoin(TaskInstanceTable)
+            .leftJoin(TaskInstanceFileTable)
+            .select {
+                //@formatter:off
+                ((TaskTable.creator eq userId) or (TaskInstanceTable.executor eq userId)) and
+                        ((TaskFileTable.file eq fileId) or (TaskInstanceFileTable.file eq fileId))
+                //@formatter:on
+            }
+            .count()
 
-        if (task.executor.id.value != userId) throw ErrorException("Ты хто?")
-
-        if (task.status.id.value != Status.InWork.value) throw ErrorException("Задача уже в работе")
-
-        val file = FileEntity[fileId]
-        file.delete()
-
-        return file.toFile()
-    }
-
-    fun getFileFromCreated(userId: UUID, taskId: UUID, fileId: UUID): File {
-        val task = TaskEntity[taskId]
-
-        if (task.creator.id.value != userId) throw ErrorException("Так не пойдет, ты хто такой?")
-
-        val file = FileEntity[fileId]
-
-        return file.toFile()
-    }
-
-    fun getFileFromReceived(userId: UUID, taskId: UUID, fileId: UUID): File {
-        val task = TaskInstanceEntity[taskId]
-
-        if (task.executor.id.value != userId) throw ErrorException("Так не пойдет, ты хто такой?")
-
-        val file = FileEntity[fileId]
-
-        return file.toFile()
+        return count > 0
     }
 
     private fun getStatus(tasks: List<TaskInstance>): Status {

@@ -33,92 +33,74 @@ fun Route.task() {
 
             call.success(
                 message = "Задача успешно создана",
-                data = service.createTaskAndTaskInstance(userId, task)
+                data = service.createTaskAndTaskInstances(userId, task)
             )
         }
 
-        //TODO Experimental
-        val receivedTaskId = "taskInstanceId"
-        route("/received/{$receivedTaskId}") {
+        //TODO Experimental path name
+        val fileIdPath = "fileIdPath"
+        route("/file/{$fileIdPath}") {
             get {
                 val userId = call.getPrincipal<AuthenticationPrincipal>().id
-                val taskId = call.getId<UUID>(receivedTaskId)
+                val fileId = call.getId<UUID>(fileIdPath)
 
-                call.success(data = service.getReceived(userId, taskId))
+                call.respondFile(service.getFile(userId.asUUID(), fileId))
+            }
+
+            delete {
+                val userId = call.getPrincipal<AuthenticationPrincipal>().id
+                val fileId = call.getId<UUID>(fileIdPath)
+
+                service.removeFile(userId.asUUID(), fileId)
+
+                call.success(
+                    message = "Файл успешно удален",
+                    data = mapOf("id" to fileId.toString())
+                )
+            }
+        }
+
+        //TODO Experimental path name
+        val taskInstanceIdPath = "taskInstanceIdPath"
+        route("/received/{$taskInstanceIdPath}") {
+            get {
+                val userId = call.getPrincipal<AuthenticationPrincipal>().id
+                val taskInstanceId = call.getId<UUID>(taskInstanceIdPath)
+
+                call.success(data = service.getReceived(userId, taskInstanceId))
             }
 
             route("/file") {
-                get {
-                    val userId = call.getPrincipal<AuthenticationPrincipal>().id
-                    val taskId = call.getId<UUID>(receivedTaskId)
-                    val fileId = call.getId<UUID>()
-
-                    val file = service.getFileFromReceived(
-                        userId = userId.asUUID(),
-                        taskId = taskId,
-                        fileId = fileId
-                    )
-
-                    call.respondFile(file)
-                }
-
                 put {
                     val userId = call.getPrincipal<AuthenticationPrincipal>().id
-                    val taskId = call.getId<UUID>(receivedTaskId)
+                    val taskInstanceId = call.getId<UUID>(taskInstanceIdPath)
                     val parts = call.receiveMultipart().readAllParts()
 
                     val files = service.addFileToReceived(
                         userId = userId.asUUID(),
-                        taskId = taskId,
+                        taskInstanceId = taskInstanceId,
                         parts = parts.filterIsInstance<PartData.FileItem>()
                     )
 
                     call.file(files)
                 }
-
-                delete {
-                    val userId = call.getPrincipal<AuthenticationPrincipal>().id
-                    val taskId = call.getId<UUID>(receivedTaskId)
-                    val fileId = call.getId<UUID>()
-
-                    service.removeFileFromReceived(userId.asUUID(), taskId, fileId)
-
-                    call.success(
-                        message = "Файл успешно удален",
-                        data = mapOf("id" to fileId.toString())
-                    )
-                }
             }
         }
 
-        //TODO Experimental
-        val createdTaskId = "taskId"
-        route("/created/{$createdTaskId}") {
+        //TODO Experimental path name
+        val taskIdPath = "taskIdPath"
+        route("/created/{$taskIdPath}") {
             get {
                 val userId = call.getPrincipal<AuthenticationPrincipal>().id
-                val taskId = call.getId<UUID>(createdTaskId)
+                val taskId = call.getId<UUID>(taskIdPath)
 
                 call.success(data = service.getCreated(userId, taskId))
             }
 
             route("/file") {
-                get {
-                    val userId = call.getPrincipal<AuthenticationPrincipal>().id
-                    val taskId = call.getId<UUID>(createdTaskId)
-                    val fileId = call.getId<UUID>()
-
-                    val file = service.getFileFromCreated(
-                        userId = userId.asUUID(),
-                        taskId = taskId,
-                        fileId = fileId
-                    )
-
-                    call.respondFile(file)
-                }
-
                 put {
                     val userId = call.getPrincipal<AuthenticationPrincipal>().id
-                    val taskId = call.getId<UUID>(createdTaskId)
+                    val taskId = call.getId<UUID>(taskIdPath)
                     val parts = call.receiveMultipart().readAllParts()
 
                     val files = service.addFileToCreated(
@@ -128,19 +110,6 @@ fun Route.task() {
                     )
 
                     call.file(files)
-                }
-
-                delete {
-                    val userId = call.getPrincipal<AuthenticationPrincipal>().id
-                    val taskId = call.getId<UUID>(createdTaskId)
-                    val fileId = call.getId<UUID>()
-
-                    service.removeFileFromCreated(userId.asUUID(), taskId, fileId)
-
-                    call.success(
-                        message = "Файл успешно удален",
-                        data = mapOf("id" to fileId.toString())
-                    )
                 }
             }
         }

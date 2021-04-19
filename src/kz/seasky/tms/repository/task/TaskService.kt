@@ -62,7 +62,7 @@ class TaskService(
     }
 
     @Suppress("NAME_SHADOWING")
-    suspend fun createTaskAndTaskInstance(creatorId: String, newTask: TaskInsert): Task {
+    suspend fun createTaskAndTaskInstances(creatorId: String, newTask: TaskInsert): Task {
         return transactionService.transaction {
             val creatorId = creatorId.asUUID()
             val task = repository.insertTask(creatorId, newTask)
@@ -76,13 +76,14 @@ class TaskService(
     }
 
     @Suppress("NAME_SHADOWING")
-    suspend fun getReceived(userId: String, taskId: UUID): TaskReceiveDetail {
+    suspend fun getReceived(userId: String, taskInstanceId: UUID): TaskReceiveDetail {
         return transactionService.transaction {
             val userId = userId.asUUID()
 
-            val entry = repository.getReceived(userId, taskId) ?: throw ErrorException("Не удалось найти задачу")
+            val entry =
+                repository.getReceived(userId, taskInstanceId) ?: throw ErrorException("Не удалось найти задачу")
 
-            if (repository.updateInstanceStatusOrSkip(taskId)) {
+            if (repository.updateInstanceStatusOrSkip(taskInstanceId)) {
                 repository.updateTaskStatus(entry.task.id.asUUID())
             }
 
@@ -96,7 +97,7 @@ class TaskService(
                 files = entry.files,
                 parent = TaskReceiveDetail.Task(
                     id = entry.task.id,
-                    file = entry.task.file,
+                    files = entry.task.files,
                     status = entry.status
                 )
             )
@@ -118,7 +119,7 @@ class TaskService(
                 markdown = task.markdown,
                 dueDate = task.dueDate,
                 createdAt = task.createdAt,
-                files = task.file,
+                files = task.files,
                 taskInstances = taskInstances
             )
         }
@@ -144,7 +145,7 @@ class TaskService(
                 files = entry.files,
                 parent = TaskReceiveDetail.Task(
                     id = entry.task.id,
-                    file = entry.task.file,
+                    files = entry.task.files,
                     status = entry.status
                 )
             )
@@ -171,7 +172,7 @@ class TaskService(
                 files = entry.files,
                 parent = TaskReceiveDetail.Task(
                     id = entry.task.id,
-                    file = entry.task.file,
+                    files = entry.task.files,
                     status = entry.status
                 )
             )
@@ -246,7 +247,7 @@ class TaskService(
     @Suppress("BlockingMethodInNonBlockingContext")
     suspend fun addFileToReceived(
         userId: UUID,
-        taskId: UUID,
+        taskInstanceId: UUID,
         parts: List<PartData.FileItem>
     ): HashMap<Char, MutableList<Any>> {
         return transactionService.transaction { transaction ->
@@ -260,10 +261,11 @@ class TaskService(
                 part.streamProvider().use { input ->
                     val bytes = fileHelper.readBytesAndValidate(input)
                     val bytesSize = bytes.size
-                    val file = fileHelper.prepareFile(TaskInstanceEntity[taskId].task.id.value, originalFilename, bytes)
+                    val taskId = TaskInstanceEntity[taskInstanceId].task.id.value
+                    val file = fileHelper.prepareFile(taskId, originalFilename, bytes)
                     val fileInsert = FileInsert(originalFilename, bytesSize, file.canonicalPath)
                     if (bytesSize in 1..FILE_DEFAULT_SIZE) {
-                        val fileDescriptor = repository.insertFileToReceived(userId, taskId, fileInsert)
+                        val fileDescriptor = repository.insertFileToReceived(userId, taskInstanceId, fileInsert)
                         if (fileDescriptor.first != null) {
                             file.outputStream().use { output ->
                                 withContext(Dispatchers.IO) {
@@ -299,33 +301,20 @@ class TaskService(
         }
     }
 
-    suspend fun removeFileFromCreated(userId: UUID, taskId: UUID, fileId: UUID) {
+    suspend fun removeFile(userId: UUID, fileId: UUID) {
         transactionService.transaction {
-            val fileDescriptor = repository.deleteFileFromCreated(userId, taskId, fileId)
+            val fileDescriptor = repository.getFile(userId, fileId)
             val file = File(fileDescriptor.path)
+            if (!file.exists()) throw ErrorException("Нет такого файла :c")
             if (!file.delete()) throw ErrorException("Не удалось удалить файл")
         }
     }
 
-    suspend fun removeFileFromReceived(userId: UUID, taskId: UUID, fileId: UUID) {
-        transactionService.transaction {
-            val fileDescriptor = repository.deleteFileFromReceived(userId, taskId, fileId)
+    suspend fun getFile(userId: UUID, fileId: UUID): File {
+        return transactionService.transaction {
+            val fileDescriptor = repository.getFile(userId, fileId)
             val file = File(fileDescriptor.path)
-            if (!file.delete()) throw ErrorException("Не удалось удалить файл")
-        }
-    }
-
-    suspend fun getFileFromCreated(userId: UUID, taskId: UUID, fileId: UUID): File {
-        return transactionService.transaction {
-            val fileDescriptor = repository.getFileFromCreated(userId, taskId, fileId)
-            return@transaction File(fileDescriptor.path)
-        }
-    }
-
-    suspend fun getFileFromReceived(userId: UUID, taskId: UUID, fileId: UUID): File {
-        return transactionService.transaction {
-            val fileDescriptor = repository.getFileFromReceived(userId, taskId, fileId)
-            return@transaction File(fileDescriptor.path)
+            return@transaction if (file.exists()) file else throw ErrorException("Нет такого файла :c")
         }
     }
 }

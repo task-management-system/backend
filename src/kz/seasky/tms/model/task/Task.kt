@@ -15,5 +15,5 @@ data class Task(
     val dueDate: String,
     val createdAt: String,
     val creator: User,
-    val file: List<File>
+    val files: List<File>
 )

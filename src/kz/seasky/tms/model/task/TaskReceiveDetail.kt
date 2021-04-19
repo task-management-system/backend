@@ -15,7 +15,7 @@ data class TaskReceiveDetail(
 ) {
     data class Task(
         val id: String,
-        val file: List<File>,
+        val files: List<File>,
         val status: Status
     )
 }
