@@ -31,7 +31,7 @@ class JWTConfig(jwtProperties: Properties) {
 
     private fun getExpireDate(): Date {
         val calendar = Calendar.getInstance()
-        calendar.set(Calendar.HOUR, 12)
+        calendar.add(Calendar.HOUR, 12)
         return calendar.time
     }
 }
