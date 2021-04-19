@@ -303,7 +303,7 @@ class TaskService(
 
     suspend fun removeFile(userId: UUID, fileId: UUID) {
         transactionService.transaction {
-            val fileDescriptor = repository.getFile(userId, fileId)
+            val fileDescriptor = repository.deleteFile(userId, fileId)
             val file = File(fileDescriptor.path)
             if (!file.exists()) throw ErrorException("Нет такого файла :c")
             if (!file.delete()) throw ErrorException("Не удалось удалить файл")

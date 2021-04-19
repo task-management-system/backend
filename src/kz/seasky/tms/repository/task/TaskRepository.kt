@@ -230,6 +230,13 @@ class TaskRepository {
         return FileEntity[fileId].toFile()
     }
 
+    fun deleteFile(userId: UUID, fileId: UUID): File {
+        if (!validateFile(userId, fileId)) throw ErrorException("Не удалось провалидировать файл")
+        val file = FileEntity[fileId]
+        file.delete()
+        return file.toFile()
+    }
+
     /**
      * @return true if file count > 0, false otherwise
      */
