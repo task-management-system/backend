@@ -46,7 +46,7 @@ suspend fun <T> ApplicationCall.warning(
 }
 
 @Deprecated("WIP, can be replaced in future")
-suspend fun ApplicationCall.file(files: HashMap<Char, MutableList<Any>>) {
+suspend fun ApplicationCall.file(files: HashMap<String, MutableList<Any>>) {
     when {
         files[FileHelper.KEY_SUCCESS].isNullOrEmpty() -> {
             error(
