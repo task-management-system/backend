@@ -3,14 +3,15 @@ package kz.seasky.tms.model.user
 import kz.seasky.tms.exceptions.ErrorException
 import kz.seasky.tms.extensions.isValidUUID
 import kz.seasky.tms.model.ReceiveValidator
+import kz.seasky.tms.model.WithId
 import kz.seasky.tms.utils.MAX_PASSWORD_LENGTH
 import kz.seasky.tms.utils.MIN_PASSWORD_LENGTH
 
 class UserChangePassword(
-    val id: String,
+    override val id: String,
     val oldPassword: String,
     val newPassword: String
-) : ReceiveValidator {
+) : ReceiveValidator, WithId {
     override fun <T> validate(): T {
         val passwordRegex by lazy { """\p{Graph}+""".toRegex() } //[a-z][A-Z][0-9]!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
 
