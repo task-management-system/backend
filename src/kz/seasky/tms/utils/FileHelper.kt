@@ -10,8 +10,8 @@ import java.io.InputStream
 
 class FileHelper {
     companion object {
-        const val KEY_SUCCESS = 's'
-        const val KEY_ERROR = 'e'
+        const val KEY_SUCCESS = "success"
+        const val KEY_ERROR = "error"
 
         /** Equals to 4MiB */
         const val YIELD_SIZE = 4 * 1024 * 1024

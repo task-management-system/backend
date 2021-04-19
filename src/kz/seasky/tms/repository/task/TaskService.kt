@@ -193,9 +193,9 @@ class TaskService(
         userId: UUID,
         taskId: UUID,
         parts: List<PartData.FileItem>
-    ): HashMap<Char, MutableList<Any>> {
+    ): HashMap<String, MutableList<Any>> {
         return transactionService.transaction { transaction ->
-            val files = hashMapOf<Char, MutableList<Any>>(
+            val files = hashMapOf<String, MutableList<Any>>(
                 FileHelper.KEY_SUCCESS to mutableListOf(),
                 FileHelper.KEY_ERROR to mutableListOf()
             )
@@ -249,9 +249,9 @@ class TaskService(
         userId: UUID,
         taskInstanceId: UUID,
         parts: List<PartData.FileItem>
-    ): HashMap<Char, MutableList<Any>> {
+    ): HashMap<String, MutableList<Any>> {
         return transactionService.transaction { transaction ->
-            val files = hashMapOf<Char, MutableList<Any>>(
+            val files = hashMapOf<String, MutableList<Any>>(
                 FileHelper.KEY_SUCCESS to mutableListOf(),
                 FileHelper.KEY_ERROR to mutableListOf()
             )
