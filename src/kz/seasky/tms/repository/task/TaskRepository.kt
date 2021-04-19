@@ -103,15 +103,17 @@ class TaskRepository {
     /**
      * @return true if update succeeded else if not
      */
-    fun updateInstanceStatusOrSkip(taskId: UUID): Boolean {
-        return if (TaskInstanceEntity[taskId].status.id.value == 1.toShort()) {
+    fun updateInstanceStatusOrSkip(taskInstanceId: UUID): Boolean {
+        val taskInstance = TaskInstanceEntity[taskInstanceId]
+        return if (taskInstance.status.id.value == Status.New.value) {
             TaskInstanceTable.update(
-                where = { TaskInstanceTable.id eq taskId },
+                where = { TaskInstanceTable.id eq taskInstanceId },
                 body = { statement ->
-                    statement[status] = 2.toShort()
+                    statement[status] = Status.InWork.value
                 }
             )
 
+            taskInstance.refresh()
             true
         } else {
             false
@@ -248,7 +250,7 @@ class TaskRepository {
             .select {
                 //@formatter:off
                 ((TaskTable.creator eq userId) or (TaskInstanceTable.executor eq userId)) and
-                        ((TaskFileTable.file eq fileId) or (TaskInstanceFileTable.file eq fileId))
+                ((TaskFileTable.file eq fileId) or (TaskInstanceFileTable.file eq fileId))
                 //@formatter:on
             }
             .count()
