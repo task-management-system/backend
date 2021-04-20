@@ -114,7 +114,7 @@ fun Route.task() {
             }
         }
 
-        route("action") {
+        route("/action") {
             patch("/cancel") {
                 val userId = call.getPrincipal<AuthenticationPrincipal>().id
                 val taskId = call.getId<UUID>()
