@@ -4,7 +4,6 @@ import kotlinx.uuid.UUID
 import kz.seasky.tms.database.tables.user.UserEntity
 import kz.seasky.tms.database.tables.user.UserTable
 import kz.seasky.tms.extensions.crypt
-import kz.seasky.tms.model.paging.Paging
 import kz.seasky.tms.model.user.User
 import kz.seasky.tms.model.user.UserInsert
 import kz.seasky.tms.model.user.UserUpdate
@@ -61,14 +60,6 @@ class UserRepository {
             .map(UserEntity::toUser)
     }
 
-    fun getAll(paging: Paging): List<User> {
-        return UserEntity
-            .all()
-            .orderBy(UserTable.createdAt to paging.sortOrder)
-            .limit(paging.limit, paging.offset)
-            .map(UserEntity::toUser)
-    }
-
     fun getByIdOrNull(id: UUID): User? {
         return UserEntity
             .findById(id)
@@ -100,5 +91,12 @@ class UserRepository {
         )
 
         return UserEntity.findById(id)?.toUser()
+    }
+
+    fun getAllAvailable(userId: UUID): List<User> {
+        return UserEntity
+            .all()
+            .filter { user -> user.id.value != userId && user.isActive }
+            .map(UserEntity::toUser)
     }
 }

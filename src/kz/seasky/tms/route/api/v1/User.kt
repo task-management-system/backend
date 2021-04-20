@@ -106,6 +106,12 @@ fun Route.user() {
             get {
                 call.success(data = service.getAll())
             }
+
+            get("/available") {
+                val userId = call.getPrincipal<AuthenticationPrincipal>().id.asUUID()
+
+                call.success(data = service.getAllAvailable(userId))
+            }
         }
 
         withPermission(Permission.UpdateUser.power or Permission.Administrator.power) {

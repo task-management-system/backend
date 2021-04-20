@@ -4,7 +4,6 @@ import kotlinx.uuid.UUID
 import kz.seasky.tms.database.TransactionService
 import kz.seasky.tms.exceptions.ErrorException
 import kz.seasky.tms.exceptions.WarningException
-import kz.seasky.tms.model.paging.Paging
 import kz.seasky.tms.model.user.User
 import kz.seasky.tms.model.user.UserInsert
 import kz.seasky.tms.model.user.UserUpdate
@@ -73,15 +72,15 @@ class UserService(
         }
     }
 
-    suspend fun getAll(paging: Paging): List<User> {
-        return transactionService.transaction {
-            repository.getAll(paging)
-        }
-    }
-
     suspend fun getById(id: String): User {
         return transactionService.transaction {
             repository.getByIdOrNull(UUID(id)) ?: throw ErrorException("Не удалось найти пользователя")
+        }
+    }
+
+    suspend fun getAllAvailable(userId: UUID): List<User> {
+        return transactionService.transaction {
+            return@transaction repository.getAllAvailable(userId)
         }
     }
 }
