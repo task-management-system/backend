@@ -50,6 +50,7 @@ class TaskEntity(id: EntityID<UUID>) : KotlinxUUIDEntity(id) {
             dueDate = dueDate.toString(),
             createdAt = createdAt.toString(),
             creator = creator.toUser(),
+            status = status.toStatus(),
             files = file.map(FileEntity::toFile)
         )
     }

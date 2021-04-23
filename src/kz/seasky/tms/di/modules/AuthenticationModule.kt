@@ -9,7 +9,7 @@ import org.koin.dsl.module
 import org.koin.experimental.builder.singleBy
 
 val authenticationModule = module(createdAtStart = true) {
-    single { JWTConfig(jwtProperties = get<ApplicationSettings>().jwtProperties) }
+    single { JWTConfig(properties = get<ApplicationSettings>().jwtProperties) }
 
     singleBy<AuthenticationService, AuthenticationServiceImpl>()
     single { AuthenticationRepository(transactionService = get()) }

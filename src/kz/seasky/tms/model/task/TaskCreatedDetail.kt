@@ -11,6 +11,7 @@ data class TaskCreatedDetail(
     val markdown: String?,
     val dueDate: String,
     val createdAt: String,
+    val status: Status,
     val files: List<File>,
     val taskInstances: List<TaskInstance>
 ) {

@@ -10,6 +10,7 @@ data class TaskReceiveDetail(
     val markdown: String?,
     val dueDate: String,
     val createdAt: String,
+    val status: Status,
     val files: List<File>,
     val parent: Task
 ) {
