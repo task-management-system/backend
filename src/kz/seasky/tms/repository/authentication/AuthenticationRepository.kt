@@ -21,14 +21,14 @@ class AuthenticationRepository(private val transactionService: TransactionServic
     }
 
     /**
-     * @return true if [password] equals with password in database, or false if not
+     * @return true if [password] equals with password in database, false if not
      */
     suspend fun validatePassword(id: String, password: String): Boolean = transactionService.transaction {
         val match = UserTable.password.crypt(password)
         UserTable
             .slice(match)
             .select { UserTable.id eq UUID(id) }
-            .map { rs -> rs[match] }
+            .map { row -> row[match] }
             .firstOrNull() ?: false
     }
 }

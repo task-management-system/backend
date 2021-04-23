@@ -1,6 +1,5 @@
 package kz.seasky.tms.model.user
 
-import kotlinx.uuid.UUIDExperimentalAPI
 import kz.seasky.tms.exceptions.ErrorException
 import kz.seasky.tms.extensions.isValidUUID
 import kz.seasky.tms.model.ReceiveValidator
@@ -14,7 +13,6 @@ class UserUpdate(
     val email: String? = null,
     val roleId: Short
 ) : ReceiveValidator {
-    @OptIn(UUIDExperimentalAPI::class)
     override fun <T> validate(): T {
         val usernameRegex by lazy { """\p{Alnum}+""".toRegex() } //[a-z][A-Z][0-9]
 

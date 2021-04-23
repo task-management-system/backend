@@ -5,13 +5,13 @@ import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
 import java.util.*
 
-class JWTConfig(jwtProperties: Properties) {
+class JWTConfig(properties: Properties) {
 
-    val realm = jwtProperties["realm"].toString()
+    val realm = properties["realm"].toString()
 
-    private val secret = jwtProperties["secret"].toString()
-    private val issuer = jwtProperties["issuer"].toString()
-    private val audience = jwtProperties["audience"].toString()
+    private val secret = properties["secret"].toString()
+    private val issuer = properties["issuer"].toString()
+    private val audience = properties["audience"].toString()
 
     private val algorithm = Algorithm.HMAC512(secret)
 

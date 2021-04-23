@@ -22,11 +22,9 @@ class AuthenticationServiceImpl(
 
         if (!user.isActive) throw ErrorException("Пользователь неактивен, обратитесь к администратору")
 
-        if (!repository.validatePassword(
-                user.id,
-                credentials.password
-            )
-        ) throw ErrorException("Неверный пароль, проверьте корректность введенных данных")
+        if (!repository.validatePassword(user.id, credentials.password)) {
+            throw ErrorException("Неверный пароль, проверьте корректность введенных данных")
+        }
 
         val token = jwtConfig.makeToken(user.id)
         return AuthenticationResponse(token, user)
