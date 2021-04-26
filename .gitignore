@@ -2,7 +2,8 @@
 /.idea
 /out
 /build
-/_files
+/.files
+/.sessions
 /documentation
 *.iml
 *.ipr

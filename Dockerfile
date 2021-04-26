@@ -6,7 +6,8 @@ RUN adduser -D -g '' $USER
 
 # Creating work directory and giving permissions
 RUN mkdir /app \
-    && mkdir /app/_files \
+    && mkdir /app/.files \
+    && mkdir /app/.sessions \
     && mkdir /app/resources \
     && chown -R $USER /app \
     && chmod -R 755 /app

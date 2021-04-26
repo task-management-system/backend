@@ -10,6 +10,8 @@ fun Route.v1() {
 
         authentication()
 
+        statistic()
+
         authenticate(JWT_NAME_STANDARD) {
             permission()
 
