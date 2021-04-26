@@ -21,7 +21,7 @@ import org.jetbrains.exposed.sql.*
 import org.joda.time.DateTime
 
 class TaskRepository {
-    fun countAll(): Map<Short, Long> {
+    fun countAllByStatus(): Map<Short, Long> {
         return TaskTable
             .slice(TaskTable.status, TaskTable.status.count())
             .selectAll()
@@ -31,7 +31,7 @@ class TaskRepository {
             }
     }
 
-    fun countAll(dueDate: DateTime): Map<Short, Long> {
+    fun countAllByStatus(dueDate: DateTime): Map<Short, Long> {
         return TaskTable
             .slice(TaskTable.status, TaskTable.status.count())
             .select { TaskTable.dueDate greaterEq dueDate }

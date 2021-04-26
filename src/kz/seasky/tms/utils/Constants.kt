@@ -14,4 +14,4 @@ const val FILE_ROOT_DIR = "./.files"
 const val FILE_DEFAULT_SIZE: Long = 25 * 1024 * 1024
 
 const val SESSION_ROOT_DIR = "./.sessions"
-const val COOKIE_STATISTIC_NAME = "cookie-statistic-name"
+const val COOKIE_STATISTICS_NAME = "statistics"

@@ -5,12 +5,12 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.sessions.*
 import kz.seasky.tms.extensions.success
-import kz.seasky.tms.model.statistic.Statistic
-import kz.seasky.tms.repository.statistic.StatisticService
+import kz.seasky.tms.model.statistic.Statistics
+import kz.seasky.tms.repository.statistic.StatisticsService
 import org.koin.ktor.ext.inject
 
-fun Route.statistic() {
-    val service: StatisticService by inject()
+fun Route.statistics() {
+    val service: StatisticsService by inject()
 
     get("/smile") { call.respondText("Smile") }
 
@@ -18,11 +18,9 @@ fun Route.statistic() {
 
     get("/sister") { call.respondText("Sister") }
 
-    get("/statistic") {
-        val statistic = call.sessions.get<Statistic>()?.let { statistic ->
-            return@let statistic
-        } ?: service.getAndUpdateSession(call.sessions)
-        call.success(data = statistic)
+    get("/statistics") {
+        val statistics = call.sessions.get<Statistics>() ?: service.getAndUpdateSession(call.sessions)
+        call.success(data = statistics)
     }
 
     get("/surprise") { call.respondText("Surprise") }

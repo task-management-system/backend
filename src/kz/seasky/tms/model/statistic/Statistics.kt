@@ -1,6 +1,6 @@
 package kz.seasky.tms.model.statistic
 
-data class Statistic(
+data class Statistics(
     val task: Task,
     val disk: Disk,
     val createdAt: Long

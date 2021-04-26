@@ -14,9 +14,9 @@ import kz.seasky.tms.features.PermissionFeature
 import kz.seasky.tms.features.installAuthentication
 import kz.seasky.tms.features.installRouting
 import kz.seasky.tms.features.installStatusPages
-import kz.seasky.tms.model.statistic.Statistic
+import kz.seasky.tms.model.statistic.Statistics
 import kz.seasky.tms.utils.BuildConfig
-import kz.seasky.tms.utils.COOKIE_STATISTIC_NAME
+import kz.seasky.tms.utils.COOKIE_STATISTICS_NAME
 import kz.seasky.tms.utils.SESSION_ROOT_DIR
 import org.koin.ktor.ext.Koin
 import java.io.File
@@ -62,11 +62,11 @@ private fun Application.setRestAPI() {
     install(CORS)
 
     install(Sessions) {
-        cookie<Statistic>(
-            name = COOKIE_STATISTIC_NAME,
+        cookie<Statistics>(
+            name = COOKIE_STATISTICS_NAME,
             storage = directorySessionStorage(File(SESSION_ROOT_DIR), true),
             block = {
-                cookie.maxAgeInSeconds = 5 * 60 * 1000
+                cookie.maxAgeInSeconds = 5 * 60 * 1000 // 5 min
             }
         )
     }

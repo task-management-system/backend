@@ -13,7 +13,7 @@ import kz.seasky.tms.extensions.asUUID
 import kz.seasky.tms.model.file.FileInsert
 import kz.seasky.tms.model.paging.Paging
 import kz.seasky.tms.model.paging.PagingResponse
-import kz.seasky.tms.model.statistic.Statistic
+import kz.seasky.tms.model.statistic.Statistics
 import kz.seasky.tms.model.task.*
 import kz.seasky.tms.utils.FILE_DEFAULT_SIZE
 import kz.seasky.tms.utils.FileHelper
@@ -325,23 +325,23 @@ class TaskService(
         }
     }
 
-    suspend fun getAllCount(): Statistic.Task.Status {
+    suspend fun getAllCount(): Statistics.Task.Status {
         return transactionService.transaction {
-            val countsByStatus = repository.countAll()
+            val countsByStatus = repository.countAllByStatus()
             return@transaction countsByStatus.extract()
         }
     }
 
-    suspend fun getActualCount(): Statistic.Task.Status {
+    suspend fun getActualCount(): Statistics.Task.Status {
         return transactionService.transaction {
             val currentTime = DateTime.now()
-            val countsByStatus = repository.countAll(currentTime)
+            val countsByStatus = repository.countAllByStatus(currentTime)
             return@transaction countsByStatus.extract()
         }
     }
 
-    private fun Map<Short, Long>.extract(): Statistic.Task.Status {
-        return Statistic.Task.Status(
+    private fun Map<Short, Long>.extract(): Statistics.Task.Status {
+        return Statistics.Task.Status(
             new = getOrDefault(Status.New.value, 0),
             inWork = getOrDefault(Status.InWork.value, 0),
             canceled = getOrDefault(Status.Canceled.value, 0),
