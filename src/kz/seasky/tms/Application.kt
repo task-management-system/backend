@@ -4,6 +4,7 @@ import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.gson.*
 import io.ktor.server.netty.*
+import io.ktor.sessions.*
 import kz.seasky.tms.di.modules.applicationModule
 import kz.seasky.tms.di.modules.authenticationModule
 import kz.seasky.tms.di.modules.databaseModule
@@ -13,8 +14,12 @@ import kz.seasky.tms.features.PermissionFeature
 import kz.seasky.tms.features.installAuthentication
 import kz.seasky.tms.features.installRouting
 import kz.seasky.tms.features.installStatusPages
+import kz.seasky.tms.model.statistic.Statistic
 import kz.seasky.tms.utils.BuildConfig
+import kz.seasky.tms.utils.COOKIE_STATISTIC_NAME
+import kz.seasky.tms.utils.SESSION_ROOT_DIR
 import org.koin.ktor.ext.Koin
+import java.io.File
 
 fun main(args: Array<String>) {
 //    EngineMain.main(args + arrayOf("-P:args=${args.toList()}"))
@@ -55,6 +60,16 @@ private fun Application.setRestAPI() {
     install(DefaultHeaders)
     install(CallLogging)
     install(CORS)
+
+    install(Sessions) {
+        cookie<Statistic>(
+            name = COOKIE_STATISTIC_NAME,
+            storage = directorySessionStorage(File(SESSION_ROOT_DIR), true),
+            block = {
+                cookie.maxAgeInSeconds = 5 * 60 * 1000
+            }
+        )
+    }
 
     install(ContentNegotiation) {
         gson { serializeNulls() }

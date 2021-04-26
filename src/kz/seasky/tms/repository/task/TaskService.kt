@@ -6,16 +6,19 @@ import kotlinx.coroutines.withContext
 import kotlinx.uuid.UUID
 import kz.seasky.tms.database.TransactionService
 import kz.seasky.tms.database.tables.task.TaskInstanceEntity
+import kz.seasky.tms.enums.Status
 import kz.seasky.tms.exceptions.ErrorException
 import kz.seasky.tms.exceptions.WarningException
 import kz.seasky.tms.extensions.asUUID
 import kz.seasky.tms.model.file.FileInsert
 import kz.seasky.tms.model.paging.Paging
 import kz.seasky.tms.model.paging.PagingResponse
+import kz.seasky.tms.model.statistic.Statistic
 import kz.seasky.tms.model.task.*
 import kz.seasky.tms.utils.FILE_DEFAULT_SIZE
 import kz.seasky.tms.utils.FileHelper
 import kz.seasky.tms.utils.asMiB
+import org.joda.time.DateTime
 import java.io.File
 
 class TaskService(
@@ -320,5 +323,29 @@ class TaskService(
             val file = File(fileDescriptor.path)
             return@transaction if (file.exists()) file else throw ErrorException("Нет такого файла :c")
         }
+    }
+
+    suspend fun getAllCount(): Statistic.Task.Status {
+        return transactionService.transaction {
+            val countsByStatus = repository.countAll()
+            return@transaction countsByStatus.extract()
+        }
+    }
+
+    suspend fun getActualCount(): Statistic.Task.Status {
+        return transactionService.transaction {
+            val currentTime = DateTime.now()
+            val countsByStatus = repository.countAll(currentTime)
+            return@transaction countsByStatus.extract()
+        }
+    }
+
+    private fun Map<Short, Long>.extract(): Statistic.Task.Status {
+        return Statistic.Task.Status(
+            new = getOrDefault(Status.New.value, 0),
+            inWork = getOrDefault(Status.InWork.value, 0),
+            canceled = getOrDefault(Status.Canceled.value, 0),
+            closed = getOrDefault(Status.Closed.value, 0)
+        )
     }
 }

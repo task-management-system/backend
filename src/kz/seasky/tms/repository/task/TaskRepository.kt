@@ -18,8 +18,29 @@ import kz.seasky.tms.model.paging.Paging
 import kz.seasky.tms.model.task.*
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.*
+import org.joda.time.DateTime
 
 class TaskRepository {
+    fun countAll(): Map<Short, Long> {
+        return TaskTable
+            .slice(TaskTable.status, TaskTable.status.count())
+            .selectAll()
+            .groupBy(TaskTable.status)
+            .associate { row ->
+                row[TaskTable.status].value to row[TaskTable.status.count()]
+            }
+    }
+
+    fun countAll(dueDate: DateTime): Map<Short, Long> {
+        return TaskTable
+            .slice(TaskTable.status, TaskTable.status.count())
+            .select { TaskTable.dueDate greaterEq dueDate }
+            .groupBy(TaskTable.status)
+            .associate { row ->
+                row[TaskTable.status].value to row[TaskTable.status.count()]
+            }
+    }
+
     fun countReceived(userId: UUID, statusId: Short): Long {
         return TaskInstanceEntity
             .find { (TaskInstanceTable.executor eq userId) and (TaskInstanceTable.status eq statusId) }

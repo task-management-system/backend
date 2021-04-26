@@ -9,6 +9,8 @@ import java.io.File
 import java.io.InputStream
 
 class FileHelper {
+    private val directory = File(FILE_ROOT_DIR)
+
     companion object {
         const val KEY_SUCCESS = "success"
         const val KEY_ERROR = "error"
@@ -65,6 +67,14 @@ class FileHelper {
             }
             return@withContext output.toByteArray()
         }
+    }
+
+    suspend fun usedSpace(): Long = withContext(Dispatchers.IO) {
+        return@withContext directory.totalSpace - directory.usableSpace
+    }
+
+    suspend fun availableSpace(): Long = withContext(Dispatchers.IO) {
+        return@withContext directory.usableSpace
     }
 }
 
