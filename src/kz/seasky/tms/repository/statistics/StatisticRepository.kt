@@ -1,6 +1,6 @@
-package kz.seasky.tms.repository.statistic
+package kz.seasky.tms.repository.statistics
 
-import kz.seasky.tms.model.statistic.Statistics
+import kz.seasky.tms.model.statistics.Statistics
 import kz.seasky.tms.repository.task.TaskService
 import kz.seasky.tms.utils.FileHelper
 

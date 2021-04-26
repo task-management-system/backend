@@ -13,7 +13,7 @@ import kz.seasky.tms.extensions.asUUID
 import kz.seasky.tms.model.file.FileInsert
 import kz.seasky.tms.model.paging.Paging
 import kz.seasky.tms.model.paging.PagingResponse
-import kz.seasky.tms.model.statistic.Statistics
+import kz.seasky.tms.model.statistics.Statistics
 import kz.seasky.tms.model.task.*
 import kz.seasky.tms.utils.FILE_DEFAULT_SIZE
 import kz.seasky.tms.utils.FileHelper

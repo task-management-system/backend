@@ -2,9 +2,9 @@ package kz.seasky.tms.di.modules
 
 import kz.seasky.tms.repository.role.RoleRepository
 import kz.seasky.tms.repository.role.RoleService
-import kz.seasky.tms.repository.statistic.StatisticRepository
-import kz.seasky.tms.repository.statistic.StatisticsService
-import kz.seasky.tms.repository.statistic.StatisticsServiceImpl
+import kz.seasky.tms.repository.statistics.StatisticRepository
+import kz.seasky.tms.repository.statistics.StatisticsService
+import kz.seasky.tms.repository.statistics.StatisticsServiceImpl
 import kz.seasky.tms.repository.status.StatusRepository
 import kz.seasky.tms.repository.status.StatusService
 import kz.seasky.tms.repository.task.TaskRepository

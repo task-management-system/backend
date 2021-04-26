@@ -14,7 +14,7 @@ import kz.seasky.tms.features.PermissionFeature
 import kz.seasky.tms.features.installAuthentication
 import kz.seasky.tms.features.installRouting
 import kz.seasky.tms.features.installStatusPages
-import kz.seasky.tms.model.statistic.Statistics
+import kz.seasky.tms.model.statistics.Statistics
 import kz.seasky.tms.utils.BuildConfig
 import kz.seasky.tms.utils.COOKIE_STATISTICS_NAME
 import kz.seasky.tms.utils.SESSION_ROOT_DIR

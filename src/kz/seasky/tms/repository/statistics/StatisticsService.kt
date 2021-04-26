@@ -1,7 +1,7 @@
-package kz.seasky.tms.repository.statistic
+package kz.seasky.tms.repository.statistics
 
 import io.ktor.sessions.*
-import kz.seasky.tms.model.statistic.Statistics
+import kz.seasky.tms.model.statistics.Statistics
 import org.joda.time.DateTime
 
 interface StatisticsService {

@@ -5,8 +5,8 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.sessions.*
 import kz.seasky.tms.extensions.success
-import kz.seasky.tms.model.statistic.Statistics
-import kz.seasky.tms.repository.statistic.StatisticsService
+import kz.seasky.tms.model.statistics.Statistics
+import kz.seasky.tms.repository.statistics.StatisticsService
 import org.koin.ktor.ext.inject
 
 fun Route.statistics() {

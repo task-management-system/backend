@@ -1,4 +1,4 @@
-package kz.seasky.tms.model.statistic
+package kz.seasky.tms.model.statistics
 
 data class Statistics(
     val task: Task,
