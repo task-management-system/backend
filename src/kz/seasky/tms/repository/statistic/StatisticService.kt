@@ -14,7 +14,7 @@ class StatisticServiceImpl(private val repository: StatisticRepository) : Statis
         val statistic = Statistic(
             task = Statistic.Task(repository.getTasksAll(), repository.getTasksActual()),
             disk = Statistic.Disk(repository.getFileUsedSpace(), repository.getFileAvailableSpace()),
-            createdAt = DateTime.now()
+            createdAt = DateTime.now().millis
         )
 
         sessions.set(statistic)
