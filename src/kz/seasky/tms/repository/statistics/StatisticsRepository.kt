@@ -4,7 +4,7 @@ import kz.seasky.tms.model.statistics.Statistics
 import kz.seasky.tms.repository.task.TaskService
 import kz.seasky.tms.utils.FileHelper
 
-class StatisticRepository(
+class StatisticsRepository(
     private val taskService: TaskService,
     private val fileHelper: FileHelper
 ) {

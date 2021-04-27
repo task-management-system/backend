@@ -2,7 +2,7 @@ package kz.seasky.tms.di.modules
 
 import kz.seasky.tms.repository.role.RoleRepository
 import kz.seasky.tms.repository.role.RoleService
-import kz.seasky.tms.repository.statistics.StatisticRepository
+import kz.seasky.tms.repository.statistics.StatisticsRepository
 import kz.seasky.tms.repository.statistics.StatisticsService
 import kz.seasky.tms.repository.statistics.StatisticsServiceImpl
 import kz.seasky.tms.repository.status.StatusRepository
@@ -35,5 +35,5 @@ val repositoryModule = module {
     single { UserService(get(), get()) }
 
     singleBy<StatisticsService, StatisticsServiceImpl>()
-    single { StatisticRepository(taskService = get(), fileHelper = get()) }
+    single { StatisticsRepository(taskService = get(), fileHelper = get()) }
 }
