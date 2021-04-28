@@ -36,6 +36,12 @@ class UserService(
         }
     }
 
+    suspend fun updateAsUser(user: UserUpdate): User {
+        return transactionService.transaction {
+            repository.updateByIdAsUser(user) ?: throw ErrorException("Не удалось обновить пользователя")
+        }
+    }
+
     suspend fun lock(id: UUID): User {
         return transactionService.transaction {
             repository.lock(id) ?: throw WarningException("Пользователь и так заблокирован")
@@ -48,9 +54,11 @@ class UserService(
         }
     }
 
-    suspend fun validatePassword(id: UUID, password: String): Boolean {
+    suspend fun validatePassword(id: UUID, password: String) {
         return transactionService.transaction {
-            repository.validatePassword(id, password) ?: false
+            repository.validatePassword(id, password) ?: throw ErrorException(
+                message = "Неверный старый пароль, проверьте корректность введенных данных"
+            )
         }
     }
 

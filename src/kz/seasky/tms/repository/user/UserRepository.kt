@@ -3,6 +3,7 @@ package kz.seasky.tms.repository.user
 import kotlinx.uuid.UUID
 import kz.seasky.tms.database.tables.user.UserEntity
 import kz.seasky.tms.database.tables.user.UserTable
+import kz.seasky.tms.extensions.asUUID
 import kz.seasky.tms.extensions.crypt
 import kz.seasky.tms.model.user.User
 import kz.seasky.tms.model.user.UserInsert
@@ -28,7 +29,29 @@ class UserRepository {
     }
 
     fun updateById(user: UserUpdate): User? {
-        return UserEntity.update(user)
+        UserTable.update(
+            where = { UserTable.id eq UUID(user.id) },
+            body = { statement ->
+                statement[username] = user.username
+                statement[name] = user.name
+                statement[email] = user.email
+                statement[role] = user.roleId
+            }
+        )
+
+        return UserEntity.findById(user.id.asUUID())?.toUser()
+    }
+
+    fun updateByIdAsUser(user: UserUpdate): User? {
+        UserTable.update(
+            where = { UserTable.id eq user.id.asUUID() },
+            body = { statement ->
+                statement[name] = user.name
+                statement[email] = user.email
+            }
+        )
+
+        return UserEntity.findById(user.id.asUUID())?.toUser()
     }
 
     fun lock(id: UUID): User? {

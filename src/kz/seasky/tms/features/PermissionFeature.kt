@@ -29,7 +29,6 @@ class PermissionFeature(config: Configuration) {
 
         pipeline.intercept(AuthorizationPhase) {
             val principal = call.getPrincipal<AuthenticationPrincipal>()
-
             val role = permission(principal)
 
             if (permission and role == 0L) throw ErrorException("У вас недостаточно прав для данной операции")

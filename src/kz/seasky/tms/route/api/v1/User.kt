@@ -58,16 +58,40 @@ fun Route.user() {
             }
         }
 
-        withPermission(Permission.UpdateUser.power or Permission.Administrator.power) {
-            patch {
-                val user = call.receiveAndValidate<UserUpdate>()
+        patch {
+            val principal = call.getPrincipal<AuthenticationPrincipal>()
+            val user = call.receiveAndValidate<UserUpdate>()
 
-                call.success(
-                    message = "Пользователь успешно обновлен",
-                    data = service.update(user)
-                )
+            val permission = Permission.Administrator.power
+            val isCurrentUser = principal.id == user.id
+            val isPermissionEnough = principal.power and permission != 0L
+
+            if (!isCurrentUser) {
+                if (!isPermissionEnough) throw ErrorException("У вас недостаточно прав")
             }
 
+            val result = if (isCurrentUser && !isPermissionEnough) service.updateAsUser(user) else service.update(user)
+
+            call.success(
+                message = "Пользователь успешно обновлен",
+                data = result
+            )
+        }
+
+        patch("/change-password") {
+            val principal = call.getPrincipal<AuthenticationPrincipal>()
+            val user = call.receiveAndValidate<UserChangePassword>()
+            if (principal.id != user.id) throw ErrorException("Не пытайтесь поменять пароль другому пользователю")
+
+            service.validatePassword(user.id.asUUID(), user.oldPassword)
+
+            call.success(
+                message = "Пароль успешно изменен",
+                data = service.changePassword(user.id.asUUID(), user.newPassword)
+            )
+        }
+
+        withPermission(Permission.UpdateUser.power or Permission.Administrator.power) {
             patch("/lock") {
                 val id = call.getId<UUID>()
 
@@ -83,19 +107,6 @@ fun Route.user() {
                 call.success(
                     message = "Пользователь разблокирован",
                     data = service.unlock(id)
-                )
-            }
-
-            patch("/change-password") {
-                val user = call.receiveAndValidate<UserChangePassword>()
-
-                if (!service.validatePassword(user.id.asUUID(), user.oldPassword)) throw ErrorException(
-                    message = "Неверный старый пароль, проверьте корректность введенных данных"
-                )
-
-                call.success(
-                    message = "Пароль успешно изменен",
-                    data = service.changePassword(user.id.asUUID(), user.newPassword)
                 )
             }
         }
