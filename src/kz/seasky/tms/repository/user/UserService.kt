@@ -56,9 +56,9 @@ class UserService(
 
     suspend fun validatePassword(id: UUID, password: String) {
         return transactionService.transaction {
-            repository.validatePassword(id, password) ?: throw ErrorException(
-                message = "Неверный старый пароль, проверьте корректность введенных данных"
-            )
+            val exception = ErrorException("Неверный старый пароль, проверьте корректность введенных данных")
+            val result = repository.validatePassword(id, password) ?: throw exception
+            if (!result) throw exception
         }
     }
 
