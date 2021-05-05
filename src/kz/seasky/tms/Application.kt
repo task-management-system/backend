@@ -3,7 +3,7 @@ package kz.seasky.tms
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.gson.*
-import io.ktor.server.netty.*
+import io.ktor.server.jetty.*
 import io.ktor.sessions.*
 import kz.seasky.tms.di.modules.applicationModule
 import kz.seasky.tms.di.modules.authenticationModule
