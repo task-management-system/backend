@@ -10,18 +10,12 @@ import io.ktor.routing.*
 import kotlinx.uuid.UUID
 import kz.seasky.tms.extensions.*
 import kz.seasky.tms.model.authentication.AuthenticationPrincipal
+import kz.seasky.tms.model.notification.EmailNotification
 import kz.seasky.tms.model.task.TaskInsert
 import kz.seasky.tms.model.task.TaskPrepare
 import kz.seasky.tms.repository.task.TaskService
 import kz.seasky.tms.repository.user.UserService
 import org.koin.ktor.ext.inject
-
-class Body(
-    val receiverEmail: String,
-    val taskTitle: String,
-    val creatorName: String,
-    val taskDueDate: String
-)
 
 fun Route.task() {
     val service: TaskService by inject()
@@ -49,7 +43,7 @@ fun Route.task() {
             )
 
             val emails = task.executorIds.mapNotNull { userService.getById(it).email }
-            val bodies = emails.map { Body(it, task.title, user.username, task.dueDate) }
+            val bodies = emails.map { EmailNotification(it, task.title, user.username, task.dueDate) }
 
             client.post {
                 url { encodedPath = "/api/v1/send-email-notification" }
