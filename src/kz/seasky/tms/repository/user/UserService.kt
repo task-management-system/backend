@@ -1,5 +1,6 @@
 package kz.seasky.tms.repository.user
 
+import io.ktor.http.*
 import kotlinx.uuid.UUID
 import kz.seasky.tms.database.TransactionService
 import kz.seasky.tms.exceptions.ErrorException
@@ -7,10 +8,13 @@ import kz.seasky.tms.exceptions.WarningException
 import kz.seasky.tms.model.user.User
 import kz.seasky.tms.model.user.UserInsert
 import kz.seasky.tms.model.user.UserUpdate
+import kz.seasky.tms.utils.FileHelper
+import java.io.InputStream
 
 class UserService(
     private val transactionService: TransactionService,
-    private val repository: UserRepository
+    private val repository: UserRepository,
+    private val fileHelper: FileHelper
 ) {
     suspend fun count(): Long {
         return transactionService.transaction {
@@ -65,6 +69,15 @@ class UserService(
     suspend fun changePassword(id: UUID, newPassword: String): User {
         return transactionService.transaction {
             repository.changePassword(id, newPassword) ?: throw ErrorException("Не удалось сменить пароль")
+        }
+    }
+
+    suspend fun uploadAvatar(id: UUID, contentType: ContentType, stream: InputStream): User? {
+        return transactionService.transaction {
+            val fileSize: Long = 10 * 1024 * 1024
+            val image = stream.use { fileHelper.readBytesAndValidate(it, fileSize) }
+            if (image.isEmpty()) throw ErrorException("Не удалось загрузить аватар")
+            return@transaction repository.uploadAvatar(id, contentType, image)
         }
     }
 

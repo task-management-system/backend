@@ -1,5 +1,7 @@
 package kz.seasky.tms.repository.user
 
+import io.ktor.http.*
+import io.ktor.util.*
 import kotlinx.uuid.UUID
 import kz.seasky.tms.database.tables.user.UserEntity
 import kz.seasky.tms.database.tables.user.UserTable
@@ -110,6 +112,19 @@ class UserRepository {
             where = { UserTable.id eq id },
             body = { statement ->
                 statement[password] = crypt(newPassword)
+            }
+        )
+
+        return UserEntity.findById(id)?.toUser()
+    }
+
+    @OptIn(InternalAPI::class)
+    fun uploadAvatar(id: UUID, contentType: ContentType, image: ByteArray): User? {
+        val type = "data:${contentType.contentType}/${contentType.contentSubtype};base64,"
+        UserTable.update(
+            where = { UserTable.id eq id },
+            body = { statement ->
+                statement[avatar] = type + image.encodeBase64()
             }
         )
 

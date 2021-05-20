@@ -32,7 +32,7 @@ val repositoryModule = module {
 
     single { UserRepository() }
 
-    single { UserService(get(), get()) }
+    single { UserService(get(), get(), get()) }
 
     singleBy<StatisticsService, StatisticsServiceImpl>()
     single { StatisticsRepository(taskService = get(), fileHelper = get()) }
