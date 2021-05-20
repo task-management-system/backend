@@ -1,6 +1,8 @@
 package kz.seasky.tms.route.api.v1
 
 import io.ktor.application.*
+import io.ktor.client.*
+import io.ktor.client.request.*
 import io.ktor.http.content.*
 import io.ktor.request.*
 import io.ktor.response.*
@@ -11,10 +13,20 @@ import kz.seasky.tms.model.authentication.AuthenticationPrincipal
 import kz.seasky.tms.model.task.TaskInsert
 import kz.seasky.tms.model.task.TaskPrepare
 import kz.seasky.tms.repository.task.TaskService
+import kz.seasky.tms.repository.user.UserService
 import org.koin.ktor.ext.inject
+
+class Body(
+    val receiverEmail: String,
+    val taskTitle: String,
+    val creatorName: String,
+    val taskDueDate: String
+)
 
 fun Route.task() {
     val service: TaskService by inject()
+    val userService: UserService by inject()
+    val client: HttpClient by inject()
 
     route("/task") {
         put("/prepare") {
@@ -28,13 +40,21 @@ fun Route.task() {
         }
 
         put("/create") {
-            val userId = call.getPrincipal<AuthenticationPrincipal>().id
+            val user = call.getPrincipal<AuthenticationPrincipal>()
             val task = call.receiveAndValidate<TaskInsert>()
 
             call.success(
                 message = "Задача успешно создана",
-                data = service.createTaskAndTaskInstances(userId, task)
+                data = service.createTaskAndTaskInstances(user.id, task)
             )
+
+            val emails = task.executorIds.mapNotNull { userService.getById(it).email }
+            val bodies = emails.map { Body(it, task.title, user.username, task.dueDate) }
+
+            client.post {
+                url { encodedPath = "/api/v1/send-email-notification" }
+                body = bodies
+            }
         }
 
         //TODO Experimental path name

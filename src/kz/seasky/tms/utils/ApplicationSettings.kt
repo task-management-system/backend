@@ -20,6 +20,11 @@ class ApplicationSettings {
         jwtConfig.toProperties()
     }
 
+    val notificationProperties by lazy {
+        val notificationConfig = config.getConfig("notification")
+        notificationConfig.toProperties()
+    }
+
     private fun Config.toProperties(): Properties {
         return Properties().apply {
             for (e in entrySet()) {
