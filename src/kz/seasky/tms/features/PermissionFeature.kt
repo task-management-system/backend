@@ -50,7 +50,7 @@ class PermissionFeature(config: Configuration) {
     }
 }
 
-class PermissionRouteSelector(
+private class PermissionRouteSelector(
     private val description: String
 ) : RouteSelector(RouteSelectorEvaluation.qualityConstant) {
     override fun evaluate(context: RoutingResolveContext, segmentIndex: Int) = RouteSelectorEvaluation.Constant
