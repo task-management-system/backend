@@ -8,4 +8,23 @@ data class TaskInstance(
     val task: Task,
     val files: List<File>,
     val status: Status
-)
+) {
+    fun toTaskReceiveDetail(): TaskReceiveDetail {
+        return TaskReceiveDetail(
+            id = id,
+            title = task.title,
+            description = task.description,
+            markdown = task.markdown,
+            dueDate = task.dueDate,
+            createdAt = task.createdAt,
+            creator = task.creator,
+            status = status,
+            files = files,
+            parent = TaskReceiveDetail.Task(
+                id = task.id,
+                files = task.files,
+                status = status
+            )
+        )
+    }
+}

@@ -84,28 +84,14 @@ class TaskService(
         return transactionService.transaction {
             val userId = userId.asUUID()
 
-            val entry =
-                repository.getReceived(userId, taskInstanceId) ?: throw ErrorException("Не удалось найти задачу")
+            val taskInstance = repository.getReceived(userId, taskInstanceId)
+                ?: throw ErrorException("Не удалось найти задачу")
 
             if (repository.updateInstanceStatusOrSkip(taskInstanceId)) {
-                repository.updateTaskStatus(entry.task.id.asUUID())
+                repository.updateTaskStatus(taskInstance.task.id.asUUID())
             }
 
-            return@transaction TaskReceiveDetail(
-                id = entry.id,
-                title = entry.task.title,
-                description = entry.task.description,
-                markdown = entry.task.markdown,
-                dueDate = entry.task.dueDate,
-                createdAt = entry.task.createdAt,
-                status = entry.status,
-                files = entry.files,
-                parent = TaskReceiveDetail.Task(
-                    id = entry.task.id,
-                    files = entry.task.files,
-                    status = entry.status
-                )
-            )
+            return@transaction taskInstance.toTaskReceiveDetail()
         }
     }
 
@@ -117,17 +103,7 @@ class TaskService(
             val task = repository.getCreated(userId, taskId) ?: throw ErrorException("Не удалось найти задачу")
             val taskInstances = repository.getCreatedInstances(taskId)
 
-            return@transaction TaskCreatedDetail(
-                id = task.id,
-                title = task.title,
-                description = task.description,
-                markdown = task.markdown,
-                dueDate = task.dueDate,
-                createdAt = task.createdAt,
-                status = task.status,
-                files = task.files,
-                taskInstances = taskInstances
-            )
+            return@transaction task.toTaskCreatedDetail().copy(taskInstances = taskInstances)
         }
     }
 
@@ -136,26 +112,12 @@ class TaskService(
         return transactionService.transaction {
             val userId = userId.asUUID()
 
-            val entry = repository.cancel(userId, taskId)
-                ?: throw WarningException("Вы пытаетесь отменить не свое задание? А может задача уже отменена?!  А может вы хаццкер???")
+            val taskInstance = repository.cancel(userId, taskId)
+                ?: throw WarningException("Вы пытаетесь отменить не свое задание? А может задача уже отменена?! А может вы хаццкер???")
 
-            repository.updateTaskStatus(entry.task.id.asUUID())
+            repository.updateTaskStatus(taskInstance.task.id.asUUID())
 
-            return@transaction TaskReceiveDetail(
-                id = entry.id,
-                title = entry.task.title,
-                description = entry.task.description,
-                markdown = entry.task.markdown,
-                dueDate = entry.task.dueDate,
-                createdAt = entry.task.createdAt,
-                status = entry.status,
-                files = entry.files,
-                parent = TaskReceiveDetail.Task(
-                    id = entry.task.id,
-                    files = entry.task.files,
-                    status = entry.status
-                )
-            )
+            return@transaction taskInstance.toTaskReceiveDetail()
         }
     }
 
@@ -164,26 +126,12 @@ class TaskService(
         return transactionService.transaction {
             val userId = userId.asUUID()
 
-            val entry = repository.close(userId, taskId)
+            val taskInstance = repository.close(userId, taskId)
                 ?: throw WarningException("Вы пытаетесь закончить не свое задание? А может задача уже закончена?! А может вы хаццкер???")
 
-            repository.updateTaskStatus(entry.task.id.asUUID())
+            repository.updateTaskStatus(taskInstance.task.id.asUUID())
 
-            return@transaction TaskReceiveDetail(
-                id = entry.id,
-                title = entry.task.title,
-                description = entry.task.description,
-                markdown = entry.task.markdown,
-                dueDate = entry.task.dueDate,
-                createdAt = entry.task.createdAt,
-                status = entry.status,
-                files = entry.files,
-                parent = TaskReceiveDetail.Task(
-                    id = entry.task.id,
-                    files = entry.task.files,
-                    status = entry.status
-                )
-            )
+            return@transaction taskInstance.toTaskReceiveDetail()
         }
     }
 
