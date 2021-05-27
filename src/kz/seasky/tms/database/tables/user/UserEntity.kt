@@ -18,6 +18,7 @@ class UserEntity(id: EntityID<UUID>) : KotlinxUUIDEntity(id) {
     var email       by UserTable.email
     var isActive    by UserTable.isActive
     var role        by RoleEntity referencedOn UserTable.role
+    var avatar      by UserTable.avatar
     //@formatter:on
 
     companion object : KotlinxUUIDEntityClass<UserEntity>(UserTable) {

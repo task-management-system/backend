@@ -21,11 +21,11 @@ class JWTConfig(properties: Properties) {
         .withAudience(audience)
         .build()
 
-    fun makeToken(id: String): String = JWT.create()
+    fun makeToken(userId: String): String = JWT.create()
         .withSubject("Authentication")
         .withIssuer(issuer)
         .withAudience(audience)
-        .withClaim(JWT_CLAIM_ID, id)
+        .withClaim(JWT_CLAIM_ID, userId)
         .withExpiresAt(getExpireDate())
         .sign(algorithm)
 

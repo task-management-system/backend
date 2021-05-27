@@ -40,20 +40,20 @@ class FileHelper {
     }
 
     /**
-     * Read all bytes from [input] and validate it size so that it is not less than or equal to [FILE_DEFAULT_SIZE]
+     * Read all bytes from [input] and validate it size so that it is not less than or equal to [fileSize]
      *
      * @param input the input stream to be read
-     * @return empty byte array if file size is more than [FILE_DEFAULT_SIZE], filled byte array otherwise
+     * @return empty byte array if file size is more than [fileSize], filled byte array otherwise
      */
     @Suppress("BlockingMethodInNonBlockingContext")
-    suspend fun readBytesAndValidate(input: InputStream): ByteArray {
+    suspend fun readBytesAndValidate(input: InputStream, fileSize: Long = FILE_DEFAULT_SIZE): ByteArray {
         return withContext(Dispatchers.IO) {
             val output = ByteArrayOutputStream(DEFAULT_BUFFER_SIZE)
             val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
             var bytesCopied = 0L
             var bytesAfterYield = 0L
             while (true) {
-                if (bytesCopied > FILE_DEFAULT_SIZE) {
+                if (bytesCopied > fileSize) {
                     return@withContext ByteArray(0)
                 }
                 val bytes = input.read(buffer).takeIf { it >= 0 } ?: break

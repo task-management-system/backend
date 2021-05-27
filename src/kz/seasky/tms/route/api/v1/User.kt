@@ -2,7 +2,10 @@ package kz.seasky.tms.route.api.v1
 
 import io.ktor.application.*
 import io.ktor.http.*
+import io.ktor.request.*
 import io.ktor.routing.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.uuid.UUID
 import kz.seasky.tms.exceptions.ErrorException
 import kz.seasky.tms.extensions.*
@@ -88,6 +91,17 @@ fun Route.user() {
             call.success(
                 message = "Пароль успешно изменен",
                 data = service.changePassword(user.id.asUUID(), user.newPassword)
+            )
+        }
+
+        patch("/upload-avatar") {
+            val userId = call.getPrincipal<AuthenticationPrincipal>().id.asUUID()
+            val contentType = call.request.contentType()
+            if (contentType != ContentType.Image.JPEG && contentType != ContentType.Image.PNG) throw ErrorException("Неверный формат файла")
+            val stream = withContext(Dispatchers.IO) { call.receiveStream() }
+            call.success(
+                message = "Аватарка успешно сохранена",
+                data = service.uploadAvatar(userId, contentType, stream)
             )
         }
 

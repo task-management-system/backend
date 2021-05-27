@@ -8,7 +8,7 @@ import kotlinx.html.*
 
 fun Route.docs() {
     route("/docs") {
-        get("/") {
+        get {
             call.respondHtml {
                 body {
                     h1 {

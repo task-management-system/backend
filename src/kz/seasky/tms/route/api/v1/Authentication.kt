@@ -14,6 +14,6 @@ fun Route.authentication() {
     post("/authentication") {
         val credentials = call.receiveAndValidate<AuthenticationCredential>()
 
-        call.success(data = service.authenticate(credentials))
+        call.success(message = "Аутентификация прошла успешно", data = service.authenticate(credentials))
     }
 }
