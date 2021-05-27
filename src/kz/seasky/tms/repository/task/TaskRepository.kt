@@ -16,6 +16,7 @@ import kz.seasky.tms.model.file.File
 import kz.seasky.tms.model.file.FileInsert
 import kz.seasky.tms.model.paging.Paging
 import kz.seasky.tms.model.task.*
+import kz.seasky.tms.model.user.User
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.*
 import org.joda.time.DateTime
@@ -57,7 +58,7 @@ class TaskRepository {
         return TaskInstanceTable
             .innerJoin(TaskTable)
             .select { (TaskInstanceTable.executor eq userId) and (TaskInstanceTable.status eq statusId) }
-            .all(TaskTable.id, paging)
+            .all(TaskTable.createdAt, paging)
             .map { row ->
                 TaskInstanceEntity.wrapRow(row).toTaskInstancePreview()
             }
@@ -182,14 +183,16 @@ class TaskRepository {
         return task.toTaskInstance()
     }
 
-    fun delete(userId: UUID, taskId: UUID): Unit? {
+    fun delete(userId: UUID, taskId: UUID): Task? {
         val task = TaskEntity[taskId]
 
         if (task.creator.id.value != userId) return null
 
         if (task.status.id.value != Status.New.value) return null
 
-        return task.delete()
+        task.delete()
+
+        return task.toTask()
     }
 
     /**
@@ -258,6 +261,12 @@ class TaskRepository {
         val file = FileEntity[fileId]
         file.delete()
         return file.toFile()
+    }
+
+    fun getTaskInstanceExecutorsByTaskId(taskId: UUID): List<User> {
+        return TaskInstanceTable
+            .select { TaskInstanceTable.task eq taskId }
+            .map { row -> TaskInstanceEntity.wrapRow(row).executor.toUser() }
     }
 
     /**

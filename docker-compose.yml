@@ -37,6 +37,23 @@ services:
     networks:
       - tms-network
 
+  tms-mail-service:
+    container_name: tms-mail-service
+    build:
+      context: ../mail-service/.
+      dockerfile: ../mail-service/Dockerfile
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - TZ=${TMS_TZ}
+    expose:
+      - ${TMS_MS_PORT}
+    ports:
+      - ${TMS_MS_PORT}:${TMS_MS_PORT}
+    networks:
+      - tms-network
+
 volumes:
   tms-volume:
     name: tms-volume

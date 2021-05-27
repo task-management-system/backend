@@ -18,4 +18,18 @@ data class Task(
     val creator: User,
     val status: Status,
     val files: List<File>
-)
+) {
+    fun toTaskCreatedDetail(): TaskCreatedDetail {
+        return TaskCreatedDetail(
+            id = id,
+            title = title,
+            description = description,
+            markdown = markdown,
+            dueDate = dueDate,
+            createdAt = createdAt,
+            status = status,
+            files = files,
+            taskInstances = emptyList()
+        )
+    }
+}

@@ -15,6 +15,7 @@ import kz.seasky.tms.model.paging.Paging
 import kz.seasky.tms.model.paging.PagingResponse
 import kz.seasky.tms.model.statistics.Statistics
 import kz.seasky.tms.model.task.*
+import kz.seasky.tms.model.user.User
 import kz.seasky.tms.utils.FILE_DEFAULT_SIZE
 import kz.seasky.tms.utils.FileHelper
 import kz.seasky.tms.utils.asMiB
@@ -83,28 +84,14 @@ class TaskService(
         return transactionService.transaction {
             val userId = userId.asUUID()
 
-            val entry =
-                repository.getReceived(userId, taskInstanceId) ?: throw ErrorException("Не удалось найти задачу")
+            val taskInstance = repository.getReceived(userId, taskInstanceId)
+                ?: throw ErrorException("Не удалось найти задачу")
 
             if (repository.updateInstanceStatusOrSkip(taskInstanceId)) {
-                repository.updateTaskStatus(entry.task.id.asUUID())
+                repository.updateTaskStatus(taskInstance.task.id.asUUID())
             }
 
-            return@transaction TaskReceiveDetail(
-                id = entry.id,
-                title = entry.task.title,
-                description = entry.task.description,
-                markdown = entry.task.markdown,
-                dueDate = entry.task.dueDate,
-                createdAt = entry.task.createdAt,
-                status = entry.status,
-                files = entry.files,
-                parent = TaskReceiveDetail.Task(
-                    id = entry.task.id,
-                    files = entry.task.files,
-                    status = entry.status
-                )
-            )
+            return@transaction taskInstance.toTaskReceiveDetail()
         }
     }
 
@@ -116,17 +103,7 @@ class TaskService(
             val task = repository.getCreated(userId, taskId) ?: throw ErrorException("Не удалось найти задачу")
             val taskInstances = repository.getCreatedInstances(taskId)
 
-            return@transaction TaskCreatedDetail(
-                id = task.id,
-                title = task.title,
-                description = task.description,
-                markdown = task.markdown,
-                dueDate = task.dueDate,
-                createdAt = task.createdAt,
-                status = task.status,
-                files = task.files,
-                taskInstances = taskInstances
-            )
+            return@transaction task.toTaskCreatedDetail().copy(taskInstances = taskInstances)
         }
     }
 
@@ -135,26 +112,12 @@ class TaskService(
         return transactionService.transaction {
             val userId = userId.asUUID()
 
-            val entry = repository.cancel(userId, taskId)
-                ?: throw WarningException("Вы пытаетесь отменить не свое задание? А может задача уже отменена?!  А может вы хаццкер???")
+            val taskInstance = repository.cancel(userId, taskId)
+                ?: throw WarningException("Вы пытаетесь отменить не свое задание? А может задача уже отменена?! А может вы хаццкер???")
 
-            repository.updateTaskStatus(entry.task.id.asUUID())
+            repository.updateTaskStatus(taskInstance.task.id.asUUID())
 
-            return@transaction TaskReceiveDetail(
-                id = entry.id,
-                title = entry.task.title,
-                description = entry.task.description,
-                markdown = entry.task.markdown,
-                dueDate = entry.task.dueDate,
-                createdAt = entry.task.createdAt,
-                status = entry.status,
-                files = entry.files,
-                parent = TaskReceiveDetail.Task(
-                    id = entry.task.id,
-                    files = entry.task.files,
-                    status = entry.status
-                )
-            )
+            return@transaction taskInstance.toTaskReceiveDetail()
         }
     }
 
@@ -163,35 +126,20 @@ class TaskService(
         return transactionService.transaction {
             val userId = userId.asUUID()
 
-            val entry = repository.close(userId, taskId)
+            val taskInstance = repository.close(userId, taskId)
                 ?: throw WarningException("Вы пытаетесь закончить не свое задание? А может задача уже закончена?! А может вы хаццкер???")
 
-            repository.updateTaskStatus(entry.task.id.asUUID())
+            repository.updateTaskStatus(taskInstance.task.id.asUUID())
 
-            return@transaction TaskReceiveDetail(
-                id = entry.id,
-                title = entry.task.title,
-                description = entry.task.description,
-                markdown = entry.task.markdown,
-                dueDate = entry.task.dueDate,
-                createdAt = entry.task.createdAt,
-                status = entry.status,
-                files = entry.files,
-                parent = TaskReceiveDetail.Task(
-                    id = entry.task.id,
-                    files = entry.task.files,
-                    status = entry.status
-                )
-            )
+            return@transaction taskInstance.toTaskReceiveDetail()
         }
     }
 
     @Suppress("NAME_SHADOWING")
-    suspend fun deleteTask(userId: String, taskId: UUID) {
+    suspend fun deleteTask(userId: UUID, taskId: UUID): Task {
         return transactionService.transaction {
-            val userId = userId.asUUID()
-
-            repository.delete(userId, taskId) ?: throw WarningException("А задание уже удалить нельзя, вот беда")
+            return@transaction repository.delete(userId, taskId)
+                ?: throw WarningException("Невозожно удалить, задание уже находится в процессе")
         }
     }
 
@@ -337,6 +285,12 @@ class TaskService(
             val currentTime = DateTime.now()
             val countsByStatus = repository.countAllByStatus(currentTime)
             return@transaction countsByStatus.extract()
+        }
+    }
+
+    suspend fun getTaskExecutors(taskId: UUID): List<User> {
+        return transactionService.transaction {
+            return@transaction repository.getTaskInstanceExecutorsByTaskId(taskId)
         }
     }
 
