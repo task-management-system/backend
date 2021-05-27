@@ -8,6 +8,7 @@ import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import kotlinx.uuid.UUID
+import kz.seasky.tms.enums.Status
 import kz.seasky.tms.extensions.*
 import kz.seasky.tms.model.authentication.AuthenticationPrincipal
 import kz.seasky.tms.model.notification.EmailNotification
@@ -42,12 +43,12 @@ fun Route.task() {
                 data = service.createTaskAndTaskInstances(user.id, task)
             )
 
-            val emails = task.executorIds.mapNotNull { userService.getById(it).email }
-            val bodies = emails.map { EmailNotification(it, task.title, user.username, task.dueDate) }
-
+            val executorEmails = task.executorIds.mapNotNull { userService.getById(it).email }
+            val notification =
+                executorEmails.map { EmailNotification.NewTask(it, task.title, user.username, task.dueDate) }
             client.post {
-                url { encodedPath = "/api/v1/send-email-notification" }
-                body = bodies
+                url { encodedPath = "/api/v1/notification/new-task" }
+                body = notification
             }
         }
 
@@ -143,22 +144,42 @@ fun Route.task() {
                 val userId = call.getPrincipal<AuthenticationPrincipal>().id
                 val taskId = call.getId<UUID>()
 
+                val task = service.closeTask(userId, taskId)
+
                 call.success(
                     message = "Задача успешно закрыта",
-                    data = service.closeTask(userId, taskId)
+                    data = task
                 )
+
+                if (task.parent.status.id != Status.Closed.value) return@patch
+
+                val receiver = task.creator.email ?: return@patch
+                val executorUsernames = service.getTaskExecutors(task.parent.id.asUUID()).map { it.username }
+                val notification =
+                    EmailNotification.CloseTask(receiver, task.title, executorUsernames, task.createdAt, task.dueDate)
+                client.post {
+                    url { encodedPath = "/api/v1/notification/close-task" }
+                    body = notification
+                }
             }
 
             patch("/delete") {
-                val userId = call.getPrincipal<AuthenticationPrincipal>().id
+                val user = call.getPrincipal<AuthenticationPrincipal>()
                 val taskId = call.getId<UUID>()
 
-                service.deleteTask(userId, taskId)
+                val executorEmails = service.getTaskExecutors(taskId).mapNotNull { it.email }
+                val task = service.deleteTask(user.id.asUUID(), taskId)
 
                 call.success(
                     message = "Задача успешно удалена",
                     data = mapOf("id" to taskId.toString())
                 )
+
+                val notification = executorEmails.map { EmailNotification.DeleteTask(it, task.title, user.username) }
+                client.post {
+                    url { encodedPath = "/api/v1/notification/delete-task" }
+                    body = notification
+                }
             }
         }
     }

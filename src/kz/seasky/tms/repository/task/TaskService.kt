@@ -15,6 +15,7 @@ import kz.seasky.tms.model.paging.Paging
 import kz.seasky.tms.model.paging.PagingResponse
 import kz.seasky.tms.model.statistics.Statistics
 import kz.seasky.tms.model.task.*
+import kz.seasky.tms.model.user.User
 import kz.seasky.tms.utils.FILE_DEFAULT_SIZE
 import kz.seasky.tms.utils.FileHelper
 import kz.seasky.tms.utils.asMiB
@@ -187,11 +188,10 @@ class TaskService(
     }
 
     @Suppress("NAME_SHADOWING")
-    suspend fun deleteTask(userId: String, taskId: UUID) {
+    suspend fun deleteTask(userId: UUID, taskId: UUID): Task {
         return transactionService.transaction {
-            val userId = userId.asUUID()
-
-            repository.delete(userId, taskId) ?: throw WarningException("А задание уже удалить нельзя, вот беда")
+            return@transaction repository.delete(userId, taskId)
+                ?: throw WarningException("Невозожно удалить, задание уже находится в процессе")
         }
     }
 
@@ -337,6 +337,12 @@ class TaskService(
             val currentTime = DateTime.now()
             val countsByStatus = repository.countAllByStatus(currentTime)
             return@transaction countsByStatus.extract()
+        }
+    }
+
+    suspend fun getTaskExecutors(taskId: UUID): List<User> {
+        return transactionService.transaction {
+            return@transaction repository.getTaskInstanceExecutorsByTaskId(taskId)
         }
     }
 
